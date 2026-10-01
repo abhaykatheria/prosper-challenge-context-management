@@ -34,6 +34,13 @@ MODEL = "jev-latest"
 PRICE_PER_M_INPUT = 0.042
 
 NONE_OPTION = "none of these"
+# Measured: 32,973 input tokens accepted, larger -> HTTP 400 max_tokens_exceeded.
+MAX_INPUT_TOKENS = 30_000
+CHARS_PER_TOKEN = 3.0  # calibrated on catalog.json: 45.6KB of JSON ~ 15.2k Jev tokens
+
+
+class ContextTooLarge(ValueError):
+    """Request would exceed Jev's input window; callers fall back to the local matcher."""
 
 
 class JevClient:
@@ -45,6 +52,9 @@ class JevClient:
 
     async def system_one(self, state, questions: dict) -> dict:
         body = {"model": MODEL, "state": state, "questions": questions}
+        est = len(json.dumps(body)) / CHARS_PER_TOKEN
+        if est > MAX_INPUT_TOKENS:  # fail fast instead of a guaranteed 400 round trip
+            raise ContextTooLarge(f"~{est:.0f} input tokens exceeds Jev's {MAX_INPUT_TOKENS} budget")
         key = json.dumps(body, sort_keys=True) if self.cache is not None else None
         if key is not None and key in self.cache:
             self.calls.append({"latency": 0.0, "input_tokens": self.cache[key].get("usage", {}).get("input_tokens", 0)})
@@ -82,6 +92,10 @@ class JevResolver:
     MIN_P = 0.12
     # Top option is "clear" above this, with no real runner-up.
     CLEAR_P = 0.75
+    # With only a shortlist in context the specificity answers run lower across the board
+    # (ambiguous requests <= 0.27, 53/61 clear ones >= 0.28 on the benchmark), so shortlist
+    # mode uses its own cut. Tuned on the benchmark; recalibrate on real call transcripts.
+    SHORTLIST_SPECIFIC_THRESHOLD = 0.28
 
     def __init__(self, engine: CatalogEngine, client: Optional[JevClient] = None, context: str = "full",
                  specific_threshold: float = 0.4):
@@ -110,23 +124,43 @@ class JevResolver:
         }
         self._prov_criteria[NONE_OPTION] = "No provider in the list matches who the caller described."
 
-    def _state(self, caller_said: str, extra: dict) -> dict:
+    def _state(self, caller_said: str, extra: dict, with_catalog: bool = True) -> dict:
         state = {"caller_said": caller_said, **{k: v for k, v in extra.items() if v is not None}}
-        if self.context == "full":
+        if self.context == "full" and with_catalog:
             state["clinic_catalog"] = catalog_context()
         return state
 
     # ---- appointment types -------------------------------------------------
     async def match_appointment_types(self, query: str, new_patient: Optional[bool] = None,
-                                      patient_age: Optional[int] = None) -> dict:
+                                      patient_age: Optional[int] = None,
+                                      shortlist: Optional[list] = None) -> dict:
+        """Resolve the caller's words to appointment types.
+
+        shortlist=None: choose among ALL types (+ full catalog as context in "full" mode).
+        shortlist=[...]: choose only among these (the hybrid resolver's retrieved
+        candidates); no catalog in context, so the request stays ~1-2k tokens at any
+        catalog size.
+        """
+        if shortlist:
+            criteria = {t.name: self._type_criteria[t.name] for t in shortlist}
+            criteria[NONE_OPTION] = self._type_criteria[NONE_OPTION]
+        else:
+            criteria = self._type_criteria
+        state = self._state(query, {"new_patient": new_patient, "patient_age_years": patient_age},
+                            with_catalog=not shortlist)
+        if shortlist:
+            # The yes/no specificity question reads `state`, not the choice's options.
+            # Without the catalog in state it can't see that several similar types exist
+            # ("MRI" looks specific), so list the candidates it is choosing between.
+            state["similar_appointment_types_offered"] = [t.name for t in shortlist]
         data = await self.client.system_one(
-            self._state(query, {"new_patient": new_patient, "patient_age_years": patient_age}),
+            state,
             {
                 "appointment_type": {
                     "type": "choice",
                     "instructions": "Which of this clinic's appointment types is the caller asking for? "
                                     "Spread probability across options if the request could reasonably mean several.",
-                    "criteria": self._type_criteria,
+                    "criteria": criteria,
                 },
                 # Jev's choice probabilities are peaky: on a genuinely ambiguous request it
                 # still commits to one option. A second question in the same call (answered
@@ -152,7 +186,8 @@ class JevResolver:
             return {"status": "no_match", "query": query, "candidates": []}
 
         types = [t for _, t in cands]
-        clear = (cands[0][0] >= self.CLEAR_P and specific >= self.specific_threshold
+        threshold = self.SHORTLIST_SPECIFIC_THRESHOLD if shortlist else self.specific_threshold
+        clear = (cands[0][0] >= self.CLEAR_P and specific >= threshold
                  and (len(cands) == 1 or cands[1][0] < self.MIN_P + 0.03))
         if not clear and len(types) == 1:
             # Not specific, but the choice question gave only one candidate: widen with
@@ -161,6 +196,11 @@ class JevResolver:
         question = None
         if not clear:
             group = self.e.confusable_group(types[0].id, {t.id for t in types})
+            if group is None and len(types) == 1:
+                # Jev says "not specific" but put all its mass on one option: use the
+                # curated sibling group of that option to form the clarifying question.
+                groups = sorted(self.e.c.group_by_type.get(types[0].id, []), key=lambda g: len(g["ids"]))
+                group = groups[0] if groups else None
             if group:
                 question = group["question"]
                 types = [t for t in types if t.id in group["ids"]] + [

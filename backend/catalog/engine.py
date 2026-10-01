@@ -117,10 +117,13 @@ class CatalogEngine:
         self.bookings: dict = {}         # confirmation -> booking dict
 
     # ---- appointment types -------------------------------------------------
-    def match_appointment_types(
-        self, query: str, new_patient: Optional[bool] = None, limit: int = 4,
-        patient_age: Optional[int] = None,
-    ) -> dict:
+    def rank_appointment_types(self, query: str, patient_age: Optional[int] = None) -> list:
+        """Every type, ranked by lexical similarity to the caller's words (best first).
+
+        Used directly as the hybrid resolver's retrieval step: its top few almost always
+        contain the right type even when the top-1 is wrong (recall@5 = 80/82 on the
+        matching benchmark), so it's a good shortlist for a smarter picker.
+        """
         scored = []
         for t in self.c.appointment_types.values():
             phrases = [t.name] + t.aliases
@@ -129,11 +132,18 @@ class CatalogEngine:
             s = max(s, 0.8 * _phrase_score(query, t.specialty))
             scored.append((s, t))
         scored.sort(key=lambda x: -x[0])
-
-        top = [(s, t) for s, t in scored if s >= 60][: limit + 6]
         if patient_age is not None:
-            top = self._apply_age(top, patient_age)
-        top = top[: limit + 2]
+            # Only relevant candidates take part: a pediatric type that merely exists in
+            # the catalog must not shadow the adult type the caller actually asked for.
+            relevant = [x for x in scored if x[0] >= 60]
+            scored = self._apply_age(relevant, patient_age) + [x for x in scored if x[0] < 60]
+        return scored
+
+    def match_appointment_types(
+        self, query: str, new_patient: Optional[bool] = None, limit: int = 4,
+        patient_age: Optional[int] = None,
+    ) -> dict:
+        top = [(s, t) for s, t in self.rank_appointment_types(query, patient_age) if s >= 60][: limit + 2]
         if not top:
             return {"status": "no_match", "query": query, "candidates": [],
                     "hint": "Ask the caller to describe the reason for the visit in other words."}

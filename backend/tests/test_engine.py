@@ -135,3 +135,50 @@ def test_jev_outage_falls_back_to_fuzzy(e, monkeypatch):
     # cascade: confident local match never calls Jev at all
     r = asyncio.run(_find_appointment_types(e, {"request": "knee mri"}, {"_resolver": "cascade"}))
     assert r["resolver"] == "fuzzy"
+
+
+def test_age_filter_only_uses_relevant_candidates(e):
+    assert e.match_appointment_types("urgent care", patient_age=8)["candidates"][0]["name"] == "Urgent Care Visit"
+
+
+@pytest.mark.parametrize("query,gold", [
+    ("my chest gets tight on stairs, seeing a heart specialist", "appt_020"),
+    ("my daughter has had a fever since last night", "appt_017"),
+    ("spy rometry test", "appt_079"),
+    ("I need some kind of scan", "appt_066"),
+])
+def test_retrieval_recall_for_hybrid(e, query, gold):
+    """The hybrid resolver relies on fuzzy *recall*: gold must be in the shortlist even
+    when fuzzy's top-1 is wrong."""
+    from catalog.tools import _shortlist
+    assert gold in {t.id for t in _shortlist(e, e.rank_appointment_types(query))}
+
+
+def test_hybrid_fast_path_and_oversize_fallback(e, monkeypatch):
+    import asyncio
+    import catalog.jev as jev
+    from catalog.tools import _find_appointment_types
+
+    class Never:
+        async def match_appointment_types(self, *a, **k):
+            raise AssertionError("fast path must not call Jev")
+
+    monkeypatch.setattr(jev, "get_resolver", lambda engine, context="full": Never())
+    r = asyncio.run(_find_appointment_types(e, {"request": "pacemaker check"}, {"_resolver": "hybrid"}))
+    assert r["resolver"] == "fuzzy" and r["candidates"][0]["name"] == "Pacemaker Check"
+
+    class Oversize:
+        async def match_appointment_types(self, *a, **k):
+            raise jev.ContextTooLarge("too big")
+
+    monkeypatch.setattr(jev, "get_resolver", lambda engine, context="full": Oversize())
+    r = asyncio.run(_find_appointment_types(e, {"request": "I need an MRI"}, {"_resolver": "hybrid"}))
+    assert r["resolver"] == "fuzzy_fallback"
+
+
+def test_jev_client_refuses_oversized_requests():
+    import asyncio
+    import catalog.jev as jev
+    client = jev.JevClient(api_key="unused")
+    with pytest.raises(jev.ContextTooLarge):
+        asyncio.run(client.system_one("x" * 120_000, {}))

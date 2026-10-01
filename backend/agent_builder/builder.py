@@ -102,8 +102,8 @@ class AgentBuilder:
         names = set(self._nodes_by_name)
         if not names:
             return ["Agent has no nodes."]
-        if self.config.resolver not in ("fuzzy", "jev", "cascade"):
-            errors.append(f"Unknown resolver '{self.config.resolver}' (use 'fuzzy', 'jev' or 'cascade').")
+        if self.config.resolver not in ("fuzzy", "jev", "cascade", "hybrid"):
+            errors.append(f"Unknown resolver '{self.config.resolver}' (use fuzzy, jev, cascade or hybrid).")
         if self.config.initial_node not in names:
             errors.append(f"initial_node '{self.config.initial_node}' is not a defined node.")
         for node in self.config.nodes:

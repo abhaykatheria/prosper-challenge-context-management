@@ -68,20 +68,21 @@ async def run(resolver_name: str, items: list, engine: CatalogEngine, concurrenc
             out.append({**it, "result": r, "latency": time.perf_counter() - t0, "tokens": 0})
         return out
 
-    if resolver_name == "cascade":
+    if resolver_name in ("cascade", "hybrid"):
+        # Run through the production tool path; sequential so each lookup's Jev usage
+        # (zero, one or two calls) is attributed exactly.
+        from catalog.jev import get_resolver
         from catalog.tools import _find_appointment_types
-        sem = asyncio.Semaphore(concurrency)
-
-        async def one_c(it):
-            async with sem:
-                state = {"_resolver": "cascade"}
-                t0 = time.perf_counter()
-                r = await _find_appointment_types(engine, {"request": it["text"]}, state)
-                dt = time.perf_counter() - t0
-                return {**it, "result": r, "latency": dt,
-                        "tokens": 21805 if r.get("resolver") == "jev" else 0}
-
-        return await asyncio.gather(*[one_c(it) for it in items])
+        calls = get_resolver(engine).client.calls
+        out = []
+        for it in items:
+            n0 = len(calls)
+            t0 = time.perf_counter()
+            r = await _find_appointment_types(engine, {"request": it["text"]}, {"_resolver": resolver_name})
+            dt = time.perf_counter() - t0
+            out.append({**it, "result": r, "latency": dt, "jev_calls": len(calls) - n0,
+                        "tokens": sum(c["input_tokens"] for c in calls[n0:])})
+        return out
 
     context = "full" if resolver_name == "jev_full" else "options"
     res = JevResolver(engine, context=context)
@@ -99,7 +100,7 @@ async def run(resolver_name: str, items: list, engine: CatalogEngine, concurrenc
 
 async def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--only", default="fuzzy,jev_options,jev_full,cascade")
+    ap.add_argument("--only", default="fuzzy,jev_options,jev_full,cascade,hybrid")
     ap.add_argument("--concurrency", type=int, default=4)
     ap.add_argument("--verbose", action="store_true")
     args = ap.parse_args()
@@ -126,6 +127,7 @@ async def main():
             "p50_ms": round(statistics.median(lat) * 1000, 1),
             "p95_ms": round(sorted(lat)[int(len(lat) * 0.95) - 1] * 1000, 1),
             "avg_input_tokens": round(tokens / len(rows)),
+            "jev_call_rate": round(sum(r.get("jev_calls", 0 if name == "fuzzy" else 1) for r in rows) / len(rows), 2),
             "cost_per_lookup": cost_usd(tokens) / len(rows),
         }
         if args.verbose:

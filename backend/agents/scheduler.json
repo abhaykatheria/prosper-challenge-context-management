@@ -281,5 +281,5 @@
       "end": true
     }
   ],
-  "resolver": "cascade"
+  "resolver": "hybrid"
 }

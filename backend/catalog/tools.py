@@ -58,6 +58,8 @@ def _bool(state: dict, key: str) -> Optional[bool]:
 
 JEV_TIMEOUT_S = 1.5
 CASCADE_MIN_SCORE = 90
+HYBRID_K = 12        # fuzzy candidates handed to Jev (recall@12 = 81/82 on the benchmark)
+HYBRID_MAX = 30      # cap after adding confusable-group siblings
 
 
 def _age(e: CatalogEngine, s: dict) -> Optional[int]:
@@ -70,9 +72,59 @@ def _age(e: CatalogEngine, s: dict) -> Optional[int]:
     return t.year - dob.year - ((t.month, t.day) < (dob.month, dob.day))
 
 
+def _shortlist(e: CatalogEngine, ranked: list) -> list:
+    """Top-K fuzzy candidates plus their confusable siblings, so Jev can still surface
+    an ambiguity ("which MRI?") even if fuzzy ranked only one sibling highly."""
+    ids = [t.id for _, t in ranked[:HYBRID_K]]
+    for i in list(ids):
+        for g in e.c.group_by_type.get(i, []):
+            ids += [j for j in g["ids"] if j not in ids]
+    return [e.c.appointment_types[i] for i in ids[:HYBRID_MAX]]
+
+
+async def _hybrid(e: CatalogEngine, request: str, new_patient: Optional[bool], age: Optional[int]) -> dict:
+    """Fuzzy retrieves, Jev decides.
+
+    Fuzzy's weakness is ranking, not recall (the right type is in its top 5 for 80/82
+    benchmark phrasings), and Jev's weakness is context size (32k cap). So fuzzy narrows
+    the catalog to a shortlist locally, and Jev picks within it with ~1-2k tokens of
+    context, whatever the catalog size.
+    """
+    from .jev import get_resolver
+    ranked = e.rank_appointment_types(request, age)
+    top = ranked[0][1]
+    if ranked[0][0] >= 99 and ranked[1][0] < 97 and not e.c.group_by_type.get(top.id):
+        # Exact name/alias hit on a type with no confusable siblings: nothing for a model
+        # to add, skip the network call. (Generic aliases like "skin check" or "blood test"
+        # belong to confusable groups, so they still go to Jev.)
+        local = e.match_appointment_types(request, new_patient=new_patient, patient_age=age)
+        local["resolver"] = "fuzzy"
+        return local
+    jev = get_resolver(e)
+    shortlist = _shortlist(e, ranked)
+    result = await asyncio.wait_for(
+        jev.match_appointment_types(request, new_patient, age, shortlist=shortlist), JEV_TIMEOUT_S)
+    result["resolver"], result["shortlist_size"] = "hybrid", len(shortlist)
+    if result["status"] == "no_match":
+        # Escape hatch for zero-lexical-overlap requests ("I keep forgetting things"):
+        # one call over every option. At catalog sizes past Jev's window this raises
+        # ContextTooLarge and degrades to fuzzy (or becomes a specialty->type two-stage).
+        result = await asyncio.wait_for(jev.match_appointment_types(request, new_patient, age), JEV_TIMEOUT_S)
+        result["resolver"] = "hybrid_escape"
+    return result
+
+
 async def _find_appointment_types(e: CatalogEngine, a: dict, s: dict) -> dict:
     new_patient = _bool(s, "new_patient")
     age = _age(e, s)
+    if s.get("_resolver") == "hybrid":
+        try:
+            return await _hybrid(e, a["request"], new_patient, age)
+        except Exception as ex:  # outage/timeout/oversize must not break the call
+            logger.warning(f"Jev unavailable ({ex!r}); falling back to fuzzy matcher")
+            result = e.match_appointment_types(a["request"], new_patient=new_patient, patient_age=age)
+            result["resolver"] = "fuzzy_fallback"
+            return result
     if s.get("_resolver") == "cascade":
         # Fast path: accept the local matcher when it's lexically confident; only the
         # long tail (paraphrases, symptoms, odd STT output) pays Jev's ~400ms.

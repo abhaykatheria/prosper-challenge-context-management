@@ -44,10 +44,11 @@ When your goal is done (booked and confirmed, or clearly impossible), or the ass
 
 
 def agent_config(kind: str, model: str) -> dict:
-    if kind in ("ours", "ours_jev", "ours_cascade"):
+    if kind in ("ours", "ours_jev", "ours_cascade", "ours_hybrid"):
         cfg = json.loads((HERE.parent / "agents" / "scheduler.json").read_text())
         cfg["model"] = model
-        cfg["resolver"] = {"ours": "fuzzy", "ours_jev": "jev", "ours_cascade": "cascade"}[kind]
+        cfg["resolver"] = {"ours": "fuzzy", "ours_jev": "jev", "ours_cascade": "cascade",
+                           "ours_hybrid": "hybrid"}[kind]
         return cfg
     return naive_agent(guarded=(kind == "naive_guarded"), model=model)
 

@@ -205,8 +205,9 @@ The obvious counter-argument to this design is: *a better model with the whole
 catalog in context would be simpler.* For an LLM that's too slow and expensive
 per turn (§3). [Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev)
 (TypeSafe AI) changes the economics: it doesn't generate text, it answers typed
-questions (pick one of N options, with a probability per option), takes 32k
-tokens of context, answers in ~0.3–0.5s, and costs $0.042 per 1M input tokens.
+questions (pick one of N options, with a probability per option), takes up to
+~32k input tokens (measured: 32,973 accepted, more returns `400
+max_tokens_exceeded`), answers in ~0.3–0.5s, and costs $0.042 per 1M input tokens.
 So sending the **entire catalog on every lookup costs ~$0.0009**, and its
 output can't name an appointment type that doesn't exist.
 
@@ -218,15 +219,16 @@ drop-in for the fuzzy matcher. The solver, repairs and guards are unchanged.
 deliberately *not* taken from my alias list: 20 direct, 44 indirect
 descriptions, 10 STT garbles, 8 genuinely ambiguous, 5 not offered, 3 vague):
 
-| resolver | correct | asked a clarifying Q (safe) | committed on an ambiguous request | wrong | indirect | p50 latency | $/lookup |
-|---|---|---|---|---|---|---|---|
-| fuzzy + aliases | 64 | 8 | 3 | **15** | 27/44 | 2 ms | 0 |
-| Jev, option list only | 79 | 5 | 4 | 2 | 40/44 | 272 ms | $0.0003 |
-| **Jev, full catalog** | 76 | 13 | **0** | **1** | 32/44* | 399 ms | $0.0009 |
-| cascade (fuzzy if confident, else Jev) | 74 | 11 | 3 | 2 | 33/44 | 2 ms / 396 ms | $0.0006 |
+| resolver | correct | asked a clarifying Q (safe) | committed on an ambiguous request | wrong | ambiguous handled | p50 latency | Jev input tokens | $/lookup |
+|---|---|---|---|---|---|---|---|---|
+| fuzzy + aliases | 64 | 8 | 3 | **15** | 4/8 | 3 ms | 0 | 0 |
+| Jev, option list only | 68 | 16 | 4 | 2 | 2/8 | 285 ms | 6,930 | $0.0003 |
+| Jev, full catalog † | 69 (68–70) | 20 | **0** | **1** | **7/8** | 405 ms | 21,805 | $0.0009 |
+| cascade (fuzzy if confident, else full-catalog Jev) | 69 | 16 | 3 | 2 | 4/8 | 389 ms | 14,780 | $0.0006 |
+| **hybrid (fuzzy shortlist → Jev picks)** † | **79.7 (79–80)** | 6 | 2 (1–3) | 2 | 4–6/8 | **260 ms** | **3,041** | **$0.00013** |
 
-\* Most of the remaining "indirect" items are *asked*, not wrong (e.g. "my
-daughter has a fever": pediatric sick visit or urgent care?).
+† Mean [range] over 3 runs: Jev's answers vary slightly from run to run, so single
+runs differ by a few points. Other rows are single runs (fuzzy is deterministic).
 
 What I learned:
 
@@ -251,7 +253,8 @@ caller only describes symptoms):
 |---|---|---|---|
 | fuzzy | 100% (40/40) | 0 | $0.0063 |
 | Jev, full catalog | 98% (39/40) | 0 | $0.0075 |
-| cascade | 100% (20/20) | 0 | $0.0065 (Jev on 12 of ~23 lookups) |
+| cascade | 98% (39/40) | 0 | $0.0065 (0.55 Jev calls/conv, ~500 ms each) |
+| **hybrid** | **100% (40/40)** | **0** | $0.0066 (1.07 Jev calls/conv, ~330 ms, $0.00016 of it Jev) |
 
 The isolated gap almost vanishes end to end, and the reason matters for the
 design: **the conversational LLM already normalises language before the
@@ -262,13 +265,44 @@ that fuzzy *and* Jev shared and that are now fixed for both: neither used the
 the adult sick visit), and the confirm step could say "you're booked" without
 calling `book_appointment`.
 
-**Decision:** default to the **cascade**. The local matcher answers confident
-requests in ~2 ms; only the long tail (paraphrases, symptoms, odd STT output)
-pays Jev's ~400 ms. If Jev errors or exceeds 1.5 s, the lookup degrades to the
-fuzzy result (tested), so a third-party outage can't take down the phone line.
-The resolver is a per-agent setting in the builder UI. At catalog sizes past
-Jev's 255-option limit, the same interface takes Jev's documented two-stage
-choice (specialty, then type).
+**Why full-catalog context doesn't scale, and what does.** Our catalog already
+uses 21.8k of Jev's ~32k window; about 1.5× this catalog would not fit. I looked
+at sharding the context by region: all 8 sample locations are in one city (so a
+city split is a no-op), 34/50 providers work at several locations (they repeat
+across location shards), and the location is usually unknown when the service is
+resolved, especially for "soonest anywhere". Region is still a sensible *outer*
+filter for a multi-city system, but it doesn't solve the problem inside one region.
+
+The measurement that settled it: **fuzzy matching's weakness is ranking, not
+recall.** The right type is in fuzzy's top 5 for 80/82 benchmark phrasings (top
+15: 81/82). So the **hybrid** resolver lets each component do what it's good at:
+
+1. fuzzy ranks every type locally (~3 ms) and keeps a shortlist: top 12 plus their
+   confusable siblings, so "which MRI?" can still be asked;
+2. an exact match on a type with no confusable siblings skips Jev entirely;
+3. otherwise Jev picks within the shortlist, with only those options and the
+   patient facts in context (~2.8k tokens instead of 21.8k, the same at any
+   catalog size), plus the same-call specificity question;
+4. if Jev answers "none of these" (zero lexical overlap, e.g. "I keep forgetting
+   things"), one escape-hatch call over every option;
+5. a size check refuses any request over 30k tokens before sending it, and any Jev
+   error, timeout or oversize degrades to the fuzzy result (tested).
+
+With only the shortlist in context, the specificity scores run lower across the
+board, so shortlist mode uses its own threshold (0.28). Like the 0.4 threshold,
+it was tuned on this benchmark and would be recalibrated on real call transcripts.
+
+**Decision:** default to **hybrid**. It gets the most right on the first try
+(~80/90 vs 69), asks ~14 fewer unnecessary questions, is ~35% faster and ~7×
+cheaper than full-catalog Jev, passed 40/40 end to end, and its Jev context
+doesn't grow with the catalog. Its known weakness: on genuinely ambiguous
+requests it still commits in ~2 of 8 cases where full-catalog Jev always asks
+(the specificity signal is weaker without the whole catalog in view). The next
+step would be to always ask the curated clarifying question when a confusable
+sibling of the top pick carries meaningful probability, and to calibrate on real
+call transcripts. The resolver remains a per-agent setting in the builder UI
+(fuzzy, jev, cascade, hybrid). Past Jev's 255-option limit, step 4 becomes Jev's
+documented two-stage choice (specialty, then type).
 
 ## 4. Trade-offs and alternatives considered
 
@@ -309,7 +343,8 @@ as the bot, per the "keep the prebuilt client" scope decision):
 
 ## 6. Scoping — what I built, mocked, or left out
 
-* **Built:** Jev resolver experiment (benchmark, end-to-end eval, cascade),
+* **Built:** Jev resolver experiment (benchmark, end-to-end eval, cascade,
+  hybrid fuzzy-shortlist → Jev resolver as the default),
   catalog engine + tests, enrichment layer, tool/guard layer, graph
   schema extensions (tools, guards, context reset, prefetch), scheduling agent,
   text runner, simulated-caller eval with ablation, builder UI with live trace

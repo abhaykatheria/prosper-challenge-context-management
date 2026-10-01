@@ -206,7 +206,8 @@ function renderAgentPane() {
     <select onchange="agent.resolver=this.value;markDirty()">
       <option value="fuzzy" ${(agent.resolver || 'fuzzy') === 'fuzzy' ? 'selected' : ''}>Fuzzy + aliases (local, ~2ms)</option>
       <option value="jev" ${agent.resolver === 'jev' ? 'selected' : ''}>Jev by TypeSafe, full catalog (~400ms, falls back to fuzzy)</option>
-      <option value="cascade" ${agent.resolver === 'cascade' ? 'selected' : ''}>Cascade: fuzzy when confident, else Jev (recommended)</option>
+      <option value="cascade" ${agent.resolver === 'cascade' ? 'selected' : ''}>Cascade: fuzzy when confident, else Jev with full catalog</option>
+      <option value="hybrid" ${agent.resolver === 'hybrid' ? 'selected' : ''}>Hybrid: fuzzy shortlist, Jev picks (scales past Jev's 32k window)</option>
     </select>
     <label>Initial node</label>
     <select onchange="agent.initial_node=this.value;markDirty();renderGraph()">${agent.nodes.map(n => `<option ${n.name === agent.initial_node ? 'selected' : ''}>${esc(n.name)}</option>`).join('')}</select>
