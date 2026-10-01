@@ -1,0 +1,510 @@
+[
+ {
+  "group": "direct",
+  "kind": "clear",
+  "gold": [
+   "appt_015"
+  ],
+  "text": "I\u2019d like to make a routine checkup appointment for my child with a pediatrician."
+ },
+ {
+  "group": "indirect",
+  "kind": "clear",
+  "gold": [
+   "appt_040"
+  ],
+  "text": "I\u2019ve never been seen here before and need to schedule an appointment because I\u2019m having some women\u2019s health concerns."
+ },
+ {
+  "group": "stt_garbled",
+  "kind": "clear",
+  "gold": [
+   "appt_069"
+  ],
+  "text": "Hi, I need to book a bone dentisty scan and I think I need a referral and an imaging sight, can you help with that?"
+ },
+ {
+  "group": "direct",
+  "kind": "clear",
+  "gold": [
+   "appt_072"
+  ],
+  "text": "I\u2019d like to make an appointment to get some blood work done."
+ },
+ {
+  "group": "indirect",
+  "kind": "clear",
+  "gold": [
+   "appt_013"
+  ],
+  "text": "I'm planning a trip abroad soon and want to make sure I have the right protection for my health before I go."
+ },
+ {
+  "group": "stt_garbled",
+  "kind": "clear",
+  "gold": [
+   "appt_028"
+  ],
+  "text": "Hi, I\u2019d like to schedule a full buddy scan exam for a yearly checkup."
+ },
+ {
+  "group": "direct",
+  "kind": "clear",
+  "gold": [
+   "appt_058"
+  ],
+  "text": "I need to schedule a follow-up appointment to check my thyroid."
+ },
+ {
+  "group": "ambiguous",
+  "kind": "ambiguous",
+  "gold": [
+   "appt_062",
+   "appt_063",
+   "appt_064",
+   "appt_065",
+   "appt_066",
+   "appt_067"
+  ],
+  "text": "My doctor asked me to get some imaging done for ongoing abdominal pain, and I have a referral that I need to schedule at your clinic.",
+  "relabel": "generated for appt_067, but text does not single it out"
+ },
+ {
+  "group": "stt_garbled",
+  "kind": "clear",
+  "gold": [
+   "appt_061"
+  ],
+  "text": "Hi, I need to book a medication mannequin appointment for my cycle logic check-in, I'm an existing patient."
+ },
+ {
+  "group": "direct",
+  "kind": "clear",
+  "gold": [
+   "appt_030"
+  ],
+  "text": "I need to book a follow-up appointment for my acne treatment."
+ },
+ {
+  "group": "indirect",
+  "kind": "clear",
+  "gold": [
+   "appt_000"
+  ],
+  "text": "I\u2019m a new patient and I\u2019d like to make an appointment because I have some ongoing pain that I\u2019d like to talk about with the doctor."
+ },
+ {
+  "group": "stt_garbled",
+  "kind": "clear",
+  "gold": [
+   "appt_039"
+  ],
+  "text": "Hi, I need to book a mammary evaluation for some memory troubles and I have been told I need a refill."
+ },
+ {
+  "group": "direct",
+  "kind": "clear",
+  "gold": [
+   "appt_005"
+  ],
+  "text": "I need to book a follow-up appointment to talk about my results or treatment plan."
+ },
+ {
+  "group": "indirect",
+  "kind": "clear",
+  "gold": [
+   "appt_007"
+  ],
+  "text": "I\u2019m not feeling well and have developed a cough and a fever."
+ },
+ {
+  "group": "stt_garbled",
+  "kind": "clear",
+  "gold": [
+   "appt_018"
+  ],
+  "text": "Hi, I need to schedule a school fiscal for my child to get their paperwork completed."
+ },
+ {
+  "group": "direct",
+  "kind": "clear",
+  "gold": [
+   "appt_057"
+  ],
+  "text": "I need to book a diabetes check-up appointment."
+ },
+ {
+  "group": "ambiguous",
+  "kind": "ambiguous",
+  "gold": [
+   "appt_004",
+   "appt_005",
+   "appt_006"
+  ],
+  "text": "I need to discuss how I\u2019ve been feeling since my last visit and get some advice on managing my ongoing symptoms.",
+  "relabel": "generated for appt_006, but text does not single it out"
+ },
+ {
+  "group": "stt_garbled",
+  "kind": "clear",
+  "gold": [
+   "appt_075"
+  ],
+  "text": "Hi, I need to book a general ex-am with a Dennis."
+ },
+ {
+  "group": "direct",
+  "kind": "clear",
+  "gold": [
+   "appt_068"
+  ],
+  "text": "I\u2019d like to book a mammogram for breast cancer screening."
+ },
+ {
+  "group": "ambiguous",
+  "kind": "ambiguous",
+  "gold": [
+   "appt_062",
+   "appt_063",
+   "appt_064",
+   "appt_065",
+   "appt_066",
+   "appt_067"
+  ],
+  "text": "I've been having ongoing headaches and dizziness, and my doctor said I need to have some special pictures taken of my head, so I need help booking that and getting a referral.",
+  "relabel": "generated for appt_063, but text does not single it out"
+ },
+ {
+  "group": "stt_garbled",
+  "kind": "clear",
+  "gold": [
+   "appt_043"
+  ],
+  "text": "Hi, I need to book an appointment for a pap smear, it's for a cervical candles screening test."
+ },
+ {
+  "group": "direct",
+  "kind": "clear",
+  "gold": [
+   "appt_031"
+  ],
+  "text": "I'd like to book an appointment to talk about cosmetic skin treatments."
+ },
+ {
+  "group": "indirect",
+  "kind": "clear",
+  "gold": [
+   "appt_074"
+  ],
+  "text": "I'd like to schedule a visit to have my teeth checked and polished because it's been a while since my last one."
+ },
+ {
+  "group": "stt_garbled",
+  "kind": "clear",
+  "gold": [
+   "appt_020"
+  ],
+  "text": "Hi, I need to book a heart ology consolation and I have a refill letter."
+ },
+ {
+  "group": "direct",
+  "kind": "clear",
+  "gold": [
+   "appt_076"
+  ],
+  "text": "I\u2019d like to make an appointment for a first-time dental checkup and x-rays."
+ },
+ {
+  "group": "indirect",
+  "kind": "clear",
+  "gold": [
+   "appt_025"
+  ],
+  "text": "My doctor said I need a routine checkup for my heart device and I was told I need a referral for it."
+ },
+ {
+  "group": "stt_garbled",
+  "kind": "clear",
+  "gold": [
+   "appt_016"
+  ],
+  "text": "Hi, I need to schedule a new barn visit for my baby\u2019s first checkups."
+ },
+ {
+  "group": "direct",
+  "kind": "clear",
+  "gold": [
+   "appt_022"
+  ],
+  "text": "I need to book a stress test for my heart and I have a referral."
+ },
+ {
+  "group": "indirect",
+  "kind": "clear",
+  "gold": [
+   "appt_051"
+  ],
+  "text": "I've been having trouble hearing clearly and would like to get it checked."
+ },
+ {
+  "group": "stt_garbled",
+  "kind": "clear",
+  "gold": [
+   "appt_024"
+  ],
+  "text": "Hi, I need to book an appointment for a Holder monitor sitting and I think I need a referral."
+ },
+ {
+  "group": "direct",
+  "kind": "clear",
+  "gold": [
+   "appt_032"
+  ],
+  "text": "I need to make an appointment to see a bone and joint doctor, and I have a referral."
+ },
+ {
+  "group": "indirect",
+  "kind": "clear",
+  "gold": [
+   "appt_080"
+  ],
+  "text": "I've been having frequent sneezing, itchy eyes, and trouble breathing, and my doctor said I need to see a specialist for it."
+ },
+ {
+  "group": "stt_garbled",
+  "kind": "clear",
+  "gold": [
+   "appt_004"
+  ],
+  "text": "Hi, I need to book a follow-up lizard with my provider for an existing tissue."
+ },
+ {
+  "group": "direct",
+  "kind": "clear",
+  "gold": [
+   "appt_021"
+  ],
+  "text": "I need to book an ultrasound of my heart and I have a referral."
+ },
+ {
+  "group": "ambiguous",
+  "kind": "ambiguous",
+  "gold": [
+   "appt_062",
+   "appt_063",
+   "appt_064",
+   "appt_065",
+   "appt_066",
+   "appt_067"
+  ],
+  "text": "My doctor said I need special imaging for ongoing abdominal pain and needs to send a referral\u2014can you help me schedule this at one of your locations?",
+  "relabel": "generated for appt_066, but text does not single it out"
+ },
+ {
+  "group": "stt_garbled",
+  "kind": "clear",
+  "gold": [
+   "appt_035"
+  ],
+  "text": "Hi, I need to book an ortho peed tick consult for a pre-surgickle visit and I think I need a referral."
+ },
+ {
+  "group": "direct",
+  "kind": "clear",
+  "gold": [
+   "appt_034"
+  ],
+  "text": "I need to book an appointment to check how my broken bone is healing."
+ },
+ {
+  "group": "ambiguous",
+  "kind": "ambiguous",
+  "gold": [
+   "appt_062",
+   "appt_063",
+   "appt_064",
+   "appt_065",
+   "appt_066",
+   "appt_067"
+  ],
+  "text": "I've been having ongoing back pain and my doctor said I need to get some imaging done, so I need help finding a place and getting a referral.",
+  "relabel": "generated for appt_064, but text does not single it out"
+ },
+ {
+  "group": "stt_garbled",
+  "kind": "clear",
+  "gold": [
+   "appt_036"
+  ],
+  "text": "Hi, I need to book a neural allergy consultation and I have a refill for it."
+ },
+ {
+  "group": "direct",
+  "kind": "clear",
+  "gold": [
+   "appt_029"
+  ],
+  "text": "I need to book an appointment to have a mole removed and I have a referral."
+ },
+ {
+  "group": "indirect",
+  "kind": "clear",
+  "gold": [
+   "appt_009"
+  ],
+  "text": "I need to talk to someone about the medications I'm currently taking to make sure everything is still right for me."
+ },
+ {
+  "group": "stt_garbled",
+  "kind": "clear",
+  "gold": [
+   "appt_019"
+  ],
+  "text": "Hi, I need to schedule a spork's fiscal for my child to get cleared for sports."
+ },
+ {
+  "group": "ambiguous",
+  "kind": "ambiguous",
+  "gold": [
+   "appt_000",
+   "appt_001"
+  ],
+  "text": "I\u2019d like to schedule a new patient appointment."
+ },
+ {
+  "group": "ambiguous",
+  "kind": "ambiguous",
+  "gold": [
+   "appt_001",
+   "appt_040",
+   "appt_076"
+  ],
+  "text": "Hi, I'd like to schedule a new patient appointment."
+ },
+ {
+  "group": "ambiguous",
+  "kind": "ambiguous",
+  "gold": [
+   "appt_072",
+   "appt_073"
+  ],
+  "text": "I need to make an appointment for some blood work."
+ },
+ {
+  "group": "ambiguous",
+  "kind": "ambiguous",
+  "gold": [
+   "appt_014",
+   "appt_035"
+  ],
+  "text": "I need to make an appointment before my surgery."
+ },
+ {
+  "group": "ambiguous",
+  "kind": "ambiguous",
+  "gold": [
+   "appt_074",
+   "appt_075",
+   "appt_076"
+  ],
+  "text": "I\u2019d like to schedule a dental appointment."
+ },
+ {
+  "group": "ambiguous",
+  "kind": "ambiguous",
+  "gold": [
+   "appt_026",
+   "appt_027",
+   "appt_028"
+  ],
+  "text": "I'd like to book an appointment to have my skin checked."
+ },
+ {
+  "group": "ambiguous",
+  "kind": "ambiguous",
+  "gold": [
+   "appt_015",
+   "appt_018",
+   "appt_019"
+  ],
+  "text": "I\u2019d like to schedule a physical for my child."
+ },
+ {
+  "group": "ambiguous",
+  "kind": "ambiguous",
+  "gold": [
+   "appt_002",
+   "appt_003"
+  ],
+  "text": "I need to schedule my yearly checkup."
+ },
+ {
+  "group": "ambiguous",
+  "kind": "ambiguous",
+  "gold": [
+   "appt_007",
+   "appt_008",
+   "appt_017"
+  ],
+  "text": "I need to make an appointment because someone isn\u2019t feeling well."
+ },
+ {
+  "group": "ambiguous",
+  "kind": "ambiguous",
+  "gold": [
+   "appt_010",
+   "appt_011",
+   "appt_012",
+   "appt_013"
+  ],
+  "text": "Hi, I'd like to make an appointment to get a shot or vaccine, please."
+ },
+ {
+  "group": "not_offered",
+  "kind": "not_offered",
+  "gold": [],
+  "text": "I need to see a urologist and I was told I need a referral\u2014can you help me with that?"
+ },
+ {
+  "group": "not_offered",
+  "kind": "not_offered",
+  "gold": [],
+  "text": "Hi, I'd like to schedule my ongoing physical therapy session."
+ },
+ {
+  "group": "not_offered",
+  "kind": "not_offered",
+  "gold": [],
+  "text": "I\u2019d like to schedule a basic eye exam to check my vision."
+ },
+ {
+  "group": "not_offered",
+  "kind": "not_offered",
+  "gold": [],
+  "text": "Hi, I\u2019d like to book an appointment to get fitted for contact lenses."
+ },
+ {
+  "group": "not_offered",
+  "kind": "not_offered",
+  "gold": [],
+  "text": "Hi, I'd like to schedule an appointment to get my eyes checked for cataracts because I need a referral."
+ },
+ {
+  "group": "vague",
+  "kind": "vague",
+  "gold": [],
+  "text": "I'd like to schedule an appointment, please."
+ },
+ {
+  "group": "vague",
+  "kind": "vague",
+  "gold": [],
+  "text": "I'd like to schedule an appointment, please."
+ },
+ {
+  "group": "vague",
+  "kind": "vague",
+  "gold": [],
+  "text": "I'd like to schedule an appointment, please."
+ }
+]
