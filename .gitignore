@@ -31,3 +31,5 @@ Thumbs.db
 .idea/
 .vscode/
 *.swp
+backend/sim/results/archive/
+backend/logs/

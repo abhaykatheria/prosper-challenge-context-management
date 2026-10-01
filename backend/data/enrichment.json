@@ -1,0 +1,1017 @@
+{
+  "_about": "Offline enrichment layer on top of catalog.json. Lay-language aliases improve recall from spoken requests; descriptions and confusable_groups drive disambiguation. In production this is generated once per catalog version by an LLM and reviewed by clinic staff - it is never produced at call time.",
+  "appointment_types": {
+    "appt_000": {
+      "aliases": [
+        "new patient appointment",
+        "establish care",
+        "first visit",
+        "new doctor",
+        "consult as a new patient",
+        "new patient consult"
+      ],
+      "description": "Longer first visit for a new patient who has a specific concern to discuss."
+    },
+    "appt_001": {
+      "aliases": [
+        "new patient appointment",
+        "establish care",
+        "first visit",
+        "new primary care",
+        "get a new doctor",
+        "become a patient"
+      ],
+      "description": "Standard first visit to establish care as a new patient."
+    },
+    "appt_002": {
+      "aliases": [
+        "physical",
+        "checkup",
+        "check-up",
+        "check up",
+        "yearly physical",
+        "annual exam",
+        "routine physical",
+        "annual checkup",
+        "general checkup"
+      ],
+      "description": "Yearly head-to-toe physical exam with family medicine."
+    },
+    "appt_003": {
+      "aliases": [
+        "wellness visit",
+        "wellness check",
+        "annual wellness",
+        "medicare wellness",
+        "yearly wellness",
+        "preventive visit",
+        "annual checkup"
+      ],
+      "description": "Yearly preventive planning visit with internal medicine (screenings and risk review; typically Medicare-style, not a hands-on physical)."
+    },
+    "appt_004": {
+      "aliases": [
+        "follow up",
+        "followup",
+        "check back in",
+        "come back",
+        "recheck",
+        "follow-up appointment"
+      ],
+      "description": "Short in-person follow-up on an existing issue with your provider."
+    },
+    "appt_005": {
+      "aliases": [
+        "follow up",
+        "followup",
+        "follow-up consult",
+        "results discussion",
+        "go over results"
+      ],
+      "description": "Follow-up focused on discussing results or a treatment plan."
+    },
+    "appt_006": {
+      "aliases": [
+        "video visit",
+        "virtual visit",
+        "telehealth",
+        "telemedicine",
+        "online appointment",
+        "phone follow up",
+        "virtual follow up"
+      ],
+      "description": "Video follow-up from home; existing patients only."
+    },
+    "appt_007": {
+      "aliases": [
+        "sick",
+        "not feeling well",
+        "cold",
+        "flu symptoms",
+        "fever",
+        "cough",
+        "sore throat",
+        "ill",
+        "same day sick"
+      ],
+      "description": "Visit for a new, non-emergency illness like a cold, cough or fever."
+    },
+    "appt_008": {
+      "aliases": [
+        "urgent care",
+        "urgent",
+        "same day",
+        "walk in",
+        "need to be seen today",
+        "minor injury",
+        "sprain",
+        "cut"
+      ],
+      "description": "Same-day visit for an urgent but non-life-threatening problem or minor injury."
+    },
+    "appt_009": {
+      "aliases": [
+        "medication review",
+        "review my meds",
+        "prescription review",
+        "medication check",
+        "refill review"
+      ],
+      "description": "Primary-care review of your current medications; existing patients only."
+    },
+    "appt_010": {
+      "aliases": [
+        "vaccine",
+        "vaccination",
+        "immunization",
+        "shots",
+        "shot",
+        "booster",
+        "tetanus",
+        "hpv",
+        "shingles vaccine"
+      ],
+      "description": "General vaccines such as tetanus, shingles, HPV or routine boosters."
+    },
+    "appt_011": {
+      "aliases": [
+        "flu shot",
+        "flu vaccine",
+        "influenza vaccine",
+        "flu jab"
+      ],
+      "description": "Seasonal influenza vaccine."
+    },
+    "appt_012": {
+      "aliases": [
+        "covid vaccine",
+        "covid shot",
+        "covid booster",
+        "coronavirus vaccine",
+        "covid-19"
+      ],
+      "description": "COVID-19 vaccine or booster."
+    },
+    "appt_013": {
+      "aliases": [
+        "travel vaccines",
+        "travel shots",
+        "travel clinic",
+        "going abroad",
+        "yellow fever",
+        "typhoid",
+        "travel consult"
+      ],
+      "description": "Consult for vaccines and medications before international travel."
+    },
+    "appt_014": {
+      "aliases": [
+        "pre-op",
+        "pre op",
+        "pre-op clearance",
+        "surgical clearance",
+        "medical clearance for surgery",
+        "clearance before surgery"
+      ],
+      "description": "Medical clearance from internal medicine before a scheduled surgery; needs a referral."
+    },
+    "appt_015": {
+      "aliases": [
+        "well child",
+        "kids checkup",
+        "child checkup",
+        "pediatric checkup",
+        "well baby",
+        "child physical",
+        "my son's checkup",
+        "my daughter's checkup",
+        "kid checkup",
+        "checkup for my kid",
+        "child",
+        "kid",
+        "my kid",
+        "checkup for my child"
+      ],
+      "description": "Routine checkup for a child with pediatrics."
+    },
+    "appt_016": {
+      "aliases": [
+        "newborn",
+        "baby's first visit",
+        "newborn checkup",
+        "infant visit",
+        "new baby"
+      ],
+      "description": "First checkups for a newborn baby."
+    },
+    "appt_017": {
+      "aliases": [
+        "sick child",
+        "kid is sick",
+        "child fever",
+        "pediatric sick",
+        "my child is sick",
+        "sick kid",
+        "my kid is sick",
+        "sick kid visit"
+      ],
+      "description": "Visit for a child who is sick."
+    },
+    "appt_018": {
+      "aliases": [
+        "school physical",
+        "school form",
+        "school checkup",
+        "school forms",
+        "back to school physical"
+      ],
+      "description": "Physical exam to complete school paperwork for a child."
+    },
+    "appt_019": {
+      "aliases": [
+        "sports physical",
+        "athletic physical",
+        "sports clearance",
+        "physical for sports",
+        "team physical"
+      ],
+      "description": "Physical clearance for a child to play sports."
+    },
+    "appt_020": {
+      "aliases": [
+        "heart doctor",
+        "cardiologist",
+        "cardiology",
+        "heart consult",
+        "chest pain",
+        "palpitations",
+        "heart problem"
+      ],
+      "description": "Consult with a cardiologist; needs a referral."
+    },
+    "appt_021": {
+      "aliases": [
+        "echo",
+        "heart ultrasound",
+        "echocardiogram",
+        "cardiac echo"
+      ],
+      "description": "Ultrasound of the heart; needs imaging, a referral, and is for existing patients."
+    },
+    "appt_022": {
+      "aliases": [
+        "stress test",
+        "treadmill test",
+        "cardiac stress test",
+        "exercise test"
+      ],
+      "description": "Heart test during exercise; needs a referral."
+    },
+    "appt_023": {
+      "aliases": [
+        "ekg",
+        "ecg",
+        "electrocardiogram",
+        "heart rhythm test",
+        "heart tracing"
+      ],
+      "description": "Quick heart-rhythm tracing; existing patients."
+    },
+    "appt_024": {
+      "aliases": [
+        "holter",
+        "heart monitor",
+        "holter monitor",
+        "wear a heart monitor",
+        "24 hour monitor"
+      ],
+      "description": "Fitting a wearable heart-rhythm monitor; needs a referral."
+    },
+    "appt_025": {
+      "aliases": [
+        "pacemaker",
+        "pacemaker check",
+        "device check",
+        "pacemaker interrogation"
+      ],
+      "description": "Routine pacemaker device check; needs a referral."
+    },
+    "appt_026": {
+      "aliases": [
+        "dermatologist",
+        "dermatology",
+        "skin doctor",
+        "skin problem",
+        "rash",
+        "eczema",
+        "psoriasis",
+        "skin consult"
+      ],
+      "description": "Consult with a dermatologist about a skin problem; needs a referral."
+    },
+    "appt_027": {
+      "aliases": [
+        "skin cancer screening",
+        "skin cancer check",
+        "check a mole",
+        "suspicious mole",
+        "melanoma check",
+        "spot check"
+      ],
+      "description": "Focused check of specific moles or spots for skin cancer."
+    },
+    "appt_028": {
+      "aliases": [
+        "full body skin exam",
+        "full skin check",
+        "body check",
+        "skin check",
+        "total body skin exam",
+        "mole check",
+        "annual skin check"
+      ],
+      "description": "Head-to-toe exam of all skin, typically yearly."
+    },
+    "appt_029": {
+      "aliases": [
+        "mole removal",
+        "remove a mole",
+        "cut out a mole",
+        "excision",
+        "skin tag removal",
+        "lesion removal"
+      ],
+      "description": "Minor procedure to remove a mole; needs a surgery-capable site and a referral."
+    },
+    "appt_030": {
+      "aliases": [
+        "acne",
+        "acne follow up",
+        "pimples",
+        "breakouts"
+      ],
+      "description": "Follow-up for ongoing acne treatment; existing patients."
+    },
+    "appt_031": {
+      "aliases": [
+        "cosmetic",
+        "botox",
+        "fillers",
+        "cosmetic dermatology",
+        "wrinkles",
+        "aesthetic"
+      ],
+      "description": "Consult about cosmetic skin treatments."
+    },
+    "appt_032": {
+      "aliases": [
+        "orthopedist",
+        "orthopedics",
+        "bone doctor",
+        "joint pain",
+        "knee pain",
+        "back pain",
+        "shoulder pain",
+        "hip pain",
+        "ortho",
+        "sports injury"
+      ],
+      "description": "Consult with an orthopedic specialist for bones and joints; needs a referral."
+    },
+    "appt_033": {
+      "aliases": [
+        "joint injection",
+        "cortisone shot",
+        "steroid injection",
+        "knee injection",
+        "shoulder injection",
+        "gel injection"
+      ],
+      "description": "Injection into a joint for pain; needs a referral."
+    },
+    "appt_034": {
+      "aliases": [
+        "fracture follow up",
+        "broken bone follow up",
+        "cast check",
+        "broken arm",
+        "broken leg"
+      ],
+      "description": "Follow-up after a broken bone."
+    },
+    "appt_035": {
+      "aliases": [
+        "pre-surgical",
+        "surgery consult",
+        "surgical consultation",
+        "talk about surgery",
+        "orthopedic surgery"
+      ],
+      "description": "Orthopedic consult to plan an upcoming surgery; needs a referral."
+    },
+    "appt_036": {
+      "aliases": [
+        "neurologist",
+        "neurology",
+        "nerve doctor",
+        "brain doctor",
+        "seizures",
+        "numbness",
+        "tingling"
+      ],
+      "description": "Consult with a neurologist; needs a referral."
+    },
+    "appt_037": {
+      "aliases": [
+        "eeg",
+        "brain wave test",
+        "electroencephalogram",
+        "seizure test"
+      ],
+      "description": "Brain-wave recording test; needs a referral."
+    },
+    "appt_038": {
+      "aliases": [
+        "headache",
+        "migraine",
+        "headache follow up",
+        "migraine follow up"
+      ],
+      "description": "Follow-up for ongoing headaches or migraines; existing patients."
+    },
+    "appt_039": {
+      "aliases": [
+        "memory",
+        "memory loss",
+        "dementia",
+        "forgetfulness",
+        "cognitive test",
+        "alzheimer's"
+      ],
+      "description": "Assessment for memory problems; needs a referral."
+    },
+    "appt_040": {
+      "aliases": [
+        "new gynecologist",
+        "new obgyn",
+        "first gyn visit",
+        "new ob gyn patient",
+        "women's health new patient"
+      ],
+      "description": "First visit with OB/GYN as a new patient."
+    },
+    "appt_041": {
+      "aliases": [
+        "well woman",
+        "gyn exam",
+        "gynecology checkup",
+        "annual gyn",
+        "women's annual exam",
+        "yearly gyn",
+        "pelvic exam"
+      ],
+      "description": "Yearly gynecological wellness exam."
+    },
+    "appt_042": {
+      "aliases": [
+        "prenatal",
+        "pregnancy visit",
+        "pregnant",
+        "ob visit",
+        "pregnancy checkup",
+        "expecting"
+      ],
+      "description": "Checkup during pregnancy."
+    },
+    "appt_043": {
+      "aliases": [
+        "pap smear",
+        "pap test",
+        "cervical screening",
+        "pap"
+      ],
+      "description": "Cervical cancer screening test."
+    },
+    "appt_044": {
+      "aliases": [
+        "birth control",
+        "contraception",
+        "iud",
+        "the pill",
+        "family planning"
+      ],
+      "description": "Consult about birth control options."
+    },
+    "appt_045": {
+      "aliases": [
+        "eye exam",
+        "eye doctor",
+        "vision test",
+        "eye check",
+        "eyes checked",
+        "new glasses"
+      ],
+      "description": "Basic eye and vision exam."
+    },
+    "appt_046": {
+      "aliases": [
+        "comprehensive eye exam",
+        "dilated eye exam",
+        "full eye exam"
+      ],
+      "description": "Full dilated eye health exam."
+    },
+    "appt_047": {
+      "aliases": [
+        "glaucoma",
+        "eye pressure test",
+        "glaucoma test"
+      ],
+      "description": "Screening for glaucoma; needs a referral."
+    },
+    "appt_048": {
+      "aliases": [
+        "contacts",
+        "contact lenses",
+        "contact lens fitting"
+      ],
+      "description": "Fitting for contact lenses."
+    },
+    "appt_049": {
+      "aliases": [
+        "cataract",
+        "cataracts",
+        "cloudy vision"
+      ],
+      "description": "Evaluation for cataracts; needs a referral."
+    },
+    "appt_050": {
+      "aliases": [
+        "ent",
+        "ear nose throat",
+        "ear nose and throat",
+        "otolaryngologist",
+        "ear problem",
+        "throat problem",
+        "ear infection"
+      ],
+      "description": "Consult with an ear, nose and throat specialist; needs a referral."
+    },
+    "appt_051": {
+      "aliases": [
+        "hearing test",
+        "audiogram",
+        "hearing check",
+        "hearing loss",
+        "can't hear well"
+      ],
+      "description": "Hearing test."
+    },
+    "appt_052": {
+      "aliases": [
+        "sinus",
+        "sinus infection",
+        "sinusitis",
+        "sinus problems",
+        "stuffy nose"
+      ],
+      "description": "Evaluation of sinus problems; needs a referral."
+    },
+    "appt_053": {
+      "aliases": [
+        "gi",
+        "gastroenterologist",
+        "stomach doctor",
+        "digestive",
+        "acid reflux",
+        "ibs",
+        "stomach problems"
+      ],
+      "description": "Consult with a gastroenterologist; needs a referral."
+    },
+    "appt_054": {
+      "aliases": [
+        "colonoscopy",
+        "colon screening",
+        "colon cancer screening"
+      ],
+      "description": "Consult to plan a colonoscopy; needs a referral."
+    },
+    "appt_055": {
+      "aliases": [
+        "endoscopy",
+        "upper endoscopy",
+        "scope",
+        "egd"
+      ],
+      "description": "Consult to plan an upper endoscopy; needs a referral."
+    },
+    "appt_056": {
+      "aliases": [
+        "endocrinologist",
+        "endocrinology",
+        "hormone doctor",
+        "hormones",
+        "gland"
+      ],
+      "description": "Consult with an endocrinologist; needs a referral."
+    },
+    "appt_057": {
+      "aliases": [
+        "diabetes",
+        "blood sugar",
+        "a1c",
+        "diabetes check",
+        "diabetic follow up",
+        "insulin"
+      ],
+      "description": "Ongoing diabetes care; existing patients."
+    },
+    "appt_058": {
+      "aliases": [
+        "thyroid",
+        "thyroid follow up",
+        "hypothyroid",
+        "hyperthyroid"
+      ],
+      "description": "Follow-up for a thyroid condition; existing patients."
+    },
+    "appt_059": {
+      "aliases": [
+        "psychiatrist",
+        "psychiatric evaluation",
+        "mental health evaluation",
+        "depression",
+        "anxiety",
+        "adhd evaluation",
+        "bipolar",
+        "mental health",
+        "mental health services",
+        "new mental health patient",
+        "see a psychiatrist",
+        "start therapy",
+        "start mental health care"
+      ],
+      "description": "First evaluation with psychiatry; needs a referral."
+    },
+    "appt_060": {
+      "aliases": [
+        "therapy",
+        "therapist",
+        "counseling",
+        "talk therapy",
+        "counselling",
+        "psychotherapy"
+      ],
+      "description": "Talk-therapy session with psychiatry; existing patients. Not physical therapy."
+    },
+    "appt_061": {
+      "aliases": [
+        "psych meds",
+        "medication management",
+        "adjust my medication",
+        "antidepressant",
+        "psychiatric medication",
+        "psychiatry follow up"
+      ],
+      "description": "Psychiatric medication check-in; existing patients."
+    },
+    "appt_062": {
+      "aliases": [
+        "x-ray",
+        "xray",
+        "x ray",
+        "radiograph",
+        "chest x-ray"
+      ],
+      "description": "X-ray imaging; needs an imaging site and a referral."
+    },
+    "appt_063": {
+      "aliases": [
+        "brain mri",
+        "head mri",
+        "mri of the brain",
+        "mri head"
+      ],
+      "description": "MRI of the brain; needs an imaging site and a referral."
+    },
+    "appt_064": {
+      "aliases": [
+        "spine mri",
+        "back mri",
+        "mri of the back",
+        "lumbar mri",
+        "neck mri",
+        "mri of the spine"
+      ],
+      "description": "MRI of the spine; needs an imaging site and a referral."
+    },
+    "appt_065": {
+      "aliases": [
+        "knee mri",
+        "mri of the knee",
+        "mri knee"
+      ],
+      "description": "MRI of the knee; needs an imaging site and a referral."
+    },
+    "appt_066": {
+      "aliases": [
+        "ct",
+        "ct scan",
+        "cat scan",
+        "computed tomography"
+      ],
+      "description": "CT scan; needs an imaging site and a referral."
+    },
+    "appt_067": {
+      "aliases": [
+        "ultrasound",
+        "sonogram",
+        "abdominal ultrasound"
+      ],
+      "description": "Ultrasound imaging; needs an imaging site and a referral."
+    },
+    "appt_068": {
+      "aliases": [
+        "mammogram",
+        "breast screening",
+        "breast cancer screening",
+        "mammo"
+      ],
+      "description": "Breast cancer screening imaging; no referral needed."
+    },
+    "appt_069": {
+      "aliases": [
+        "dexa",
+        "bone density",
+        "bone scan",
+        "osteoporosis screening"
+      ],
+      "description": "Bone density scan; needs an imaging site and a referral."
+    },
+    "appt_070": {
+      "aliases": [
+        "physical therapy",
+        "pt",
+        "physio",
+        "physiotherapy",
+        "pt evaluation",
+        "rehab"
+      ],
+      "description": "First physical therapy evaluation; needs a referral."
+    },
+    "appt_071": {
+      "aliases": [
+        "physical therapy session",
+        "pt session",
+        "physio session",
+        "rehab session"
+      ],
+      "description": "Ongoing physical therapy session."
+    },
+    "appt_072": {
+      "aliases": [
+        "blood work",
+        "blood test",
+        "labs",
+        "lab work",
+        "blood draw",
+        "get my blood drawn"
+      ],
+      "description": "Standard blood draw for lab tests; no fasting needed."
+    },
+    "appt_073": {
+      "aliases": [
+        "fasting blood test",
+        "fasting labs",
+        "cholesterol test",
+        "fasting glucose",
+        "lipid panel"
+      ],
+      "description": "Blood test that requires fasting beforehand (e.g. cholesterol, glucose)."
+    },
+    "appt_074": {
+      "aliases": [
+        "dental cleaning",
+        "teeth cleaning",
+        "cleaning",
+        "hygienist"
+      ],
+      "description": "Routine teeth cleaning."
+    },
+    "appt_075": {
+      "aliases": [
+        "dental exam",
+        "dentist",
+        "dental checkup",
+        "tooth pain",
+        "toothache",
+        "teeth checked"
+      ],
+      "description": "Dental exam with a dentist."
+    },
+    "appt_076": {
+      "aliases": [
+        "new dental patient",
+        "first dental visit",
+        "new patient dentist",
+        "new dentist"
+      ],
+      "description": "Longer first dental visit for new patients, including exam and x-rays."
+    },
+    "appt_077": {
+      "aliases": [
+        "urologist",
+        "urology",
+        "bladder",
+        "prostate",
+        "kidney stones"
+      ],
+      "description": "Consult with a urologist; needs a referral."
+    },
+    "appt_078": {
+      "aliases": [
+        "pulmonologist",
+        "lung doctor",
+        "pulmonology",
+        "breathing problems",
+        "asthma",
+        "copd",
+        "shortness of breath"
+      ],
+      "description": "Consult with a lung specialist; needs a referral."
+    },
+    "appt_079": {
+      "aliases": [
+        "spirometry",
+        "lung function test",
+        "breathing test",
+        "pulmonary function test",
+        "pft"
+      ],
+      "description": "Breathing test measuring lung function; needs a referral."
+    },
+    "appt_080": {
+      "aliases": [
+        "allergist",
+        "allergy",
+        "allergies",
+        "allergy doctor",
+        "hay fever",
+        "food allergy"
+      ],
+      "description": "Consult with an allergist; needs a referral."
+    },
+    "appt_081": {
+      "aliases": [
+        "allergy test",
+        "allergy testing",
+        "skin prick test",
+        "scratch test"
+      ],
+      "description": "Allergy skin testing; needs a referral."
+    }
+  },
+  "confusable_groups": [
+    {
+      "ids": [
+        "appt_000",
+        "appt_001"
+      ],
+      "question": "Would you like a standard new-patient visit to establish care, or a longer new-patient consultation about a specific concern?"
+    },
+    {
+      "ids": [
+        "appt_002",
+        "appt_003"
+      ],
+      "question": "Are you looking for a hands-on annual physical exam, or an annual wellness visit focused on preventive screenings and planning?"
+    },
+    {
+      "ids": [
+        "appt_004",
+        "appt_005",
+        "appt_006"
+      ],
+      "question": "Would you like an in-person follow-up, a follow-up to go over results, or a video follow-up from home?"
+    },
+    {
+      "ids": [
+        "appt_007",
+        "appt_008",
+        "appt_017"
+      ],
+      "question": "Is this for an adult or a child, and does it need to be seen today, or is it a regular sick visit?"
+    },
+    {
+      "ids": [
+        "appt_010",
+        "appt_011",
+        "appt_012",
+        "appt_013"
+      ],
+      "question": "Which vaccine do you need: a flu shot, a COVID vaccine, travel vaccines, or another routine vaccine?"
+    },
+    {
+      "ids": [
+        "appt_014",
+        "appt_035"
+      ],
+      "question": "Do you need medical clearance before a surgery that's already scheduled, or a consult with orthopedics to plan a surgery?"
+    },
+    {
+      "ids": [
+        "appt_015",
+        "appt_018",
+        "appt_019"
+      ],
+      "question": "Is this a routine well-child checkup, a school physical, or a sports physical?"
+    },
+    {
+      "ids": [
+        "appt_026",
+        "appt_027",
+        "appt_028"
+      ],
+      "question": "Do you want a quick check of a specific mole or spot, a full-body skin exam, or a consult about another skin problem?"
+    },
+    {
+      "ids": [
+        "appt_063",
+        "appt_064",
+        "appt_065"
+      ],
+      "question": "Which part of the body is the MRI for: brain, spine, or knee?"
+    },
+    {
+      "ids": [
+        "appt_062",
+        "appt_063",
+        "appt_064",
+        "appt_065",
+        "appt_066",
+        "appt_067"
+      ],
+      "question": "Which imaging test did your doctor order: an X-ray, MRI, CT scan, or ultrasound?"
+    },
+    {
+      "ids": [
+        "appt_045",
+        "appt_046"
+      ],
+      "question": "Do you need a basic vision exam, or a comprehensive dilated eye exam?"
+    },
+    {
+      "ids": [
+        "appt_009",
+        "appt_061"
+      ],
+      "question": "Is this a review of general medications with primary care, or psychiatric medication management?"
+    },
+    {
+      "ids": [
+        "appt_060",
+        "appt_071"
+      ],
+      "question": "Do you mean talk therapy with our mental health team, or physical therapy?"
+    },
+    {
+      "ids": [
+        "appt_072",
+        "appt_073"
+      ],
+      "question": "Did your doctor say you need to fast before the blood test?"
+    },
+    {
+      "ids": [
+        "appt_074",
+        "appt_075",
+        "appt_076"
+      ],
+      "question": "Is this your first visit with our dental team, and do you need a cleaning or an exam?"
+    },
+    {
+      "ids": [
+        "appt_001",
+        "appt_040",
+        "appt_076"
+      ],
+      "question": "Which team would you like to establish care with: primary care, OB/GYN, or dental?"
+    },
+    {
+      "ids": [
+        "appt_002",
+        "appt_041",
+        "appt_015"
+      ],
+      "question": "Is the checkup for an adult general physical, a women's well-woman exam, or a child?"
+    },
+    {
+      "ids": [
+        "appt_070",
+        "appt_071"
+      ],
+      "question": "Is this your first physical therapy visit, or a continuing session?"
+    }
+  ]
+}

@@ -7,3 +7,5 @@
 pipecat-ai[runner,webrtc,silero,elevenlabs,openai]>=1.4.0,<2
 # Pipecat Flows: node-graph conversations (used by flow_agent.py).
 pipecat-ai-flows>=1.3.0,<2
+rapidfuzz>=3.9,<4
+pytest>=8

@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prosper Agent Builder</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<style>
+  :root {
+    --bg: #0f1115; --panel: #171a21; --panel2: #1e222b; --line: #2a2f3a; --text: #e6e8ec;
+    --muted: #8b93a3; --accent: #5b8def; --ok: #3fb97f; --warn: #e3a33b; --bad: #e5534b; --tool: #b083f0;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 13px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif; background: var(--bg); color: var(--text); }
+  header { display: flex; gap: 8px; align-items: center; padding: 10px 14px; border-bottom: 1px solid var(--line); background: var(--panel); position: sticky; top: 0; z-index: 5; flex-wrap: wrap; }
+  header h1 { font-size: 15px; margin: 0 12px 0 0; font-weight: 600; }
+  select, input, textarea, button { font: inherit; color: var(--text); background: var(--panel2); border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; }
+  textarea { width: 100%; resize: vertical; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+  input[type=text] { width: 100%; }
+  button { cursor: pointer; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: white; }
+  button.call { background: var(--ok); border-color: var(--ok); color: #06140d; font-weight: 600; }
+  button.ghost { background: transparent; }
+  button.danger { color: var(--bad); }
+  .spacer { flex: 1; }
+  main { display: grid; grid-template-columns: minmax(360px, 1.1fr) minmax(360px, 1fr) minmax(380px, 1fr); gap: 10px; padding: 10px; height: calc(100vh - 54px); }
+  .col { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: auto; display: flex; flex-direction: column; min-height: 0; }
+  .col h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0; padding: 10px 12px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 8px; }
+  .pad { padding: 12px; }
+  #graph { padding: 8px; overflow: auto; flex: 1; }
+  #graph svg { max-width: 100%; height: auto; }
+  label { display: block; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .05em; margin: 12px 0 4px; }
+  .row { display: flex; gap: 8px; }
+  .row > * { flex: 1; }
+  .edge { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px 10px; margin-top: 8px; background: var(--panel2); }
+  .edge .row { align-items: center; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; cursor: pointer; user-select: none; color: var(--muted); }
+  .chip.on { border-color: var(--tool); color: var(--tool); background: rgba(176,131,240,.08); }
+  .tabs { display: flex; gap: 4px; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+  .tabs button { background: transparent; border-color: transparent; color: var(--muted); }
+  .tabs button.on { color: var(--text); border-color: var(--line); background: var(--panel2); }
+  #errors { color: var(--bad); white-space: pre-wrap; }
+  #toast { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); background: var(--panel2); border: 1px solid var(--line); padding: 8px 14px; border-radius: 8px; display: none; z-index: 10; }
+  iframe { width: 100%; height: 330px; border: 0; border-bottom: 1px solid var(--line); background: #000; flex: none; }
+  #trace { flex: 1; overflow: auto; padding: 8px 10px; font-size: 12px; }
+  .ev { padding: 5px 8px; border-left: 3px solid var(--line); margin: 4px 0; background: var(--panel2); border-radius: 0 6px 6px 0; word-break: break-word; }
+  .ev .k { font-size: 10px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-right: 6px; }
+  .ev.user { border-color: var(--accent); }
+  .ev.assistant { border-color: var(--ok); }
+  .ev.tool { border-color: var(--tool); }
+  .ev.action.ok { border-color: var(--ok); } .ev.action.bad { border-color: var(--bad); }
+  .ev.node { border-color: var(--warn); }
+  .ev details summary { cursor: pointer; }
+  .ev pre { margin: 4px 0 0; white-space: pre-wrap; font-size: 11px; color: var(--muted); max-height: 220px; overflow: auto; }
+  .stats { display: flex; gap: 14px; padding: 8px 12px; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; flex-wrap: wrap; }
+  .stats b { color: var(--text); } .stats span { color: var(--muted); }
+  .muted { color: var(--muted); }
+  .res { background: var(--panel2); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; margin-top: 8px; }
+  .pill { display: inline-block; font-size: 10px; padding: 1px 7px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); margin-left: 6px; text-transform: uppercase; }
+  @media (max-width: 1100px) { main { grid-template-columns: 1fr; height: auto; } .col { min-height: 420px; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Prosper Agent Builder</h1>
+  <select id="agentSel" title="Agent"></select>
+  <button class="ghost" onclick="newAgent(false)">New</button>
+  <button class="ghost" onclick="newAgent(true)">Duplicate</button>
+  <button class="ghost danger" onclick="deleteAgent()">Delete</button>
+  <span class="spacer"></span>
+  <span id="dirty" class="muted"></span>
+  <button class="primary" onclick="save()">Save</button>
+  <button class="call" onclick="testCall()">Test call</button>
+</header>
+
+<main>
+  <!-- column 1: graph -->
+  <section class="col">
+    <h2>Conversation graph <span class="muted" style="text-transform:none;letter-spacing:0">click a node to edit</span>
+      <span class="spacer"></span><button class="ghost" onclick="addNode()">+ Node</button></h2>
+    <div id="graph"></div>
+    <div class="pad muted" style="border-top:1px solid var(--line)">
+      Dashed nodes reset context (carry over a state summary only). Edges marked <b>guard</b> run a server-side policy check before transitioning. Purple = lookup tools.
+    </div>
+  </section>
+
+  <!-- column 2: editor -->
+  <section class="col">
+    <div class="tabs">
+      <button id="tabNode" class="on" onclick="tab('node')">Node</button>
+      <button id="tabAgent" onclick="tab('agent')">Agent settings</button>
+      <button id="tabJson" onclick="tab('json')">Raw JSON</button>
+      <button id="tabCatalog" onclick="tab('catalog')">Catalog search</button>
+    </div>
+    <div id="errors" class="pad" style="display:none"></div>
+    <div id="pane" class="pad"></div>
+  </section>
+
+  <!-- column 3: test call + trace -->
+  <section class="col">
+    <h2>Test call <span class="spacer"></span><button class="ghost" onclick="clearTrace()">Clear trace</button></h2>
+    <iframe id="client" allow="microphone; autoplay" src="about:blank"></iframe>
+    <div class="stats">
+      <span>Node <b id="sNode">–</b></span>
+      <span>LLM turns <b id="sTurns">0</b></span>
+      <span>Prompt tok (last) <b id="sLast">0</b></span>
+      <span>Total tok <b id="sTok">0</b></span>
+      <span>Cost <b id="sCost">$0.0000</b></span>
+      <span>Response time (last / avg) <b id="sLat">–</b></span>
+    </div>
+    <div id="trace"><div class="muted">Press <b>Test call</b>, then Connect in the client above. Tool calls, guard decisions, node transitions and token usage stream here live.</div></div>
+  </section>
+</main>
+<div id="toast"></div>
+
+<script>
+const API = '/builder/api';
+let agentId = null, agent = null, meta = {tools: {}, actions: {}}, selected = null, curTab = 'node', dirty = false;
+
+mermaid.initialize({ startOnLoad: false, theme: 'dark', securityLevel: 'loose', flowchart: { curve: 'basis' } });
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function toast(msg) { const t = $('toast'); t.textContent = msg; t.style.display = 'block'; clearTimeout(t._h); t._h = setTimeout(() => t.style.display = 'none', 2600); }
+function markDirty() { dirty = true; $('dirty').textContent = 'unsaved changes'; }
+
+async function api(path, opts = {}) {
+  const r = await fetch(API + path, { headers: {'Content-Type': 'application/json'}, ...opts });
+  const body = await r.json().catch(() => ({}));
+  if (!r.ok) throw body;
+  return body;
+}
+
+// ---------- loading ----------
+async function init() {
+  meta = await api('/meta');
+  await loadList();
+  pollTrace();
+}
+async function loadList(selectId) {
+  const list = await api('/agents');
+  $('agentSel').innerHTML = list.map(a => `<option value="${a.id}">${esc(a.name)}${a.active ? '  (active)' : ''}</option>`).join('');
+  const pick = selectId || (list.find(a => a.active) || list[0]).id;
+  $('agentSel').value = pick;
+  await loadAgent(pick);
+}
+$('agentSel').onchange = (e) => { if (dirty && !confirm('Discard unsaved changes?')) { e.target.value = agentId; return; } loadAgent(e.target.value); };
+async function loadAgent(id) {
+  agentId = id; agent = await api('/agents/' + id);
+  selected = agent.initial_node; dirty = false; $('dirty').textContent = ''; showErrors([]);
+  render();
+}
+
+// ---------- graph ----------
+function nodeByName(n) { return agent.nodes.find(x => x.name === n); }
+async function renderGraph() {
+  const lines = ['flowchart TD'];
+  for (const n of agent.nodes) {
+    const tools = (n.tools || []).length ? `<br/><span style='color:#b083f0;font-size:11px'>${(n.tools||[]).join('<br/>')}</span>` : '';
+    const label = `"<b>${n.name}</b>${n.end ? ' (end)' : ''}${tools}"`;
+    lines.push(n.context === 'reset' ? `  ${n.name}[/${label}/]` : `  ${n.name}[${label}]`);
+    lines.push(`  click ${n.name} call selectNode("${n.name}")`);
+  }
+  for (const n of agent.nodes) for (const e of (n.edges || [])) {
+    const lbl = e.function + (e.action ? ' · guard' : '');
+    lines.push(`  ${n.name} -->|${lbl}| ${e.target}`);
+    if (e.fallback_target) lines.push(`  ${n.name} -.->|${e.function} fails| ${e.fallback_target}`);
+  }
+  lines.push(`  classDef sel stroke:#5b8def,stroke-width:3px;`);
+  lines.push(`  classDef start fill:#1b3a2a,stroke:#3fb97f;`);
+  lines.push(`  classDef reset stroke-dasharray: 5 4;`);
+  lines.push(`  class ${agent.initial_node} start;`);
+  const resets = agent.nodes.filter(n => n.context === 'reset').map(n => n.name);
+  if (resets.length) lines.push(`  class ${resets.join(',')} reset;`);
+  if (selected && nodeByName(selected)) lines.push(`  class ${selected} sel;`);
+  try {
+    const { svg, bindFunctions } = await mermaid.render('g' + Date.now(), lines.join('\n'));
+    $('graph').innerHTML = svg; bindFunctions?.($('graph'));
+  } catch (err) { $('graph').innerHTML = `<div class="pad" style="color:var(--bad)">Graph error: ${esc(err.message || err)}</div>`; }
+}
+window.selectNode = (name) => { selected = name; tab('node'); renderGraph(); };
+
+// ---------- editor ----------
+function tab(t) {
+  curTab = t;
+  for (const k of ['node', 'agent', 'json', 'catalog']) $('tab' + k[0].toUpperCase() + k.slice(1)).classList.toggle('on', k === t);
+  renderPane();
+}
+function render() { renderGraph(); renderPane(); }
+function renderPane() {
+  if (curTab === 'agent') return renderAgentPane();
+  if (curTab === 'json') return renderJsonPane();
+  if (curTab === 'catalog') return renderCatalogPane();
+  renderNodePane();
+}
+
+function renderAgentPane() {
+  $('pane').innerHTML = `
+    <label>Name</label><input type="text" value="${esc(agent.name)}" oninput="agent.name=this.value;markDirty()">
+    <div class="row">
+      <div><label>LLM model</label><input type="text" value="${esc(agent.model || 'gpt-4o')}" oninput="agent.model=this.value;markDirty()"></div>
+      <div><label>ElevenLabs voice id</label><input type="text" value="${esc(agent.voice_id || '')}" oninput="agent.voice_id=this.value;markDirty()"></div>
+    </div>
+    <label>Initial node</label>
+    <select onchange="agent.initial_node=this.value;markDirty();renderGraph()">${agent.nodes.map(n => `<option ${n.name === agent.initial_node ? 'selected' : ''}>${esc(n.name)}</option>`).join('')}</select>
+    <label>Persona (global role message)</label>
+    <textarea rows="12" oninput="agent.persona=this.value;markDirty()">${esc(agent.persona || '')}</textarea>`;
+}
+
+function renderJsonPane() {
+  $('pane').innerHTML = `<textarea id="raw" rows="38">${esc(JSON.stringify(agent, null, 2))}</textarea>
+    <div class="row" style="margin-top:8px"><button onclick="applyJson()">Apply JSON</button></div>`;
+}
+function applyJson() {
+  try { agent = JSON.parse($('raw').value); markDirty(); render(); toast('JSON applied (not yet saved)'); }
+  catch (e) { showErrors(['Invalid JSON: ' + e.message]); }
+}
+
+function renderNodePane() {
+  const n = nodeByName(selected);
+  if (!n) { $('pane').innerHTML = '<div class="muted">Select a node in the graph.</div>'; return; }
+  const task = (n.task_messages || []).map(m => m.content).join('\n\n');
+  const toolChips = Object.keys(meta.tools).map(t =>
+    `<span class="chip ${ (n.tools || []).includes(t) ? 'on' : ''}" title="${esc(meta.tools[t].description)}" onclick="toggleTool('${t}')">${t}</span>`).join('');
+  const targets = agent.nodes.map(x => x.name);
+  const opt = (arr, v, blank) => (blank ? `<option value="">${blank}</option>` : '') + arr.map(a => `<option ${a === v ? 'selected' : ''}>${esc(a)}</option>`).join('');
+  const edges = (n.edges || []).map((e, i) => `
+    <div class="edge">
+      <div class="row">
+        <input type="text" value="${esc(e.function)}" placeholder="function_name" oninput="edgeSet(${i},'function',this.value)">
+        <span class="muted" style="flex:none">→</span>
+        <select onchange="edgeSet(${i},'target',this.value,true)">${opt(targets, e.target)}</select>
+        <button class="ghost danger" style="flex:none" onclick="removeEdge(${i})">✕</button>
+      </div>
+      <label>When to take it</label>
+      <input type="text" value="${esc(e.description)}" oninput="edgeSet(${i},'description',this.value)">
+      <div class="row">
+        <div><label>Guard action</label><select onchange="edgeSet(${i},'action',this.value||undefined,true)">${opt(Object.keys(meta.actions), e.action, '— none —')}</select></div>
+        <div><label>If guard fails go to</label><select onchange="edgeSet(${i},'fallback_target',this.value||undefined,true)">${opt(targets, e.fallback_target, '— stay & self-correct —')}</select></div>
+      </div>
+      <label>Collected fields (JSON schema properties) · required: <input type="text" style="width:auto;display:inline-block;padding:2px 6px" value="${esc((e.required || []).join(','))}" oninput="edgeSet(${i},'required',this.value.split(',').map(s=>s.trim()).filter(Boolean))"></label>
+      <textarea rows="4" onchange="edgeProps(${i}, this)">${esc(JSON.stringify(e.properties || {}, null, 2))}</textarea>
+    </div>`).join('');
+  $('pane').innerHTML = `
+    <div class="row">
+      <div><label>Node name</label><input type="text" value="${esc(n.name)}" onchange="renameNode(this.value)"></div>
+      <div><label>Context on entry</label>
+        <select onchange="nodeSet('context',this.value,true)">
+          <option value="append" ${n.context !== 'reset' ? 'selected' : ''}>append (keep transcript)</option>
+          <option value="reset" ${n.context === 'reset' ? 'selected' : ''}>reset (state summary only)</option>
+        </select></div>
+    </div>
+    <label><input type="checkbox" ${n.end ? 'checked' : ''} onchange="nodeSet('end',this.checked,true)"> Terminal node (ends the call)</label>
+    <label>Task instructions</label>
+    <textarea rows="7" oninput="nodeSet('task_messages',[{role:'developer',content:this.value}])">${esc(task)}</textarea>
+    <label>Lookup tools on this node</label>
+    <div class="chips">${toolChips}</div>
+    <label style="display:flex;align-items:center">Edges (transitions) <span class="spacer"></span><button class="ghost" onclick="addEdge()">+ Edge</button></label>
+    ${edges || '<div class="muted">No edges.</div>'}
+    <div class="row" style="margin-top:16px"><button class="ghost danger" onclick="removeNode()">Delete node</button></div>`;
+}
+function nodeSet(k, v, redraw) { const n = nodeByName(selected); n[k] = v; if (k === 'context' && v === 'append') delete n.context; markDirty(); if (redraw) render(); }
+function toggleTool(t) { const n = nodeByName(selected); n.tools = n.tools || []; n.tools = n.tools.includes(t) ? n.tools.filter(x => x !== t) : [...n.tools, t]; if (!n.tools.length) delete n.tools; markDirty(); render(); }
+function edgeSet(i, k, v, redraw) { const e = nodeByName(selected).edges[i]; if (v === undefined) delete e[k]; else e[k] = v; markDirty(); if (redraw) render(); else renderGraph(); }
+function edgeProps(i, el) { try { nodeByName(selected).edges[i].properties = JSON.parse(el.value || '{}'); markDirty(); showErrors([]); } catch (e) { showErrors(['Edge properties: ' + e.message]); } }
+function addEdge() { const n = nodeByName(selected); n.edges = n.edges || []; n.edges.push({ function: 'go_next', description: 'When to take this transition.', target: agent.nodes[0].name }); markDirty(); render(); }
+function removeEdge(i) { nodeByName(selected).edges.splice(i, 1); markDirty(); render(); }
+function addNode() {
+  let name = 'new_node', k = 1; while (nodeByName(name)) name = `new_node_${k++}`;
+  agent.nodes.push({ name, task_messages: [{ role: 'developer', content: 'Describe what the agent should do in this step.' }], edges: [] });
+  selected = name; markDirty(); tab('node'); renderGraph();
+}
+function removeNode() {
+  if (selected === agent.initial_node) return toast("Can't delete the initial node");
+  agent.nodes = agent.nodes.filter(n => n.name !== selected); selected = agent.initial_node; markDirty(); render();
+}
+function renameNode(v) {
+  v = v.trim().replace(/[^a-zA-Z0-9_]/g, '_'); if (!v || nodeByName(v)) return toast('Invalid or duplicate name');
+  const old = selected;
+  for (const n of agent.nodes) for (const e of (n.edges || [])) { if (e.target === old) e.target = v; if (e.fallback_target === old) e.fallback_target = v; }
+  if (agent.initial_node === old) agent.initial_node = v;
+  nodeByName(old).name = v; selected = v; markDirty(); render();
+}
+
+// ---------- catalog playground ----------
+function renderCatalogPane() {
+  $('pane').innerHTML = `
+    <div class="muted">Try what a caller might say. This is exactly what the agent's lookup tools return: a few scored candidates, never the whole catalog.</div>
+    <div class="row" style="margin-top:10px"><input type="text" id="cq" placeholder="e.g. knee mri, annual checkup, Dr. Chen, mission" onkeydown="if(event.key==='Enter')catSearch()">
+      <label style="flex:none;margin:0;display:flex;align-items:center;gap:4px;text-transform:none"><input type="checkbox" id="cnew"> new patient</label>
+      <button style="flex:none" onclick="catSearch()">Search</button></div>
+    <div id="cres"></div>`;
+  $('cq').focus();
+}
+async function catSearch() {
+  const q = $('cq').value.trim(); if (!q) return;
+  const r = await api(`/catalog/search?q=${encodeURIComponent(q)}${$('cnew').checked ? '&new_patient=true' : ''}`);
+  const block = (title, x) => `<div class="res"><b>${title}</b><span class="pill">${x.status}</span>
+      ${x.suggested_question ? `<div style="margin-top:6px;color:var(--warn)">Ask: “${esc(x.suggested_question)}”</div>` : ''}
+      <pre style="white-space:pre-wrap;color:var(--muted);font-size:11px;margin:6px 0 0">${esc(JSON.stringify(x.candidates, null, 1))}</pre>
+      <div class="muted" style="margin-top:4px">${JSON.stringify(x).length} chars ≈ ${Math.round(JSON.stringify(x).length / 4)} tokens</div></div>`;
+  $('cres').innerHTML = block('Appointment types', r.appointment_types) + block('Providers', r.providers) + block('Locations', r.locations);
+}
+
+// ---------- save / agents ----------
+function showErrors(errs) { $('errors').style.display = errs.length ? 'block' : 'none'; $('errors').textContent = errs.join('\n'); }
+async function save() {
+  try { await api('/agents/' + agentId, { method: 'PUT', body: JSON.stringify(agent) }); dirty = false; $('dirty').textContent = ''; showErrors([]); toast('Saved'); return true; }
+  catch (e) { showErrors(e.detail?.errors || [JSON.stringify(e.detail || e)]); return false; }
+}
+async function newAgent(copy) {
+  const name = prompt(copy ? 'Name for the copy' : 'New agent name'); if (!name) return;
+  const r = await api('/agents', { method: 'POST', body: JSON.stringify({ id: name, name, from: copy ? agentId : undefined }) });
+  await loadList(r.id);
+}
+async function deleteAgent() {
+  if (!confirm(`Delete agent '${agentId}'?`)) return;
+  try { await api('/agents/' + agentId, { method: 'DELETE' }); await loadList(); } catch (e) { toast(e.detail || 'Delete failed'); }
+}
+async function testCall() {
+  if (dirty && !(await save())) return;
+  await api(`/agents/${agentId}/activate`, { method: 'POST' });
+  $('client').src = '/client/';
+  await loadList(agentId);
+  toast('Agent activated. Click Connect in the call panel.');
+}
+
+// ---------- live trace ----------
+let lastSeq = 0, stats = { turns: 0, tok: 0, cost: 0 }, lat = [];
+function clearTrace() { $('trace').innerHTML = ''; stats = { turns: 0, tok: 0, cost: 0 }; lat = []; $('sLat').textContent = '–'; updStats(); }
+function updStats(last) {
+  $('sTurns').textContent = stats.turns; $('sTok').textContent = stats.tok.toLocaleString();
+  $('sCost').textContent = '$' + stats.cost.toFixed(4); if (last !== undefined) $('sLast').textContent = last.toLocaleString();
+}
+function addEv(cls, kind, html, detail) {
+  const d = document.createElement('div'); d.className = 'ev ' + cls;
+  d.innerHTML = `<span class="k">${kind}</span>${html}` + (detail ? `<details><summary class="muted">result</summary><pre>${esc(JSON.stringify(detail, null, 1))}</pre></details>` : '');
+  const t = $('trace'); const atBottom = t.scrollTop + t.clientHeight >= t.scrollHeight - 30;
+  t.appendChild(d); if (atBottom) t.scrollTop = t.scrollHeight;
+}
+async function pollTrace() {
+  try {
+    const evs = await api('/trace?since=' + lastSeq);
+    for (const e of evs) {
+      lastSeq = e.seq;
+      if (e.type === 'call_start') { clearTrace(); addEv('node', 'call', `started · ${esc(e.agent)}`); }
+      else if (e.type === 'call_end') addEv('node', 'call', 'ended');
+      else if (e.type === 'user') addEv('user', 'caller', esc(e.text));
+      else if (e.type === 'assistant') addEv('assistant', 'agent', esc(e.text));
+      else if (e.type === 'node') { $('sNode').textContent = e.node; selected = e.node; if (curTab === 'node') renderPane(); renderGraph(); addEv('node', 'node', `${esc(e.node)}${e.context === 'reset' ? ' <span class="pill">context reset</span>' : ''}`); }
+      else if (e.type === 'latency') {
+        lat.push(e.seconds); const avg = lat.reduce((a, b) => a + b, 0) / lat.length;
+        $('sLat').textContent = `${e.seconds.toFixed(2)}s / ${avg.toFixed(2)}s`;
+        const t = e.ttfb || {}; addEv('', 'latency', `${e.seconds.toFixed(2)}s voice-to-voice <span class="muted">(stt ${t.stt ?? '–'}s · llm ${t.llm ?? '–'}s · tts ${t.tts ?? '–'}s)</span>`);
+      }
+      else if (e.type === 'tool') addEv('tool', e.prefetch ? 'prefetch' : 'tool', `${esc(e.name)}(${esc(JSON.stringify(e.args))}) → <b>${esc(e.result?.status)}</b>`, e.result);
+      else if (e.type === 'action') addEv('action ' + (e.ok ? 'ok' : 'bad'), 'guard', `${esc(e.name)} → <b>${e.ok ? 'allowed' : 'refused'}</b>`, e.result);
+      else if (e.type === 'transition') addEv('node', 'edge', `${esc(e.function)}: ${esc(e.from)} → ${esc(e.to)}`);
+      else if (e.type === 'usage') { stats.turns++; stats.tok += e.prompt + e.completion; stats.cost += e.cost; updStats(e.prompt); }
+      else if (e.type === 'info') addEv('', 'info', esc(e.text));
+    }
+  } catch (_) {}
+  setTimeout(pollTrace, 700);
+}
+
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+[
+  {
+    "id": "mri_knee_soonest",
+    "probes": "near-duplicate types (MRI family) + capability-gated site",
+    "patient": {"name": "Jordan Lee", "dob": "1985-04-12", "new_patient": false, "has_referral": true},
+    "persona": "You need an MRI of your knee; your orthopedist gave you a referral. You want the soonest available.",
+    "expect": {"book": true, "type_ids": ["appt_065"]}
+  },
+  {
+    "id": "dr_chen_cardiology_new",
+    "probes": "duplicate provider names + new-patient acceptance",
+    "patient": {"name": "Sam Rivera", "dob": "1972-11-03", "new_patient": true, "has_referral": true},
+    "persona": "Your primary doctor referred you to 'Dr. Chen, the cardiologist' for a heart consultation. You don't know the first name. If that doctor can't see you, accept another cardiologist, preferring one named Chen.",
+    "expect": {"book": true, "type_ids": ["appt_020"], "provider_ids": ["prov_046", "prov_005"]}
+  },
+  {
+    "id": "annual_checkup_ambiguous",
+    "probes": "near-duplicate types (Annual Physical vs Annual Wellness Visit)",
+    "patient": {"name": "Priya Shah", "dob": "1990-06-21", "new_patient": false, "has_referral": false},
+    "persona": "You want your 'annual checkup'. If asked to clarify, you want a hands-on physical exam, not a preventive planning visit. Any provider, soonest.",
+    "expect": {"book": true, "type_ids": ["appt_002"]}
+  },
+  {
+    "id": "eye_exam_not_offered",
+    "probes": "types in the catalog with no providers",
+    "patient": {"name": "Alex Kim", "dob": "1995-02-14", "new_patient": false, "has_referral": false},
+    "persona": "You want an eye exam for new glasses. If the clinic doesn't offer it, thank them and end the call; do not book anything else.",
+    "expect": {"book": false}
+  },
+  {
+    "id": "therapy_new_patient",
+    "probes": "new-patient rule on types; redirect to an allowed type",
+    "patient": {"name": "Morgan Blake", "dob": "1988-09-09", "new_patient": true, "has_referral": true},
+    "persona": "You're struggling with anxiety and want to 'start therapy'. You've never been to this clinic. You have a referral from your GP. Accept whatever first step they recommend with mental health.",
+    "expect": {"book": true, "type_ids": ["appt_059"]}
+  },
+  {
+    "id": "maria_garcia_peds",
+    "probes": "duplicate names across specialties",
+    "patient": {"name": "Lily Tran", "dob": "2019-03-30", "new_patient": true, "has_referral": false},
+    "persona": "You're a parent booking a well-child checkup for your daughter Lily Tran (born 2019-03-30). A friend recommended Dr. Maria Garcia, the pediatrician. Give Lily's details as the patient.",
+    "expect": {"book": true, "type_ids": ["appt_015"], "provider_ids": ["prov_002"]}
+  },
+  {
+    "id": "mole_removal_wrong_site",
+    "probes": "location lacks required capability (surgery); repair via alternatives",
+    "patient": {"name": "Chris Park", "dob": "1979-12-01", "new_patient": false, "has_referral": true},
+    "persona": "You need a mole removed; your dermatologist referred you. You'd like it at the Downtown Health Center. If that's not possible, accept another location they suggest.",
+    "expect": {"book": true, "type_ids": ["appt_029"], "location_ids": ["loc_000", "loc_006", "loc_007"]}
+  },
+  {
+    "id": "spanish_sick_visit",
+    "probes": "language preference filter",
+    "patient": {"name": "Rosa Delgado", "dob": "1965-07-15", "new_patient": true, "has_referral": false},
+    "persona": "You have a bad cough and fever and want to see a doctor who speaks Spanish. You're new to the clinic. Soonest is fine. Mention the Spanish requirement early.",
+    "expect": {"book": true, "type_ids": ["appt_007", "appt_008"], "provider_language": "Spanish"}
+  },
+  {
+    "id": "blood_work_mission",
+    "probes": "confusable location names + service only bookable at one site",
+    "patient": {"name": "Dana White", "dob": "1970-01-20", "new_patient": false, "has_referral": false},
+    "persona": "You need routine blood work (no fasting). You'd like it at 'the Mission clinic'. If asked, you mean Mission District, but you'll accept another nearby location if needed.",
+    "expect": {"book": true, "type_ids": ["appt_072"], "location_ids": ["loc_000"]}
+  },
+  {
+    "id": "flu_shot_afternoon",
+    "probes": "time-of-day preference",
+    "patient": {"name": "Evan Wu", "dob": "1992-10-10", "new_patient": false, "has_referral": false},
+    "persona": "You want a flu shot, but only in an afternoon since you work mornings. Any provider or location.",
+    "expect": {"book": true, "type_ids": ["appt_011"], "afternoon": true}
+  },
+  {
+    "id": "michael_sato_new",
+    "probes": "duplicate name where only one is accepting new patients",
+    "patient": {"name": "Taylor Brooks", "dob": "1983-05-05", "new_patient": true, "has_referral": false},
+    "persona": "You're new to the clinic and want an annual physical with Dr. Michael Sato, who a coworker recommended. You don't know his specialty.",
+    "expect": {"book": true, "type_ids": ["appt_002"], "provider_ids": ["prov_032"]}
+  },
+  {
+    "id": "dental_mandarin",
+    "probes": "language + capability-gated site intersection",
+    "patient": {"name": "Wei Zhang", "dob": "1960-08-08", "new_patient": true, "has_referral": false},
+    "persona": "You want a teeth cleaning with a dentist who speaks Mandarin. You're a new patient.",
+    "expect": {"book": true, "type_ids": ["appt_074", "appt_076"], "provider_ids": ["prov_020"], "location_ids": ["loc_001"]}
+  },
+  {
+    "id": "pacemaker_no_referral",
+    "probes": "referral policy",
+    "patient": {"name": "Harold Finch", "dob": "1950-03-03", "new_patient": false, "has_referral": false},
+    "persona": "You want a pacemaker check. You do NOT have a referral. If they say you need one, say you'll get one from your doctor and end the call.",
+    "expect": {"book": false}
+  },
+  {
+    "id": "qa_mri_locations",
+    "probes": "Q&A: equipment != bookable (Mission District has imaging but no radiologist)",
+    "patient": {"name": "Pat Morgan", "dob": "1980-01-01", "new_patient": false, "has_referral": true},
+    "persona": "You just have a question: which of their locations can you get an MRI at? Ask it, listen, then say thanks and end the call without booking.",
+    "expect": {"book": false, "mentions": ["Downtown", "Midtown"], "not_mentions": ["Mission District"]}
+  },
+  {
+    "id": "echo_new_patient",
+    "probes": "existing-only type for a new patient -> alternative",
+    "patient": {"name": "Nina Ortiz", "dob": "1977-02-02", "new_patient": true, "has_referral": true},
+    "persona": "Your GP referred you for an echocardiogram. You're new to this clinic. If you can't book it directly, accept the cardiology visit they suggest instead.",
+    "expect": {"book": true, "type_ids": ["appt_020"]}
+  }
+]

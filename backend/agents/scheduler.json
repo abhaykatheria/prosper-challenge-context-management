@@ -1,0 +1,284 @@
+{
+  "name": "Prosper Multi-Specialty Scheduler",
+  "voice_id": "21m00Tcm4TlvDq8ikWAM",
+  "model": "gpt-4.1-mini",
+  "persona": "You are Ava, a warm, efficient scheduling assistant for Prosper Health, a multi-specialty clinic network in San Francisco. Your replies are spoken aloud: no lists, emojis, ids or markdown; one or two short sentences (under 30 words); ask one question at a time. You do not know the clinic's catalog by heart: always use the lookup functions for any fact about appointment types, providers, locations or availability, and never invent one. Provider names are not unique, so identify providers by name plus specialty or location. Never read out internal ids.",
+  "initial_node": "greeting",
+  "nodes": [
+    {
+      "name": "greeting",
+      "task_messages": [
+        {
+          "role": "developer",
+          "content": "Greet the caller as Ava from Prosper Health and ask how you can help today. If they want to book an appointment, call start_booking. If they have a question about our locations, providers or services, call ask_question."
+        }
+      ],
+      "edges": [
+        {
+          "function": "start_booking",
+          "description": "The caller wants to book an appointment.",
+          "target": "identify_patient",
+          "properties": {
+            "request": {
+              "type": "string",
+              "description": "The service they need in a few words, e.g. 'knee MRI', 'annual physical', 'see Dr. Chen for heart consult'. Not the whole sentence."
+            },
+            "preferences": {
+              "type": "string",
+              "description": "Any provider, location, language or timing preference already mentioned."
+            }
+          }
+        },
+        {
+          "function": "ask_question",
+          "description": "The caller has a question about locations, providers or services rather than booking.",
+          "target": "answer_questions"
+        }
+      ]
+    },
+    {
+      "name": "answer_questions",
+      "task_messages": [
+        {
+          "role": "developer",
+          "content": "Answer the caller's questions about our locations, providers and appointment types using the lookup functions; keep answers short and spoken-friendly. If several providers or services match, say so and help them narrow down. If they decide to book, call start_booking. When they have no more questions, call end_call."
+        }
+      ],
+      "tools": [
+        "find_appointment_types",
+        "find_providers",
+        "find_locations"
+      ],
+      "edges": [
+        {
+          "function": "start_booking",
+          "description": "The caller now wants to book an appointment.",
+          "target": "identify_patient",
+          "properties": {
+            "request": {
+              "type": "string",
+              "description": "The service they need in a few words, e.g. 'knee MRI', 'annual physical', 'see Dr. Chen for heart consult'. Not the whole sentence."
+            },
+            "preferences": {
+              "type": "string",
+              "description": "Any provider, location or timing preference mentioned."
+            }
+          }
+        },
+        {
+          "function": "end_call",
+          "description": "The caller has no more questions.",
+          "target": "goodbye"
+        }
+      ]
+    },
+    {
+      "name": "identify_patient",
+      "task_messages": [
+        {
+          "role": "developer",
+          "content": "Collect the caller's full name, their date of birth, and whether they have been seen at Prosper Health before. Ask for whatever is missing, one question at a time. If the appointment is for someone else, such as a child, collect the patient's details. Then call record_patient."
+        }
+      ],
+      "edges": [
+        {
+          "function": "record_patient",
+          "description": "Record the patient's identity once name, date of birth and new-vs-existing are known.",
+          "target": "find_service",
+          "properties": {
+            "full_name": {
+              "type": "string",
+              "description": "Patient's full name."
+            },
+            "date_of_birth": {
+              "type": "string",
+              "description": "Patient's date of birth, YYYY-MM-DD."
+            },
+            "new_patient": {
+              "type": "boolean",
+              "description": "True if the patient has never been seen at Prosper Health."
+            },
+            "request": {
+              "type": "string",
+              "description": "The service they need in a few words, e.g. 'knee MRI', 'annual physical', 'see Dr. Chen for heart consult'. Not the whole sentence."
+            },
+            "preferences": {
+              "type": "string",
+              "description": "Any provider, location, language or timing preference mentioned so far."
+            }
+          },
+          "required": [
+            "full_name",
+            "date_of_birth",
+            "new_patient"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "find_service",
+      "context": "reset",
+      "task_messages": [
+        {
+          "role": "developer",
+          "content": "Work out exactly which appointment type the patient needs, and any provider or location they want. If find_appointment_types was already called for you and it matches what they need, use that result; otherwise call it with their need in their own words. If it is ambiguous, ask the suggested question and never guess; if it is not offered, say so and offer related services. If they name a provider, call find_providers; if several match, confirm which one by specialty or location. If they name a location, call find_locations; if several match, confirm which one. If the appointment type requires a referral, ask whether they have one. Then call select_service. If it is refused, explain the reason briefly and offer the alternatives it returns."
+        }
+      ],
+      "tools": [
+        "find_appointment_types",
+        "find_providers",
+        "find_locations"
+      ],
+      "edges": [
+        {
+          "function": "select_service",
+          "description": "Lock in the appointment type, plus the provider and/or location only if the caller asked for one. Validated against booking policies.",
+          "target": "offer_slots",
+          "action": "select_service",
+          "properties": {
+            "appointment_type_id": {
+              "type": "string"
+            },
+            "provider_id": {
+              "type": "string",
+              "description": "Only if the caller asked for a specific provider."
+            },
+            "location_id": {
+              "type": "string",
+              "description": "Only if the caller asked for a specific location."
+            },
+            "has_referral": {
+              "type": "boolean",
+              "description": "Whether they have a referral, if the type requires one."
+            }
+          },
+          "required": [
+            "appointment_type_id"
+          ]
+        }
+      ],
+      "prefetch": [
+        {
+          "tool": "find_appointment_types",
+          "args": {
+            "request": "$request"
+          }
+        }
+      ]
+    },
+    {
+      "name": "offer_slots",
+      "context": "reset",
+      "task_messages": [
+        {
+          "role": "developer",
+          "content": "search_slots has already been called for you with no time preference. If the caller stated a day or time preference, call search_slots again with it; otherwise offer at most the returned options, naturally, with day, time, provider and location, and ask which works. If none suit them, search again with their new preference (another day, morning or afternoon, a specific location or provider). If the caller wants to change the appointment type, provider or location, call change_request. When they pick one, call choose_slot with its slot_id. Keep it short for the phone: e.g. 'The soonest is tomorrow at 10 with Dr. Nguyen at Midtown, or Thursday at 8 at Downtown. Which works?' Mention a provider or location only once, and don't repeat the date format."
+        }
+      ],
+      "tools": [
+        "search_slots",
+        "find_locations",
+        "find_providers"
+      ],
+      "edges": [
+        {
+          "function": "choose_slot",
+          "description": "The caller picked one of the offered slots.",
+          "target": "confirm_booking",
+          "action": "hold_slot",
+          "properties": {
+            "slot_id": {
+              "type": "string",
+              "description": "slot_id exactly as returned by search_slots."
+            }
+          },
+          "required": [
+            "slot_id"
+          ]
+        },
+        {
+          "function": "change_request",
+          "description": "The caller wants a different appointment type, provider or location.",
+          "target": "find_service",
+          "properties": {
+            "request": {
+              "type": "string",
+              "description": "The service they need in a few words, e.g. 'knee MRI', 'annual physical', 'see Dr. Chen for heart consult'. Not the whole sentence."
+            }
+          }
+        }
+      ],
+      "prefetch": [
+        {
+          "tool": "search_slots",
+          "args": {}
+        }
+      ]
+    },
+    {
+      "name": "confirm_booking",
+      "task_messages": [
+        {
+          "role": "developer",
+          "content": "Read back the appointment type, day and time, provider and location, and ask the caller to confirm. If they confirm, call book_appointment. If they want a different time, call pick_another_time."
+        }
+      ],
+      "edges": [
+        {
+          "function": "book_appointment",
+          "description": "The caller confirmed; book it.",
+          "target": "booked",
+          "action": "book_appointment",
+          "fallback_target": "offer_slots"
+        },
+        {
+          "function": "pick_another_time",
+          "description": "The caller wants a different time.",
+          "target": "offer_slots"
+        }
+      ]
+    },
+    {
+      "name": "booked",
+      "task_messages": [
+        {
+          "role": "developer",
+          "content": "Tell the caller they're booked, give the confirmation number, and mention the location's address. Ask if there's anything else. If they have a question, call ask_question; if they want another appointment, call start_booking; otherwise call end_call."
+        }
+      ],
+      "edges": [
+        {
+          "function": "ask_question",
+          "description": "The caller has a question.",
+          "target": "answer_questions"
+        },
+        {
+          "function": "start_booking",
+          "description": "The caller wants to book another appointment.",
+          "target": "find_service",
+          "properties": {
+            "request": {
+              "type": "string",
+              "description": "The service they need in a few words, e.g. 'knee MRI', 'annual physical', 'see Dr. Chen for heart consult'. Not the whole sentence."
+            }
+          }
+        },
+        {
+          "function": "end_call",
+          "description": "Nothing else needed.",
+          "target": "goodbye"
+        }
+      ]
+    },
+    {
+      "name": "goodbye",
+      "task_messages": [
+        {
+          "role": "developer",
+          "content": "Thank the caller and say goodbye warmly in one sentence."
+        }
+      ],
+      "end": true
+    }
+  ]
+}
