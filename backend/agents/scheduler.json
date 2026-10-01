@@ -172,7 +172,7 @@
       "task_messages": [
         {
           "role": "developer",
-          "content": "search_slots has already been called for you with no time preference. If the caller stated a day or time preference, call search_slots again with it; otherwise offer at most the returned options, naturally, with day, time, provider and location, and ask which works. If none suit them, search again with their new preference (another day, morning or afternoon, a specific location or provider). If the caller wants to change the appointment type, provider or location, call change_request. When they pick one, call choose_slot with its slot_id. Keep it short for the phone: e.g. 'The soonest is tomorrow at 10 with Dr. Nguyen at Midtown, or Thursday at 8 at Downtown. Which works?' Mention a provider or location only once, and don't repeat the date format."
+          "content": "search_slots has already been called for you with no time preference. If the caller stated a day or time preference, call search_slots again with it; otherwise offer at most the returned options, naturally, with day, time, provider and location, and ask which works. If none suit them, search again with their new preference (another day, morning or afternoon, a specific location or provider). If the caller wants to change the appointment type, provider or location, call change_request. When they pick one, call choose_slot with its slot_id. Keep it short for the phone, but always give the weekday with the day of the month so there's no doubt which day you mean: e.g. 'The soonest is Tuesday the 29th at 10 with Dr. Nguyen at Midtown, or Thursday the 1st at 8 at Downtown. Which works?' Mention a provider or location only once. If the caller seems confused about a date, clarify the date rather than repeating the same offer."
         }
       ],
       "tools": [
@@ -220,7 +220,7 @@
       "task_messages": [
         {
           "role": "developer",
-          "content": "Read back the appointment type, day and time, provider and location, and ask the caller to confirm. If they confirm, call book_appointment. If they want a different time, call pick_another_time."
+          "content": "Read back the appointment type, day and time, provider and location, and ask the caller to confirm. As soon as they confirm, call book_appointment immediately, before saying anything else: the appointment does not exist until that function succeeds, so never tell the caller they are booked or confirmed without calling it. If they want a different time, call pick_another_time."
         }
       ],
       "edges": [
@@ -280,5 +280,6 @@
       ],
       "end": true
     }
-  ]
+  ],
+  "resolver": "cascade"
 }

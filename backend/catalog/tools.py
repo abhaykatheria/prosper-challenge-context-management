@@ -13,8 +13,11 @@
 # instead of relying on the LLM to re-pass them on every call.
 #
 
+import asyncio
 from dataclasses import dataclass
 from typing import Callable, Optional
+
+from loguru import logger
 
 from .engine import CatalogEngine
 from .models import Catalog
@@ -53,8 +56,43 @@ def _bool(state: dict, key: str) -> Optional[bool]:
 # TOOLS (stay on node)
 # ---------------------------------------------------------------------------
 
-def _find_appointment_types(e: CatalogEngine, a: dict, s: dict) -> dict:
-    return e.match_appointment_types(a["request"], new_patient=_bool(s, "new_patient"))
+JEV_TIMEOUT_S = 1.5
+CASCADE_MIN_SCORE = 90
+
+
+def _age(e: CatalogEngine, s: dict) -> Optional[int]:
+    from datetime import date
+    try:
+        dob = date.fromisoformat(str(s.get("date_of_birth", ""))[:10])
+    except ValueError:
+        return None
+    t = e.today
+    return t.year - dob.year - ((t.month, t.day) < (dob.month, dob.day))
+
+
+async def _find_appointment_types(e: CatalogEngine, a: dict, s: dict) -> dict:
+    new_patient = _bool(s, "new_patient")
+    age = _age(e, s)
+    if s.get("_resolver") == "cascade":
+        # Fast path: accept the local matcher when it's lexically confident; only the
+        # long tail (paraphrases, symptoms, odd STT output) pays Jev's ~400ms.
+        local = e.match_appointment_types(a["request"], new_patient=new_patient, patient_age=age)
+        if local.get("score", 0) >= CASCADE_MIN_SCORE and local["status"] != "no_match":
+            local["resolver"] = "fuzzy"
+            return local
+    if s.get("_resolver") in ("jev", "cascade"):
+        from .jev import get_resolver
+        try:
+            result = await asyncio.wait_for(
+                get_resolver(e).match_appointment_types(a["request"], new_patient, age), JEV_TIMEOUT_S)
+            result["resolver"] = "jev"
+            return result
+        except Exception as ex:  # outage/timeout must not break the call: degrade to fuzzy
+            logger.warning(f"Jev unavailable ({ex!r}); falling back to fuzzy matcher")
+            result = e.match_appointment_types(a["request"], new_patient=new_patient, patient_age=age)
+            result["resolver"] = "fuzzy_fallback"
+            return result
+    return e.match_appointment_types(a["request"], new_patient=new_patient, patient_age=age)
 
 
 def _find_providers(e: CatalogEngine, a: dict, s: dict) -> dict:

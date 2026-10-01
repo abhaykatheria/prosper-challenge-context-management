@@ -34,7 +34,7 @@ Remember to update the `.env` file accordingly.
 | `backend/data/catalog.json` | A deliberately large, deliberately messy clinic catalog (locations, providers, appointment types, booking rules) for the Phase 2 work. See [`backend/data/README.md`](backend/data/README.md). |
 
 | `backend/agents/` | Agent definitions (JSON). `scheduler.json` is the Phase 2 scheduling agent. The builder UI picks which one a test call runs. |
-| `backend/catalog/` | Phase 2: catalog engine (matching + policy solver + mock availability), LLM tools and edge guards, STT vocabulary. |
+| `backend/catalog/` | Phase 2: catalog engine (matching + policy solver + mock availability), LLM tools and edge guards, STT vocabulary, Jev resolver (`jev.py`). |
 | `backend/data/enrichment.json` | Offline enrichment: lay aliases, descriptions, confusable groups + clarifying questions. |
 | `backend/builder_api.py`, `backend/ui/` | Builder UI backend + single-page editor with live call trace. |
 | `backend/sim/` | Text-mode flow runner, full-catalog baselines, 15 scenarios, eval harness (`make eval`). |

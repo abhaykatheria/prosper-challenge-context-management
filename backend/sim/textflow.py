@@ -89,7 +89,7 @@ class TextFlowRunner:
 
     # ---- conversation -------------------------------------------------------
     async def start(self) -> str:
-        self._set_node(self.builder.build_initial_node())
+        self._set_node(await self.builder.build_initial_node())
         return await self._run_llm()
 
     async def send(self, user_text: str) -> str:

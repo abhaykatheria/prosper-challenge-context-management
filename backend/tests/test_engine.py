@@ -112,3 +112,26 @@ def test_new_patient_match_carries_repair(e):
     assert r["status"] == "existing_patients_only"
     assert "Psychiatric Evaluation" in {a["name"] for a in r["alternatives"]}
     assert e.match_appointment_types("mental health")["candidates"][0]["name"] == "Psychiatric Evaluation"
+
+
+def test_patient_age_separates_pediatric_types(e):
+    assert e.match_appointment_types("sick visit", patient_age=4)["candidates"][0]["name"] == "Pediatric Sick Visit"
+    assert e.match_appointment_types("sick visit", patient_age=40)["candidates"][0]["name"] == "Sick Visit"
+
+
+def test_jev_outage_falls_back_to_fuzzy(e, monkeypatch):
+    """A Jev error or timeout must degrade to the local matcher, never break the call."""
+    import asyncio
+    import catalog.jev as jev
+    from catalog.tools import _find_appointment_types
+
+    class Down:
+        async def match_appointment_types(self, *a, **k):
+            raise RuntimeError("Jev unavailable")
+
+    monkeypatch.setattr(jev, "get_resolver", lambda engine, context="full": Down())
+    r = asyncio.run(_find_appointment_types(e, {"request": "knee mri"}, {"_resolver": "jev"}))
+    assert r["resolver"] == "fuzzy_fallback" and r["candidates"][0]["name"] == "MRI - Knee"
+    # cascade: confident local match never calls Jev at all
+    r = asyncio.run(_find_appointment_types(e, {"request": "knee mri"}, {"_resolver": "cascade"}))
+    assert r["resolver"] == "fuzzy"

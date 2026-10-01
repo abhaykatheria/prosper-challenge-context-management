@@ -187,7 +187,7 @@ async def run_bot(
     async def on_client_connected(transport, client):
         logger.info("Client connected — starting flow at initial node")
         builder_api.emit({"type": "call_start", "agent": config.name})
-        await flow_manager.initialize(builder.build_initial_node())
+        await flow_manager.initialize(await builder.build_initial_node())
 
     @transport.event_handler("on_client_disconnected")
     async def on_client_disconnected(transport, client):

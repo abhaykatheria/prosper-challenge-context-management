@@ -202,6 +202,12 @@ function renderAgentPane() {
       <div><label>LLM model</label><input type="text" value="${esc(agent.model || 'gpt-4o')}" oninput="agent.model=this.value;markDirty()"></div>
       <div><label>ElevenLabs voice id</label><input type="text" value="${esc(agent.voice_id || '')}" oninput="agent.voice_id=this.value;markDirty()"></div>
     </div>
+    <label>Catalog matcher</label>
+    <select onchange="agent.resolver=this.value;markDirty()">
+      <option value="fuzzy" ${(agent.resolver || 'fuzzy') === 'fuzzy' ? 'selected' : ''}>Fuzzy + aliases (local, ~2ms)</option>
+      <option value="jev" ${agent.resolver === 'jev' ? 'selected' : ''}>Jev by TypeSafe, full catalog (~400ms, falls back to fuzzy)</option>
+      <option value="cascade" ${agent.resolver === 'cascade' ? 'selected' : ''}>Cascade: fuzzy when confident, else Jev (recommended)</option>
+    </select>
     <label>Initial node</label>
     <select onchange="agent.initial_node=this.value;markDirty();renderGraph()">${agent.nodes.map(n => `<option ${n.name === agent.initial_node ? 'selected' : ''}>${esc(n.name)}</option>`).join('')}</select>
     <label>Persona (global role message)</label>
@@ -354,7 +360,7 @@ async function pollTrace() {
         $('sLat').textContent = `${e.seconds.toFixed(2)}s / ${avg.toFixed(2)}s`;
         const t = e.ttfb || {}; addEv('', 'latency', `${e.seconds.toFixed(2)}s voice-to-voice <span class="muted">(stt ${t.stt ?? '–'}s · llm ${t.llm ?? '–'}s · tts ${t.tts ?? '–'}s)</span>`);
       }
-      else if (e.type === 'tool') addEv('tool', e.prefetch ? 'prefetch' : 'tool', `${esc(e.name)}(${esc(JSON.stringify(e.args))}) → <b>${esc(e.result?.status)}</b>`, e.result);
+      else if (e.type === 'tool') addEv('tool', e.prefetch ? 'prefetch' : 'tool', `${esc(e.name)}(${esc(JSON.stringify(e.args))}) → <b>${esc(e.result?.status)}</b>${e.result?.resolver ? ` <span class="pill">${esc(e.result.resolver)}</span>` : ''}`, e.result);
       else if (e.type === 'action') addEv('action ' + (e.ok ? 'ok' : 'bad'), 'guard', `${esc(e.name)} → <b>${e.ok ? 'allowed' : 'refused'}</b>`, e.result);
       else if (e.type === 'transition') addEv('node', 'edge', `${esc(e.function)}: ${esc(e.from)} → ${esc(e.to)}`);
       else if (e.type === 'usage') { stats.turns++; stats.tok += e.prompt + e.completion; stats.cost += e.cost; updStats(e.prompt); }

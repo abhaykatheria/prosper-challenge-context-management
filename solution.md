@@ -199,6 +199,77 @@ across *all* concurrent calls; ours ~30. Our agent makes ~2× more LLM calls
    existing-only type with no repair, and the LLM improvised a primary-care visit.
    Fixed by making *every* tool, not just guards, return blockers with their repairs.
 
+## 3b. Experiment: "just give a model the whole catalog" with Jev
+
+The obvious counter-argument to this design is: *a better model with the whole
+catalog in context would be simpler.* For an LLM that's too slow and expensive
+per turn (§3). [Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev)
+(TypeSafe AI) changes the economics: it doesn't generate text, it answers typed
+questions (pick one of N options, with a probability per option), takes 32k
+tokens of context, answers in ~0.3–0.5s, and costs $0.042 per 1M input tokens.
+So sending the **entire catalog on every lookup costs ~$0.0009**, and its
+output can't name an appointment type that doesn't exist.
+
+Jev can't hold the conversation, so I tried it where it fits: the
+*"which appointment type does the caller mean?"* step (`catalog/jev.py`), as a
+drop-in for the fuzzy matcher. The solver, repairs and guards are unchanged.
+
+**Matching benchmark** (`sim/match_bench.py`, 90 labelled caller phrasings, most
+deliberately *not* taken from my alias list: 20 direct, 44 indirect
+descriptions, 10 STT garbles, 8 genuinely ambiguous, 5 not offered, 3 vague):
+
+| resolver | correct | asked a clarifying Q (safe) | committed on an ambiguous request | wrong | indirect | p50 latency | $/lookup |
+|---|---|---|---|---|---|---|---|
+| fuzzy + aliases | 64 | 8 | 3 | **15** | 27/44 | 2 ms | 0 |
+| Jev, option list only | 79 | 5 | 4 | 2 | 40/44 | 272 ms | $0.0003 |
+| **Jev, full catalog** | 76 | 13 | **0** | **1** | 32/44* | 399 ms | $0.0009 |
+| cascade (fuzzy if confident, else Jev) | 74 | 11 | 3 | 2 | 33/44 | 2 ms / 396 ms | $0.0006 |
+
+\* Most of the remaining "indirect" items are *asked*, not wrong (e.g. "my
+daughter has a fever": pediatric sick visit or urgent care?).
+
+What I learned:
+
+1. **Jev understands people far better than lexical matching.** Fuzzy matching
+   fails on descriptions ("I keep forgetting things" → no match; "my daughter has
+   a fever" → the *adult* sick visit). Jev gets 43/44 of those on its top pick.
+2. **Full context helps** (all STT garbles fixed; better on edge cases).
+3. **Raw Jev is overconfident on ambiguity**: "I need an MRI" → *MRI - Brain*.
+   Its choice probabilities are peaky. Fix: a second question in the **same
+   call** (answered in parallel, no added latency), a yes/no *"does the request
+   pin down exactly one type, or would a receptionist need to clarify?"*. A
+   threshold sweep traded correct-on-first-try for safety; I chose 0.4 (zero
+   overconfident commits, 7/8 ambiguous requests clarified) because an extra
+   question costs ~3s of call time while a wrong MRI costs a wasted visit. That
+   threshold was tuned on this set; production would tune it on held-out call
+   transcripts.
+
+**End to end** (20 scenarios × 2, including 5 new ones where the simulated
+caller only describes symptoms):
+
+| agent resolver | pass | violations | cost / conversation |
+|---|---|---|---|
+| fuzzy | 100% (40/40) | 0 | $0.0063 |
+| Jev, full catalog | 98% (39/40) | 0 | $0.0075 |
+| cascade | 100% (20/20) | 0 | $0.0065 (Jev on 12 of ~23 lookups) |
+
+The isolated gap almost vanishes end to end, and the reason matters for the
+design: **the conversational LLM already normalises language before the
+lookup** ("my chest hurts on stairs" arrives as "cardiology consultation"), and
+patient context does the rest. Building the experiment also exposed two gaps
+that fuzzy *and* Jev shared and that are now fixed for both: neither used the
+**patient's age** from the DOB already collected (a 4-year-old with a fever got
+the adult sick visit), and the confirm step could say "you're booked" without
+calling `book_appointment`.
+
+**Decision:** default to the **cascade**. The local matcher answers confident
+requests in ~2 ms; only the long tail (paraphrases, symptoms, odd STT output)
+pays Jev's ~400 ms. If Jev errors or exceeds 1.5 s, the lookup degrades to the
+fuzzy result (tested), so a third-party outage can't take down the phone line.
+The resolver is a per-agent setting in the builder UI. At catalog sizes past
+Jev's 255-option limit, the same interface takes Jev's documented two-stage
+choice (specialty, then type).
+
 ## 4. Trade-offs and alternatives considered
 
 | Option | Why not (as the primary mechanism) |
@@ -238,7 +309,8 @@ as the bot, per the "keep the prebuilt client" scope decision):
 
 ## 6. Scoping — what I built, mocked, or left out
 
-* **Built:** catalog engine + tests, enrichment layer, tool/guard layer, graph
+* **Built:** Jev resolver experiment (benchmark, end-to-end eval, cascade),
+  catalog engine + tests, enrichment layer, tool/guard layer, graph
   schema extensions (tools, guards, context reset, prefetch), scheduling agent,
   text runner, simulated-caller eval with ablation, builder UI with live trace
   and latency metrics, catalog-driven STT biasing.

@@ -1,0 +1,4554 @@
+{
+  "args": {
+    "agents": "ours_cascade",
+    "only": "",
+    "model": "gpt-4.1-mini",
+    "sim_model": "gpt-4o-mini",
+    "max_turns": 16,
+    "repeat": 1,
+    "concurrency": 3,
+    "verbose": false
+  },
+  "summary": {
+    "ours_cascade": {
+      "pass_rate": 1.0,
+      "avg_prompt_per_call": 905.4300341296928,
+      "max_prompt": 2178,
+      "avg_tokens_per_conv": 13642.6,
+      "avg_cost": 0.00588,
+      "avg_cost_uncached": 0.006455,
+      "policy_violations": 0,
+      "crashes": 0,
+      "avg_calls": 14.65
+    }
+  },
+  "results": [
+    {
+      "agent": "ours_cascade",
+      "scenario": "mri_knee_soonest",
+      "pass": true,
+      "reasons": [],
+      "booked": "MRI - Knee / Dr. Linda Ramirez, DO (Radiology) / Downtown Health Center / 2026-09-29 10:30:00",
+      "llm_calls": 15,
+      "prompt_tokens": 12824,
+      "completion_tokens": 359,
+      "avg_prompt_tokens": 855,
+      "max_prompt_tokens": 1283,
+      "cost_usd": 0.0057,
+      "cost_uncached_usd": 0.0057,
+      "jev_calls": 0,
+      "jev_avg_latency_ms": 0,
+      "jev_cost_usd": 0.0,
+      "cached_tokens": 0,
+      "turns": 8,
+      "seconds": 18.4,
+      "per_call": [
+        {
+          "node": "greeting",
+          "prompt": 291,
+          "cached": 0,
+          "completion": 17
+        },
+        {
+          "node": "greeting",
+          "prompt": 342,
+          "cached": 0,
+          "completion": 16
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 473,
+          "cached": 0,
+          "completion": 13
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 504,
+          "cached": 0,
+          "completion": 12
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 532,
+          "cached": 0,
+          "completion": 38
+        },
+        {
+          "node": "find_service",
+          "prompt": 910,
+          "cached": 0,
+          "completion": 24
+        },
+        {
+          "node": "find_service",
+          "prompt": 953,
+          "cached": 0,
+          "completion": 20
+        },
+        {
+          "node": "find_service",
+          "prompt": 990,
+          "cached": 0,
+          "completion": 31
+        },
+        {
+          "node": "offer_slots",
+          "prompt": 1073,
+          "cached": 0,
+          "completion": 35
+        },
+        {
+          "node": "offer_slots",
+          "prompt": 1124,
+          "cached": 0,
+          "completion": 32
+        },
+        {
+          "node": "confirm_booking",
+          "prompt": 930,
+          "cached": 0,
+          "completion": 33
+        },
+        {
+          "node": "confirm_booking",
+          "prompt": 975,
+          "cached": 0,
+          "completion": 11
+        },
+        {
+          "node": "booked",
+          "prompt": 1218,
+          "cached": 0,
+          "completion": 50
+        },
+        {
+          "node": "booked",
+          "prompt": 1283,
+          "cached": 0,
+          "completion": 10
+        },
+        {
+          "node": "goodbye",
+          "prompt": 1226,
+          "cached": 0,
+          "completion": 17
+        }
+      ],
+      "transcript": [
+        {
+          "role": "event",
+          "text": "-> node greeting"
+        },
+        {
+          "role": "assistant",
+          "text": "Hello, this is Ava from Prosper Health. How can I assist you today?"
+        },
+        {
+          "role": "user",
+          "text": "Hi, this is Jordan Lee. I need to schedule an MRI for my knee. I have a referral from my orthopedist."
+        },
+        {
+          "role": "event",
+          "text": "start_booking({\"request\": \"knee MRI\"}) -> {\"status\": \"success\", \"request\": \"knee MRI\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node identify_patient"
+        },
+        {
+          "role": "assistant",
+          "text": "Can you please tell me your date of birth, Jordan?"
+        },
+        {
+          "role": "user",
+          "text": "Sure, it's April 12, 1985."
+        },
+        {
+          "role": "assistant",
+          "text": "Have you been seen at Prosper Health before, Jordan?"
+        },
+        {
+          "role": "user",
+          "text": "Yes, I have been seen there before."
+        },
+        {
+          "role": "event",
+          "text": "record_patient({\"full_name\": \"Jordan Lee\", \"date_of_birth\": \"1985-04-12\", \"new_patient\": false, \"request\": \"knee MRI\"}) -> {\"status\": \"success\", \"full_name\": \"Jordan Lee\", \"date_of_birth\": \"1985-04-12\", \"new_patient\": false, \"request\": \"knee MRI\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node find_service"
+        },
+        {
+          "role": "assistant",
+          "text": "The knee MRI appointment requires a referral and is only for existing patients. Do you have a referral for this MRI?"
+        },
+        {
+          "role": "user",
+          "text": "Yes, I have a referral from my orthopedist."
+        },
+        {
+          "role": "assistant",
+          "text": "Great! Would you prefer to have your knee MRI at Downtown Health Center or Midtown Medical Group?"
+        },
+        {
+          "role": "user",
+          "text": "I\u2019d prefer the Downtown Health Center, please."
+        },
+        {
+          "role": "event",
+          "text": "select_service({\"appointment_type_id\": \"appt_065\", \"location_id\": \"loc_004\", \"has_referral\": true}) -> {\"status\": \"ok\", \"appointment_type\": \"MRI - Knee\", \"eligible_providers\": 1, \"eligible_locations\": 1}"
+        },
+        {
+          "role": "event",
+          "text": "-> node offer_slots"
+        },
+        {
+          "role": "assistant",
+          "text": "The soonest knee MRI at Downtown Health Center with Dr. Linda Ramirez is Tuesday, September 29 at 10:30 AM. Would you like to book that?"
+        },
+        {
+          "role": "user",
+          "text": "Yes, please book that appointment for me."
+        },
+        {
+          "role": "event",
+          "text": "choose_slot({\"slot_id\": \"appt_065|prov_014|loc_004|20260929T1030\"}) -> {\"status\": \"ok\", \"slot_id\": \"appt_065|prov_014|loc_004|20260929T1030\", \"when\": \"Tuesday, September 29 at 10:30 AM\", \"provider\": \"Dr. Linda Ramirez, DO\", \"location\": \"Downtown Health Center\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node confirm_booking"
+        },
+        {
+          "role": "assistant",
+          "text": "You are booking a knee MRI with Dr. Linda Ramirez at Downtown Health Center on Tuesday, September 29 at 10:30 AM. Is that correct?"
+        },
+        {
+          "role": "user",
+          "text": "Yes, that's correct."
+        },
+        {
+          "role": "event",
+          "text": "book_appointment({}) -> {\"status\": \"booked\", \"confirmation\": \"PX-049491\", \"patient_name\": \"Jordan Lee\", \"date_of_birth\": \"1985-04-12\", \"appointment_type\": \"MRI - Knee\", \"slot_id\": \"appt_065|prov_014|loc_004|20260929T1030\", \"when\": \"Tuesday, September 29 at 10:30 AM\", \"provider\": \"Dr. Linda Ramirez, DO\", \"location\": \"Downto"
+        },
+        {
+          "role": "event",
+          "text": "-> node booked"
+        },
+        {
+          "role": "assistant",
+          "text": "Your knee MRI with Dr. Ramirez is booked for Tuesday, September 29 at 10:30 AM. Confirmation number PX-049491. The location is 4455 Geary Blvd, San Francisco. Anything else I can help with?"
+        },
+        {
+          "role": "user",
+          "text": "No, that's all. Thank you!"
+        },
+        {
+          "role": "event",
+          "text": "end_call({}) -> {\"status\": \"success\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node goodbye"
+        },
+        {
+          "role": "assistant",
+          "text": "Thank you for choosing Prosper Health, Jordan; have a wonderful day and take care!"
+        }
+      ]
+    },
+    {
+      "agent": "ours_cascade",
+      "scenario": "dr_chen_cardiology_new",
+      "pass": true,
+      "reasons": [],
+      "booked": "Cardiology Consultation / Dr. Emily Chen, MD (Cardiology) / Richmond Care Center / 2026-09-29 08:00:00",
+      "llm_calls": 16,
+      "prompt_tokens": 13870,
+      "completion_tokens": 409,
+      "avg_prompt_tokens": 867,
+      "max_prompt_tokens": 1315,
+      "cost_usd": 0.0062,
+      "cost_uncached_usd": 0.0071,
+      "jev_calls": 1,
+      "jev_avg_latency_ms": 455,
+      "jev_cost_usd": 0.00092,
+      "cached_tokens": 3200,
+      "turns": 8,
+      "seconds": 18.9,
+      "per_call": [
+        {
+          "node": "greeting",
+          "prompt": 291,
+          "cached": 0,
+          "completion": 17
+        },
+        {
+          "node": "greeting",
+          "prompt": 339,
+          "cached": 0,
+          "completion": 20
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 478,
+          "cached": 0,
+          "completion": 18
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 509,
+          "cached": 0,
+          "completion": 10
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 535,
+          "cached": 0,
+          "completion": 18
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 566,
+          "cached": 0,
+          "completion": 42
+        },
+        {
+          "node": "find_service",
+          "prompt": 951,
+          "cached": 0,
+          "completion": 23
+        },
+        {
+          "node": "find_service",
+          "prompt": 1061,
+          "cached": 0,
+          "completion": 33
+        },
+        {
+          "node": "find_service",
+          "prompt": 1119,
+          "cached": 1024,
+          "completion": 31
+        },
+        {
+          "node": "offer_slots",
+          "prompt": 1086,
+          "cached": 0,
+          "completion": 39
+        },
+        {
+          "node": "offer_slots",
+          "prompt": 1156,
+          "cached": 1024,
+          "completion": 32
+        },
+        {
+          "node": "confirm_booking",
+          "prompt": 960,
+          "cached": 0,
+          "completion": 31
+        },
+        {
+          "node": "confirm_booking",
+          "prompt": 1003,
+          "cached": 0,
+          "completion": 11
+        },
+        {
+          "node": "booked",
+          "prompt": 1243,
+          "cached": 0,
+          "completion": 57
+        },
+        {
+          "node": "booked",
+          "prompt": 1315,
+          "cached": 1152,
+          "completion": 10
+        },
+        {
+          "node": "goodbye",
+          "prompt": 1258,
+          "cached": 0,
+          "completion": 17
+        }
+      ],
+      "transcript": [
+        {
+          "role": "event",
+          "text": "-> node greeting"
+        },
+        {
+          "role": "assistant",
+          "text": "Hello, this is Ava from Prosper Health. How can I assist you today?"
+        },
+        {
+          "role": "user",
+          "text": "Hi, Ava. I need to schedule an appointment with Dr. Chen, the cardiologist. I have a referral."
+        },
+        {
+          "role": "event",
+          "text": "start_booking({\"request\": \"see Dr. Chen for heart consult\"}) -> {\"status\": \"success\", \"request\": \"see Dr. Chen for heart consult\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node identify_patient"
+        },
+        {
+          "role": "assistant",
+          "text": "May I have the full name of the patient for the appointment with Dr. Chen?"
+        },
+        {
+          "role": "user",
+          "text": "Sure, it's Sam Rivera."
+        },
+        {
+          "role": "assistant",
+          "text": "What is Sam Rivera's date of birth?"
+        },
+        {
+          "role": "user",
+          "text": "It's November 3, 1972."
+        },
+        {
+          "role": "assistant",
+          "text": "Has Sam Rivera been seen at Prosper Health before, or is this the first visit?"
+        },
+        {
+          "role": "user",
+          "text": "This is my first visit."
+        },
+        {
+          "role": "event",
+          "text": "record_patient({\"full_name\": \"Sam Rivera\", \"date_of_birth\": \"1972-11-03\", \"new_patient\": true, \"request\": \"see Dr. Chen for heart consult\"}) -> {\"status\": \"success\", \"full_name\": \"Sam Rivera\", \"date_of_birth\": \"1972-11-03\", \"new_patient\": true, \"request\": \"see Dr. Chen for heart consult\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node find_service"
+        },
+        {
+          "role": "event",
+          "text": "find_providers({\"name\": \"Dr. Chen\", \"specialty\": \"Cardiology\"}) -> {\"status\": \"match\", \"candidates\": [{\"provider_id\": \"prov_046\", \"name\": \"Dr. Emily Chen\", \"title\": \"MD\", \"specialty\": \"Cardiology\", \"locations\": [\"Downtown Health Center\", \"Richmond Care Center\"], \"accepting_new_patients\": true, \"languages\": [\"English\", \"Mandarin\"]}]}"
+        },
+        {
+          "role": "assistant",
+          "text": "You want a cardiology consultation with Dr. Emily Chen, who practices at Downtown Health Center and Richmond Care Center. Do you have a referral for this appointment?"
+        },
+        {
+          "role": "user",
+          "text": "Yes, I have a referral for the appointment. Can I schedule with Dr. Chen?"
+        },
+        {
+          "role": "event",
+          "text": "select_service({\"appointment_type_id\": \"appt_020\", \"provider_id\": \"prov_046\", \"has_referral\": true}) -> {\"status\": \"ok\", \"appointment_type\": \"Cardiology Consultation\", \"eligible_providers\": 1, \"eligible_locations\": 2}"
+        },
+        {
+          "role": "event",
+          "text": "-> node offer_slots"
+        },
+        {
+          "role": "assistant",
+          "text": "The soonest Cardiology Consultation with Dr. Emily Chen is Tuesday, September 29 at 8 AM at Richmond Care Center. Would you like that, or one of the later options?"
+        },
+        {
+          "role": "user",
+          "text": "That works for me. I'll take the appointment on Tuesday, September 29 at 8 AM at Richmond Care Center."
+        },
+        {
+          "role": "event",
+          "text": "choose_slot({\"slot_id\": \"appt_020|prov_046|loc_007|20260929T0800\"}) -> {\"status\": \"ok\", \"slot_id\": \"appt_020|prov_046|loc_007|20260929T0800\", \"when\": \"Tuesday, September 29 at 8 AM\", \"provider\": \"Dr. Emily Chen, MD\", \"location\": \"Richmond Care Center\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node confirm_booking"
+        },
+        {
+          "role": "assistant",
+          "text": "You chose a Cardiology Consultation with Dr. Emily Chen on Tuesday, September 29 at 8 AM at Richmond Care Center. Is that correct?"
+        },
+        {
+          "role": "user",
+          "text": "Yes, that's correct."
+        },
+        {
+          "role": "event",
+          "text": "book_appointment({}) -> {\"status\": \"booked\", \"confirmation\": \"PX-338896\", \"patient_name\": \"Sam Rivera\", \"date_of_birth\": \"1972-11-03\", \"appointment_type\": \"Cardiology Consultation\", \"slot_id\": \"appt_020|prov_046|loc_007|20260929T0800\", \"when\": \"Tuesday, September 29 at 8 AM\", \"provider\": \"Dr. Emily Chen, MD\", \"location\": \""
+        },
+        {
+          "role": "event",
+          "text": "-> node booked"
+        },
+        {
+          "role": "assistant",
+          "text": "You're booked for a Cardiology Consultation with Dr. Emily Chen on Tuesday, September 29 at 8 AM. Your confirmation number is PX-338896. The appointment is at Richmond Care Center, 4671 Bryant St, San Francisco. Anything else I can help with?"
+        },
+        {
+          "role": "user",
+          "text": "No, that's all. Thank you!"
+        },
+        {
+          "role": "event",
+          "text": "end_call({}) -> {\"status\": \"success\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node goodbye"
+        },
+        {
+          "role": "assistant",
+          "text": "Thank you for choosing Prosper Health, Sam; have a wonderful day and take care!"
+        }
+      ]
+    },
+    {
+      "agent": "ours_cascade",
+      "scenario": "annual_checkup_ambiguous",
+      "pass": true,
+      "reasons": [],
+      "booked": "Annual Physical / Dr. Kenji Patel, DO (Family Medicine) / North Beach Specialty Center / 2026-09-29 08:00:00",
+      "llm_calls": 15,
+      "prompt_tokens": 12552,
+      "completion_tokens": 381,
+      "avg_prompt_tokens": 837,
+      "max_prompt_tokens": 1304,
+      "cost_usd": 0.0053,
+      "cost_uncached_usd": 0.0056,
+      "jev_calls": 0,
+      "jev_avg_latency_ms": 0,
+      "jev_cost_usd": 0.0,
+      "cached_tokens": 1024,
+      "turns": 8,
+      "seconds": 17.6,
+      "per_call": [
+        {
+          "node": "greeting",
+          "prompt": 291,
+          "cached": 0,
+          "completion": 17
+        },
+        {
+          "node": "greeting",
+          "prompt": 329,
+          "cached": 0,
+          "completion": 16
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 460,
+          "cached": 0,
+          "completion": 10
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 484,
+          "cached": 0,
+          "completion": 14
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 514,
+          "cached": 0,
+          "completion": 18
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 548,
+          "cached": 0,
+          "completion": 39
+        },
+        {
+          "node": "find_service",
+          "prompt": 970,
+          "cached": 0,
+          "completion": 30
+        },
+        {
+          "node": "find_service",
+          "prompt": 1023,
+          "cached": 0,
+          "completion": 18
+        },
+        {
+          "node": "offer_slots",
+          "prompt": 1055,
+          "cached": 0,
+          "completion": 63
+        },
+        {
+          "node": "offer_slots",
+          "prompt": 1145,
+          "cached": 1024,
+          "completion": 32
+        },
+        {
+          "node": "confirm_booking",
+          "prompt": 950,
+          "cached": 0,
+          "completion": 33
+        },
+        {
+          "node": "confirm_booking",
+          "prompt": 996,
+          "cached": 0,
+          "completion": 11
+        },
+        {
+          "node": "booked",
+          "prompt": 1236,
+          "cached": 0,
+          "completion": 52
+        },
+        {
+          "node": "booked",
+          "prompt": 1304,
+          "cached": 0,
+          "completion": 10
+        },
+        {
+          "node": "goodbye",
+          "prompt": 1247,
+          "cached": 0,
+          "completion": 18
+        }
+      ],
+      "transcript": [
+        {
+          "role": "event",
+          "text": "-> node greeting"
+        },
+        {
+          "role": "assistant",
+          "text": "Hello, this is Ava from Prosper Health. How can I assist you today?"
+        },
+        {
+          "role": "user",
+          "text": "Hi, I\u2019d like to schedule my annual checkup, please."
+        },
+        {
+          "role": "event",
+          "text": "start_booking({\"request\": \"annual checkup\"}) -> {\"status\": \"success\", \"request\": \"annual checkup\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node identify_patient"
+        },
+        {
+          "role": "assistant",
+          "text": "May I have your full name, please?"
+        },
+        {
+          "role": "user",
+          "text": "Sure, it's Priya Shah."
+        },
+        {
+          "role": "assistant",
+          "text": "Thank you, Priya. What is your date of birth?"
+        },
+        {
+          "role": "user",
+          "text": "It's June 21, 1990."
+        },
+        {
+          "role": "assistant",
+          "text": "Have you been seen at Prosper Health before, or would this be your first visit?"
+        },
+        {
+          "role": "user",
+          "text": "Yes, I have been seen here before."
+        },
+        {
+          "role": "event",
+          "text": "record_patient({\"full_name\": \"Priya Shah\", \"date_of_birth\": \"1990-06-21\", \"new_patient\": false, \"request\": \"annual checkup\"}) -> {\"status\": \"success\", \"full_name\": \"Priya Shah\", \"date_of_birth\": \"1990-06-21\", \"new_patient\": false, \"request\": \"annual checkup\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node find_service"
+        },
+        {
+          "role": "assistant",
+          "text": "Are you looking for a hands-on annual physical exam with family medicine, or an annual wellness visit focused on preventive screenings and planning with internal medicine?"
+        },
+        {
+          "role": "user",
+          "text": "I\u2019m looking for a hands-on physical exam, not a preventive planning visit."
+        },
+        {
+          "role": "event",
+          "text": "select_service({\"appointment_type_id\": \"appt_002\"}) -> {\"status\": \"ok\", \"appointment_type\": \"Annual Physical\", \"eligible_providers\": 21, \"eligible_locations\": 8}"
+        },
+        {
+          "role": "event",
+          "text": "-> node offer_slots"
+        },
+        {
+          "role": "assistant",
+          "text": "The soonest annual physical appointments are Tuesday, September 29th: 8 AM with Dr. Kenji Patel at North Beach Specialty Center, or 8:30 AM with Dr. Michael Sato at Sunset Community Clinic, or Dr. David Johnson at North Gate Health Center. Which works for you?"
+        },
+        {
+          "role": "user",
+          "text": "I\u2019ll take the 8 AM appointment with Dr. Kenji Patel at North Beach Specialty Center."
+        },
+        {
+          "role": "event",
+          "text": "choose_slot({\"slot_id\": \"appt_002|prov_044|loc_002|20260929T0800\"}) -> {\"status\": \"ok\", \"slot_id\": \"appt_002|prov_044|loc_002|20260929T0800\", \"when\": \"Tuesday, September 29 at 8 AM\", \"provider\": \"Dr. Kenji Patel, DO\", \"location\": \"North Beach Specialty Center\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node confirm_booking"
+        },
+        {
+          "role": "assistant",
+          "text": "You chose an annual physical on Tuesday, September 29th at 8 AM with Dr. Kenji Patel at North Beach Specialty Center. Is that correct?"
+        },
+        {
+          "role": "user",
+          "text": "Yes, that\u2019s correct."
+        },
+        {
+          "role": "event",
+          "text": "book_appointment({}) -> {\"status\": \"booked\", \"confirmation\": \"PX-845469\", \"patient_name\": \"Priya Shah\", \"date_of_birth\": \"1990-06-21\", \"appointment_type\": \"Annual Physical\", \"slot_id\": \"appt_002|prov_044|loc_002|20260929T0800\", \"when\": \"Tuesday, September 29 at 8 AM\", \"provider\": \"Dr. Kenji Patel, DO\", \"location\": \"North B"
+        },
+        {
+          "role": "event",
+          "text": "-> node booked"
+        },
+        {
+          "role": "assistant",
+          "text": "You're booked for an annual physical with Dr. Kenji Patel on Tuesday, September 29th at 8 AM. Your confirmation number is PX-845469. The location is 481 Mission Street, San Francisco. Anything else I can help with?"
+        },
+        {
+          "role": "user",
+          "text": "No, that\u2019s all. Thank you!"
+        },
+        {
+          "role": "event",
+          "text": "end_call({}) -> {\"status\": \"success\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node goodbye"
+        },
+        {
+          "role": "assistant",
+          "text": "Thank you for choosing Prosper Health, Priya; have a wonderful day and take care!"
+        }
+      ]
+    },
+    {
+      "agent": "ours_cascade",
+      "scenario": "eye_exam_not_offered",
+      "pass": true,
+      "reasons": [],
+      "llm_calls": 6,
+      "prompt_tokens": 3648,
+      "completion_tokens": 100,
+      "avg_prompt_tokens": 608,
+      "max_prompt_tokens": 902,
+      "cost_usd": 0.0025,
+      "cost_uncached_usd": 0.0025,
+      "jev_calls": 1,
+      "jev_avg_latency_ms": 496,
+      "jev_cost_usd": 0.00092,
+      "cached_tokens": 0,
+      "turns": 2,
+      "seconds": 8.3,
+      "per_call": [
+        {
+          "node": "greeting",
+          "prompt": 291,
+          "cached": 0,
+          "completion": 17
+        },
+        {
+          "node": "greeting",
+          "prompt": 339,
+          "cached": 0,
+          "completion": 10
+        },
+        {
+          "node": "answer_questions",
+          "prompt": 721,
+          "cached": 0,
+          "completion": 20
+        },
+        {
+          "node": "answer_questions",
+          "prompt": 856,
+          "cached": 0,
+          "completion": 26
+        },
+        {
+          "node": "answer_questions",
+          "prompt": 902,
+          "cached": 0,
+          "completion": 10
+        },
+        {
+          "node": "goodbye",
+          "prompt": 539,
+          "cached": 0,
+          "completion": 17
+        }
+      ],
+      "transcript": [
+        {
+          "role": "event",
+          "text": "-> node greeting"
+        },
+        {
+          "role": "assistant",
+          "text": "Hello, this is Ava from Prosper Health. How can I assist you today?"
+        },
+        {
+          "role": "user",
+          "text": "Hi, this is Alex Kim. I\u2019d like to schedule an eye exam for new glasses. Do you offer that?"
+        },
+        {
+          "role": "event",
+          "text": "ask_question({}) -> {\"status\": \"success\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node answer_questions"
+        },
+        {
+          "role": "event",
+          "text": "find_appointment_types({\"request\": \"eye exam for new glasses\"}) -> {\"status\": \"not_offered\", \"candidates\": [{\"appointment_type_id\": \"appt_045\", \"name\": \"Eye Exam\", \"specialty\": \"Ophthalmology\", \"duration_min\": 30, \"requires_referral\": false, \"new_patients_allowed\": true, \"description\": \"Basic eye and vision exam.\", \"offered\": false}], \"related_offered\": [], \"confid"
+        },
+        {
+          "role": "assistant",
+          "text": "We do not offer eye exams for new glasses at Prosper Health. Would you like help with another type of appointment or service?"
+        },
+        {
+          "role": "user",
+          "text": "No, that's okay. Thank you for your help. Goodbye!"
+        },
+        {
+          "role": "event",
+          "text": "end_call({}) -> {\"status\": \"success\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node goodbye"
+        },
+        {
+          "role": "assistant",
+          "text": "Thank you for calling Prosper Health, Alex, and have a wonderful day! Goodbye!"
+        }
+      ]
+    },
+    {
+      "agent": "ours_cascade",
+      "scenario": "therapy_new_patient",
+      "pass": true,
+      "reasons": [],
+      "booked": "Psychiatric Evaluation / Dr. Wei Smith, MD (Psychiatry) / Mission District Family Clinic / 2026-09-29 08:00:00",
+      "llm_calls": 15,
+      "prompt_tokens": 12273,
+      "completion_tokens": 351,
+      "avg_prompt_tokens": 818,
+      "max_prompt_tokens": 1267,
+      "cost_usd": 0.0048,
+      "cost_uncached_usd": 0.0055,
+      "jev_calls": 0,
+      "jev_avg_latency_ms": 0,
+      "jev_cost_usd": 0.0,
+      "cached_tokens": 2176,
+      "turns": 8,
+      "seconds": 17.3,
+      "per_call": [
+        {
+          "node": "greeting",
+          "prompt": 291,
+          "cached": 0,
+          "completion": 17
+        },
+        {
+          "node": "greeting",
+          "prompt": 334,
+          "cached": 0,
+          "completion": 14
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 461,
+          "cached": 0,
+          "completion": 10
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 484,
+          "cached": 0,
+          "completion": 15
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 515,
+          "cached": 0,
+          "completion": 12
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 542,
+          "cached": 0,
+          "completion": 36
+        },
+        {
+          "node": "find_service",
+          "prompt": 937,
+          "cached": 0,
+          "completion": 37
+        },
+        {
+          "node": "find_service",
+          "prompt": 994,
+          "cached": 0,
+          "completion": 24
+        },
+        {
+          "node": "offer_slots",
+          "prompt": 1059,
+          "cached": 0,
+          "completion": 34
+        },
+        {
+          "node": "offer_slots",
+          "prompt": 1107,
+          "cached": 1024,
+          "completion": 32
+        },
+        {
+          "node": "confirm_booking",
+          "prompt": 911,
+          "cached": 0,
+          "completion": 34
+        },
+        {
+          "node": "confirm_booking",
+          "prompt": 960,
+          "cached": 0,
+          "completion": 11
+        },
+        {
+          "node": "booked",
+          "prompt": 1201,
+          "cached": 0,
+          "completion": 48
+        },
+        {
+          "node": "booked",
+          "prompt": 1267,
+          "cached": 1152,
+          "completion": 10
+        },
+        {
+          "node": "goodbye",
+          "prompt": 1210,
+          "cached": 0,
+          "completion": 17
+        }
+      ],
+      "transcript": [
+        {
+          "role": "event",
+          "text": "-> node greeting"
+        },
+        {
+          "role": "assistant",
+          "text": "Hello, this is Ava from Prosper Health. How can I assist you today?"
+        },
+        {
+          "role": "user",
+          "text": "Hi, Ava. I\u2019d like to start therapy. I have a referral from my GP."
+        },
+        {
+          "role": "event",
+          "text": "start_booking({\"request\": \"therapy\"}) -> {\"status\": \"success\", \"request\": \"therapy\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node identify_patient"
+        },
+        {
+          "role": "assistant",
+          "text": "May I have your full name, please?"
+        },
+        {
+          "role": "user",
+          "text": "Sure, it's Morgan Blake."
+        },
+        {
+          "role": "assistant",
+          "text": "Thank you, Morgan. Could you please provide your date of birth?"
+        },
+        {
+          "role": "user",
+          "text": "It's September 9, 1988."
+        },
+        {
+          "role": "assistant",
+          "text": "Have you been seen at Prosper Health before, Morgan?"
+        },
+        {
+          "role": "user",
+          "text": "No, I\u2019m a new patient."
+        },
+        {
+          "role": "event",
+          "text": "record_patient({\"full_name\": \"Morgan Blake\", \"date_of_birth\": \"1988-09-09\", \"new_patient\": true, \"request\": \"therapy\"}) -> {\"status\": \"success\", \"full_name\": \"Morgan Blake\", \"date_of_birth\": \"1988-09-09\", \"new_patient\": true, \"request\": \"therapy\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node find_service"
+        },
+        {
+          "role": "assistant",
+          "text": "Therapy sessions are only for established patients, but as a new patient, you could start with a psychiatric evaluation, which requires a referral. Do you have a referral for this?"
+        },
+        {
+          "role": "user",
+          "text": "Yes, I have a referral from my GP for the evaluation."
+        },
+        {
+          "role": "event",
+          "text": "select_service({\"appointment_type_id\": \"appt_059\", \"has_referral\": true}) -> {\"status\": \"ok\", \"appointment_type\": \"Psychiatric Evaluation\", \"eligible_providers\": 1, \"eligible_locations\": 1}"
+        },
+        {
+          "role": "event",
+          "text": "-> node offer_slots"
+        },
+        {
+          "role": "assistant",
+          "text": "The soonest Psychiatric Evaluation is Tuesday, September 29 at 8 AM with Dr. Wei Smith at Mission District Family Clinic. Does that work for you?"
+        },
+        {
+          "role": "user",
+          "text": "Yes, that works for me."
+        },
+        {
+          "role": "event",
+          "text": "choose_slot({\"slot_id\": \"appt_059|prov_011|loc_001|20260929T0800\"}) -> {\"status\": \"ok\", \"slot_id\": \"appt_059|prov_011|loc_001|20260929T0800\", \"when\": \"Tuesday, September 29 at 8 AM\", \"provider\": \"Dr. Wei Smith, MD\", \"location\": \"Mission District Family Clinic\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node confirm_booking"
+        },
+        {
+          "role": "assistant",
+          "text": "You are scheduled for a Psychiatric Evaluation on Tuesday, September 29 at 8 AM with Dr. Wei Smith at Mission District Family Clinic. Is that correct?"
+        },
+        {
+          "role": "user",
+          "text": "Yes, that's correct. Thank you!"
+        },
+        {
+          "role": "event",
+          "text": "book_appointment({}) -> {\"status\": \"booked\", \"confirmation\": \"PX-602061\", \"patient_name\": \"Morgan Blake\", \"date_of_birth\": \"1988-09-09\", \"appointment_type\": \"Psychiatric Evaluation\", \"slot_id\": \"appt_059|prov_011|loc_001|20260929T0800\", \"when\": \"Tuesday, September 29 at 8 AM\", \"provider\": \"Dr. Wei Smith, MD\", \"location\": \""
+        },
+        {
+          "role": "event",
+          "text": "-> node booked"
+        },
+        {
+          "role": "assistant",
+          "text": "You're booked for Tuesday, September 29 at 8 AM with Dr. Wei Smith. Your confirmation number is PX-602061. The clinic is at 4732 Market St, San Francisco. Anything else I can help with?"
+        },
+        {
+          "role": "user",
+          "text": "No, that's all. Thank you for your help!"
+        },
+        {
+          "role": "event",
+          "text": "end_call({}) -> {\"status\": \"success\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node goodbye"
+        },
+        {
+          "role": "assistant",
+          "text": "Thank you for choosing Prosper Health, Morgan; have a wonderful day and take care!"
+        }
+      ]
+    },
+    {
+      "agent": "ours_cascade",
+      "scenario": "maria_garcia_peds",
+      "pass": true,
+      "reasons": [],
+      "booked": "Well-Child Visit / Dr. Maria Garcia, MD (Pediatrics) / Mission Bay Health Center / 2026-09-29 13:00:00",
+      "llm_calls": 17,
+      "prompt_tokens": 15142,
+      "completion_tokens": 467,
+      "avg_prompt_tokens": 891,
+      "max_prompt_tokens": 1354,
+      "cost_usd": 0.0058,
+      "cost_uncached_usd": 0.0068,
+      "jev_calls": 0,
+      "jev_avg_latency_ms": 0,
+      "jev_cost_usd": 0.0,
+      "cached_tokens": 3328,
+      "turns": 9,
+      "seconds": 21.1,
+      "per_call": [
+        {
+          "node": "greeting",
+          "prompt": 291,
+          "cached": 0,
+          "completion": 17
+        },
+        {
+          "node": "greeting",
+          "prompt": 333,
+          "cached": 0,
+          "completion": 17
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 466,
+          "cached": 0,
+          "completion": 11
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 492,
+          "cached": 0,
+          "completion": 10
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 522,
+          "cached": 0,
+          "completion": 11
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 548,
+          "cached": 0,
+          "completion": 40
+        },
+        {
+          "node": "find_service",
+          "prompt": 956,
+          "cached": 0,
+          "completion": 38
+        },
+        {
+          "node": "find_service",
+          "prompt": 1014,
+          "cached": 0,
+          "completion": 31
+        },
+        {
+          "node": "find_service",
+          "prompt": 1127,
+          "cached": 0,
+          "completion": 34
+        },
+        {
+          "node": "find_service",
+          "prompt": 1181,
+          "cached": 1024,
+          "completion": 32
+        },
+        {
+          "node": "offer_slots",
+          "prompt": 1095,
+          "cached": 1024,
+          "completion": 38
+        },
+        {
+          "node": "offer_slots",
+          "prompt": 1153,
+          "cached": 0,
+          "completion": 63
+        },
+        {
+          "node": "confirm_booking",
+          "prompt": 991,
+          "cached": 0,
+          "completion": 33
+        },
+        {
+          "node": "confirm_booking",
+          "prompt": 1040,
+          "cached": 0,
+          "completion": 11
+        },
+        {
+          "node": "booked",
+          "prompt": 1282,
+          "cached": 0,
+          "completion": 53
+        },
+        {
+          "node": "booked",
+          "prompt": 1354,
+          "cached": 1280,
+          "completion": 10
+        },
+        {
+          "node": "goodbye",
+          "prompt": 1297,
+          "cached": 0,
+          "completion": 18
+        }
+      ],
+      "transcript": [
+        {
+          "role": "event",
+          "text": "-> node greeting"
+        },
+        {
+          "role": "assistant",
+          "text": "Hello, this is Ava from Prosper Health. How can I assist you today?"
+        },
+        {
+          "role": "user",
+          "text": "Hi, I\u2019d like to schedule a well-child checkup for my daughter, please."
+        },
+        {
+          "role": "event",
+          "text": "start_booking({\"request\": \"well-child checkup\"}) -> {\"status\": \"success\", \"request\": \"well-child checkup\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node identify_patient"
+        },
+        {
+          "role": "assistant",
+          "text": "May I have your daughter's full name, please?"
+        },
+        {
+          "role": "user",
+          "text": "Sure, her name is Lily Tran."
+        },
+        {
+          "role": "assistant",
+          "text": "What is Lily Tran's date of birth?"
+        },
+        {
+          "role": "user",
+          "text": "Lily was born on March 30, 2019."
+        },
+        {
+          "role": "assistant",
+          "text": "Has Lily Tran been seen at Prosper Health before?"
+        },
+        {
+          "role": "user",
+          "text": "No, she\u2019s a new patient."
+        },
+        {
+          "role": "event",
+          "text": "record_patient({\"full_name\": \"Lily Tran\", \"date_of_birth\": \"2019-03-30\", \"new_patient\": true, \"request\": \"well-child checkup\"}) -> {\"status\": \"success\", \"full_name\": \"Lily Tran\", \"date_of_birth\": \"2019-03-30\", \"new_patient\": true, \"request\": \"well-child checkup\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node find_service"
+        },
+        {
+          "role": "assistant",
+          "text": "You need a Well-Child Visit for your child, which is available for new patients and does not require a referral. Do you have a preferred clinic location or provider for this appointment?"
+        },
+        {
+          "role": "user",
+          "text": "I\u2019d like to see Dr. Maria Garcia, if possible."
+        },
+        {
+          "role": "event",
+          "text": "find_providers({\"name\": \"Maria Garcia\", \"specialty\": \"Pediatrics\", \"appointment_type_id\": \"appt_015\"}) -> {\"status\": \"match\", \"candidates\": [{\"provider_id\": \"prov_002\", \"name\": \"Dr. Maria Garcia\", \"title\": \"MD\", \"specialty\": \"Pediatrics\", \"locations\": [\"Mission Bay Health Center\"], \"accepting_new_patients\": true, \"languages\": [\"English\", \"Mandarin\"]}]}"
+        },
+        {
+          "role": "assistant",
+          "text": "Dr. Maria Garcia is a pediatrician at Mission Bay Health Center and is accepting new patients. Would you like to book the Well-Child Visit with her there?"
+        },
+        {
+          "role": "user",
+          "text": "Yes, that sounds great! When is the next available appointment?"
+        },
+        {
+          "role": "event",
+          "text": "select_service({\"appointment_type_id\": \"appt_015\", \"provider_id\": \"prov_002\", \"location_id\": \"loc_000\"}) -> {\"status\": \"ok\", \"appointment_type\": \"Well-Child Visit\", \"eligible_providers\": 1, \"eligible_locations\": 1}"
+        },
+        {
+          "role": "event",
+          "text": "-> node offer_slots"
+        },
+        {
+          "role": "assistant",
+          "text": "The soonest well-child checkup with Dr. Maria Garcia at Mission Bay Health Center is Tuesday, September 29 at 1 PM. Would you like that, or another day?"
+        },
+        {
+          "role": "user",
+          "text": "That works for us! I\u2019d like to book that appointment."
+        },
+        {
+          "role": "event",
+          "text": "choose_slot({\"slot_id\": \"appt_015|prov_002|loc_000|20260929T1300\"}) -> {\"status\": \"ok\", \"slot_id\": \"appt_015|prov_002|loc_000|20260929T1300\", \"when\": \"Tuesday, September 29 at 1 PM\", \"provider\": \"Dr. Maria Garcia, MD\", \"location\": \"Mission Bay Health Center\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node confirm_booking"
+        },
+        {
+          "role": "assistant",
+          "text": "You\u2019re booking a well-child visit on Tuesday, September 29 at 1 PM with Dr. Maria Garcia at Mission Bay Health Center. Is that correct?"
+        },
+        {
+          "role": "user",
+          "text": "Yes, that\u2019s correct. Thank you!"
+        },
+        {
+          "role": "event",
+          "text": "book_appointment({}) -> {\"status\": \"booked\", \"confirmation\": \"PX-319961\", \"patient_name\": \"Lily Tran\", \"date_of_birth\": \"2019-03-30\", \"appointment_type\": \"Well-Child Visit\", \"slot_id\": \"appt_015|prov_002|loc_000|20260929T1300\", \"when\": \"Tuesday, September 29 at 1 PM\", \"provider\": \"Dr. Maria Garcia, MD\", \"location\": \"Missio"
+        },
+        {
+          "role": "event",
+          "text": "-> node booked"
+        },
+        {
+          "role": "assistant",
+          "text": "Your well-child visit is booked for Tuesday, September 29 at 1 PM with Dr. Maria Garcia at Mission Bay Health Center, 4874 Main St, San Francisco. Your confirmation number is PX-319961. Anything else I can help with?"
+        },
+        {
+          "role": "user",
+          "text": "No, that\u2019s all. Thank you for your help!"
+        },
+        {
+          "role": "event",
+          "text": "end_call({}) -> {\"status\": \"success\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node goodbye"
+        },
+        {
+          "role": "assistant",
+          "text": "Thank you, Lily, for choosing Prosper Health\u2014have a wonderful day and take care!"
+        }
+      ]
+    },
+    {
+      "agent": "ours_cascade",
+      "scenario": "mole_removal_wrong_site",
+      "pass": true,
+      "reasons": [],
+      "booked": "Mole Removal / Dr. Wei Sato, DO (Dermatology) / Mission Bay Health Center / 2026-09-30 09:30:00",
+      "llm_calls": 15,
+      "prompt_tokens": 13296,
+      "completion_tokens": 424,
+      "avg_prompt_tokens": 886,
+      "max_prompt_tokens": 1315,
+      "cost_usd": 0.0057,
+      "cost_uncached_usd": 0.006,
+      "jev_calls": 0,
+      "jev_avg_latency_ms": 0,
+      "jev_cost_usd": 0.0,
+      "cached_tokens": 1024,
+      "turns": 8,
+      "seconds": 18.6,
+      "per_call": [
+        {
+          "node": "greeting",
+          "prompt": 291,
+          "cached": 0,
+          "completion": 17
+        },
+        {
+          "node": "greeting",
+          "prompt": 349,
+          "cached": 0,
+          "completion": 50
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 533,
+          "cached": 0,
+          "completion": 14
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 565,
+          "cached": 0,
+          "completion": 12
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 593,
+          "cached": 0,
+          "completion": 45
+        },
+        {
+          "node": "find_service",
+          "prompt": 942,
+          "cached": 0,
+          "completion": 32
+        },
+        {
+          "node": "find_service",
+          "prompt": 991,
+          "cached": 0,
+          "completion": 26
+        },
+        {
+          "node": "find_service",
+          "prompt": 1040,
+          "cached": 0,
+          "completion": 31
+        },
+        {
+          "node": "offer_slots",
+          "prompt": 1087,
+          "cached": 0,
+          "completion": 37
+        },
+        {
+          "node": "offer_slots",
+          "prompt": 1142,
+          "cached": 1024,
+          "completion": 32
+        },
+        {
+          "node": "confirm_booking",
+          "prompt": 949,
+          "cached": 0,
+          "completion": 35
+        },
+        {
+          "node": "confirm_booking",
+          "prompt": 999,
+          "cached": 0,
+          "completion": 11
+        },
+        {
+          "node": "booked",
+          "prompt": 1242,
+          "cached": 0,
+          "completion": 55
+        },
+        {
+          "node": "booked",
+          "prompt": 1315,
+          "cached": 0,
+          "completion": 10
+        },
+        {
+          "node": "goodbye",
+          "prompt": 1258,
+          "cached": 0,
+          "completion": 17
+        }
+      ],
+      "transcript": [
+        {
+          "role": "event",
+          "text": "-> node greeting"
+        },
+        {
+          "role": "assistant",
+          "text": "Hello, this is Ava from Prosper Health. How can I assist you today?"
+        },
+        {
+          "role": "user",
+          "text": "Hi, this is Chris Park. I need to schedule an appointment to have a mole removed. My dermatologist referred me. Can I do that at the Downtown Health Center?"
+        },
+        {
+          "role": "event",
+          "text": "ask_question({}) -> {\"status\": \"success\"}"
+        },
+        {
+          "role": "event",
+          "text": "start_booking({\"request\": \"mole removal\", \"preferences\": \"Downtown Health Center\"}) -> {\"status\": \"success\", \"request\": \"mole removal\", \"preferences\": \"Downtown Health Center\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node identify_patient"
+        },
+        {
+          "role": "assistant",
+          "text": "Thanks, Chris. Can you please provide your date of birth?"
+        },
+        {
+          "role": "user",
+          "text": "Sure, it's December 1, 1979."
+        },
+        {
+          "role": "assistant",
+          "text": "Have you been seen at Prosper Health before, Chris?"
+        },
+        {
+          "role": "user",
+          "text": "Yes, I have been seen there before."
+        },
+        {
+          "role": "event",
+          "text": "record_patient({\"full_name\": \"Chris Park\", \"date_of_birth\": \"1979-12-01\", \"new_patient\": false, \"request\": \"mole removal\", \"preferences\": \"Downtown Health Center\"}) -> {\"status\": \"success\", \"full_name\": \"Chris Park\", \"date_of_birth\": \"1979-12-01\", \"new_patient\": false, \"request\": \"mole removal\", \"preferences\": \"Downtown Health Center\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node find_service"
+        },
+        {
+          "role": "assistant",
+          "text": "Mole removal requires a referral and can only be done at surgery-capable sites, not Downtown Health Center. Do you have a referral for this procedure?"
+        },
+        {
+          "role": "user",
+          "text": "Yes, I have a referral from my dermatologist."
+        },
+        {
+          "role": "assistant",
+          "text": "Great! Would you prefer to book your mole removal at Mission Bay Health Center, Sunset Community Clinic, or Richmond Care Center?"
+        },
+        {
+          "role": "user",
+          "text": "I can go with the Mission Bay Health Center. What do you have available?"
+        },
+        {
+          "role": "event",
+          "text": "select_service({\"appointment_type_id\": \"appt_029\", \"location_id\": \"loc_000\", \"has_referral\": true}) -> {\"status\": \"ok\", \"appointment_type\": \"Mole Removal\", \"eligible_providers\": 1, \"eligible_locations\": 1}"
+        },
+        {
+          "role": "event",
+          "text": "-> node offer_slots"
+        },
+        {
+          "role": "assistant",
+          "text": "The soonest mole removal appointment is Wednesday, September 30 at 9:30 AM with Dr. Wei Sato at Mission Bay Health Center. Does that work for you?"
+        },
+        {
+          "role": "user",
+          "text": "Yes, that works for me. Please book it."
+        },
+        {
+          "role": "event",
+          "text": "choose_slot({\"slot_id\": \"appt_029|prov_048|loc_000|20260930T0930\"}) -> {\"status\": \"ok\", \"slot_id\": \"appt_029|prov_048|loc_000|20260930T0930\", \"when\": \"Wednesday, September 30 at 9:30 AM\", \"provider\": \"Dr. Wei Sato, DO\", \"location\": \"Mission Bay Health Center\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node confirm_booking"
+        },
+        {
+          "role": "assistant",
+          "text": "You chose a mole removal appointment on Wednesday, September 30 at 9:30 AM with Dr. Wei Sato at Mission Bay Health Center. Is that correct?"
+        },
+        {
+          "role": "user",
+          "text": "Yes, that's correct. Thank you!"
+        },
+        {
+          "role": "event",
+          "text": "book_appointment({}) -> {\"status\": \"booked\", \"confirmation\": \"PX-465730\", \"patient_name\": \"Chris Park\", \"date_of_birth\": \"1979-12-01\", \"appointment_type\": \"Mole Removal\", \"slot_id\": \"appt_029|prov_048|loc_000|20260930T0930\", \"when\": \"Wednesday, September 30 at 9:30 AM\", \"provider\": \"Dr. Wei Sato, DO\", \"location\": \"Mission "
+        },
+        {
+          "role": "event",
+          "text": "-> node booked"
+        },
+        {
+          "role": "assistant",
+          "text": "Your mole removal is booked for Wednesday, September 30 at 9:30 AM with Dr. Wei Sato at Mission Bay Health Center, 4874 Main St, San Francisco. Your confirmation number is PX-465730. Anything else I can help with?"
+        },
+        {
+          "role": "user",
+          "text": "No, that's all. Thank you for your help!"
+        },
+        {
+          "role": "event",
+          "text": "end_call({}) -> {\"status\": \"success\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node goodbye"
+        },
+        {
+          "role": "assistant",
+          "text": "Thank you for choosing Prosper Health, Chris, and have a wonderful day! Goodbye!"
+        }
+      ]
+    },
+    {
+      "agent": "ours_cascade",
+      "scenario": "spanish_sick_visit",
+      "pass": true,
+      "reasons": [],
+      "booked": "Sick Visit / Dr. Carlos Garcia, MD (Family Medicine) / North Beach Specialty Center / 2026-09-29 11:30:00",
+      "llm_calls": 22,
+      "prompt_tokens": 30205,
+      "completion_tokens": 632,
+      "avg_prompt_tokens": 1373,
+      "max_prompt_tokens": 2178,
+      "cost_usd": 0.0107,
+      "cost_uncached_usd": 0.014,
+      "jev_calls": 1,
+      "jev_avg_latency_ms": 487,
+      "jev_cost_usd": 0.00092,
+      "cached_tokens": 11136,
+      "turns": 11,
+      "seconds": 26.7,
+      "per_call": [
+        {
+          "node": "greeting",
+          "prompt": 291,
+          "cached": 0,
+          "completion": 17
+        },
+        {
+          "node": "greeting",
+          "prompt": 348,
+          "cached": 0,
+          "completion": 25
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 499,
+          "cached": 0,
+          "completion": 16
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 533,
+          "cached": 0,
+          "completion": 18
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 570,
+          "cached": 0,
+          "completion": 48
+        },
+        {
+          "node": "find_service",
+          "prompt": 1026,
+          "cached": 0,
+          "completion": 31
+        },
+        {
+          "node": "find_service",
+          "prompt": 1077,
+          "cached": 0,
+          "completion": 23
+        },
+        {
+          "node": "find_service",
+          "prompt": 1467,
+          "cached": 0,
+          "completion": 40
+        },
+        {
+          "node": "find_service",
+          "prompt": 1529,
+          "cached": 0,
+          "completion": 18
+        },
+        {
+          "node": "find_service",
+          "prompt": 2114,
+          "cached": 1408,
+          "completion": 46
+        },
+        {
+          "node": "find_service",
+          "prompt": 2178,
+          "cached": 2048,
+          "completion": 18
+        },
+        {
+          "node": "offer_slots",
+          "prompt": 1067,
+          "cached": 0,
+          "completion": 57
+        },
+        {
+          "node": "offer_slots",
+          "prompt": 1146,
+          "cached": 1024,
+          "completion": 23
+        },
+        {
+          "node": "offer_slots",
+          "prompt": 1536,
+          "cached": 0,
+          "completion": 40
+        },
+        {
+          "node": "offer_slots",
+          "prompt": 1602,
+          "cached": 1408,
+          "completion": 17
+        },
+        {
+          "node": "offer_slots",
+          "prompt": 1837,
+          "cached": 1536,
+          "completion": 39
+        },
+        {
+          "node": "offer_slots",
+          "prompt": 1892,
+          "cached": 1792,
+          "completion": 32
+        },
+        {
+          "node": "confirm_booking",
+          "prompt": 1698,
+          "cached": 0,
+          "completion": 34
+        },
+        {
+          "node": "confirm_booking",
+          "prompt": 1747,
+          "cached": 0,
+          "completion": 11
+        },
+        {
+          "node": "booked",
+          "prompt": 1989,
+          "cached": 0,
+          "completion": 52
+        },
+        {
+          "node": "booked",
+          "prompt": 2058,
+          "cached": 1920,
+          "completion": 10
+        },
+        {
+          "node": "goodbye",
+          "prompt": 2001,
+          "cached": 0,
+          "completion": 17
+        }
+      ],
+      "transcript": [
+        {
+          "role": "event",
+          "text": "-> node greeting"
+        },
+        {
+          "role": "assistant",
+          "text": "Hello, this is Ava from Prosper Health. How can I assist you today?"
+        },
+        {
+          "role": "user",
+          "text": "Hi, my name is Rosa Delgado. I need to see a doctor. I have a bad cough and fever. Also, I need a doctor who speaks Spanish."
+        },
+        {
+          "role": "event",
+          "text": "start_booking({\"request\": \"doctor visit for cough and fever\", \"preferences\": \"Spanish-speaking doctor\"}) -> {\"status\": \"success\", \"request\": \"doctor visit for cough and fever\", \"preferences\": \"Spanish-speaking doctor\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node identify_patient"
+        },
+        {
+          "role": "assistant",
+          "text": "Thank you, Rosa. Could you please tell me your date of birth?"
+        },
+        {
+          "role": "user",
+          "text": "Sure, it's July 15, 1965."
+        },
+        {
+          "role": "assistant",
+          "text": "Have you been seen before at Prosper Health, or would this be your first visit?"
+        },
+        {
+          "role": "user",
+          "text": "This will be my first visit. I'm a new patient."
+        },
+        {
+          "role": "event",
+          "text": "record_patient({\"full_name\": \"Rosa Delgado\", \"date_of_birth\": \"1965-07-15\", \"new_patient\": true, \"request\": \"doctor visit for cough and fever\", \"preferences\": \"Spanish-speaking doctor\"}) -> {\"status\": \"success\", \"full_name\": \"Rosa Delgado\", \"date_of_birth\": \"1965-07-15\", \"new_patient\": true, \"request\": \"doctor visit for cough and fever\", \"preferences\": \"Spanish-speaking doctor\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node find_service"
+        },
+        {
+          "role": "assistant",
+          "text": "For your cough and fever, would you prefer a shorter sick visit focused on your symptoms, or a longer new patient consultation to discuss your overall health?"
+        },
+        {
+          "role": "user",
+          "text": "I just need a shorter sick visit for my cough and fever."
+        },
+        {
+          "role": "event",
+          "text": "find_providers({\"appointment_type_id\": \"appt_007\", \"language\": \"Spanish\"}) -> {\"status\": \"multiple\", \"candidates\": [{\"provider_id\": \"prov_008\", \"name\": \"Dr. Carlos Garcia\", \"title\": \"MD\", \"specialty\": \"Family Medicine\", \"locations\": [\"North Beach Specialty Center\", \"Richmond Care Center\"], \"accepting_new_patients\": true, \"languages\": [\"English\", \"Spanish\"]}, {\"provider_id\": \""
+        },
+        {
+          "role": "assistant",
+          "text": "We have several Spanish-speaking providers for a sick visit: Dr. Carlos Garcia in Family Medicine, Dr. Tomas Hernandez in Internal Medicine, and others. Do you have a preferred provider or location?"
+        },
+        {
+          "role": "user",
+          "text": "I don't have a preference. Any of the Spanish-speaking doctors are fine."
+        },
+        {
+          "role": "event",
+          "text": "find_locations({\"appointment_type_id\": \"appt_007\"}) -> {\"status\": \"multiple\", \"candidates\": [{\"location_id\": \"loc_000\", \"name\": \"Mission Bay Health Center\", \"address\": \"4874 Main St, San Francisco\", \"phone\": \"(415) 555-9313\", \"hours\": \"Mon-Fri 8:00-17:00\", \"services\": [\"lab\", \"physical_therapy\", \"surgery\"]}, {\"location_id\": \"loc_001\", \"name\": \"Mission D"
+        },
+        {
+          "role": "assistant",
+          "text": "You can see a Spanish-speaking doctor for your sick visit at several locations like Mission Bay Health Center, North Beach Specialty Center, or Sunset Community Clinic. Do you want me to find the earliest available appointment at any of these?"
+        },
+        {
+          "role": "user",
+          "text": "Yes, please. The earliest appointment works for me."
+        },
+        {
+          "role": "event",
+          "text": "select_service({\"appointment_type_id\": \"appt_007\"}) -> {\"status\": \"ok\", \"appointment_type\": \"Sick Visit\", \"eligible_providers\": 18, \"eligible_locations\": 8}"
+        },
+        {
+          "role": "event",
+          "text": "-> node offer_slots"
+        },
+        {
+          "role": "assistant",
+          "text": "The soonest sick visit slots are Tuesday the 29th at 8 AM with Dr. Kenji Patel at North Beach, or 8:30 AM with Dr. David Johnson at North Gate, or Dr. Fatima Patel at Mission Bay. Which works for you?"
+        },
+        {
+          "role": "user",
+          "text": "I need a Spanish-speaking doctor. Do you have any slots with them?"
+        },
+        {
+          "role": "event",
+          "text": "find_providers({\"appointment_type_id\": \"appt_007\", \"language\": \"Spanish\"}) -> {\"status\": \"multiple\", \"candidates\": [{\"provider_id\": \"prov_008\", \"name\": \"Dr. Carlos Garcia\", \"title\": \"MD\", \"specialty\": \"Family Medicine\", \"locations\": [\"North Beach Specialty Center\", \"Richmond Care Center\"], \"accepting_new_patients\": true, \"languages\": [\"English\", \"Spanish\"]}, {\"provider_id\": \""
+        },
+        {
+          "role": "assistant",
+          "text": "I found several Spanish-speaking providers including Dr. Carlos Garcia in Family Medicine at North Beach, and Dr. Tomas Hernandez in Internal Medicine at Mission Bay. Do you prefer a specific provider or location?"
+        },
+        {
+          "role": "user",
+          "text": "I don't have a specific preference. Just the earliest appointment with a Spanish-speaking doctor, please."
+        },
+        {
+          "role": "event",
+          "text": "search_slots({\"provider_id\": \"prov_008\"}) -> {\"status\": \"ok\", \"appointment_type\": \"Sick Visit\", \"eligible_providers\": 1, \"eligible_locations\": 2, \"slots\": [{\"slot_id\": \"appt_007|prov_008|loc_002|20260929T1130\", \"when\": \"Tuesday, September 29 at 11:30 AM\", \"provider\": \"Dr. Carlos Garcia, MD\", \"location\": \"North Beach Specialty Center\"}, {\"slot_"
+        },
+        {
+          "role": "assistant",
+          "text": "The earliest appointment with a Spanish-speaking doctor is Tuesday the 29th at 11:30 AM with Dr. Carlos Garcia at North Beach Specialty Center. Would you like to book this?"
+        },
+        {
+          "role": "user",
+          "text": "Yes, please book that appointment for me."
+        },
+        {
+          "role": "event",
+          "text": "choose_slot({\"slot_id\": \"appt_007|prov_008|loc_002|20260929T1130\"}) -> {\"status\": \"ok\", \"slot_id\": \"appt_007|prov_008|loc_002|20260929T1130\", \"when\": \"Tuesday, September 29 at 11:30 AM\", \"provider\": \"Dr. Carlos Garcia, MD\", \"location\": \"North Beach Specialty Center\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node confirm_booking"
+        },
+        {
+          "role": "assistant",
+          "text": "You are booking a sick visit on Tuesday, September 29 at 11:30 AM with Dr. Carlos Garcia at North Beach Specialty Center. Is that correct?"
+        },
+        {
+          "role": "user",
+          "text": "Yes, that's correct. Thank you!"
+        },
+        {
+          "role": "event",
+          "text": "book_appointment({}) -> {\"status\": \"booked\", \"confirmation\": \"PX-919081\", \"patient_name\": \"Rosa Delgado\", \"date_of_birth\": \"1965-07-15\", \"appointment_type\": \"Sick Visit\", \"slot_id\": \"appt_007|prov_008|loc_002|20260929T1130\", \"when\": \"Tuesday, September 29 at 11:30 AM\", \"provider\": \"Dr. Carlos Garcia, MD\", \"location\": \"Nort"
+        },
+        {
+          "role": "event",
+          "text": "-> node booked"
+        },
+        {
+          "role": "assistant",
+          "text": "You're booked for a sick visit with Dr. Carlos Garcia on Tuesday, September 29 at 11:30 AM. Your confirmation number is PX-919081. The location is 481 Mission St, San Francisco. Anything else I can help with?"
+        },
+        {
+          "role": "user",
+          "text": "No, that's all. Thank you very much!"
+        },
+        {
+          "role": "event",
+          "text": "end_call({}) -> {\"status\": \"success\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node goodbye"
+        },
+        {
+          "role": "assistant",
+          "text": "Thank you for choosing Prosper Health, Rosa; take care and have a great day!"
+        }
+      ]
+    },
+    {
+      "agent": "ours_cascade",
+      "scenario": "blood_work_mission",
+      "pass": true,
+      "reasons": [],
+      "booked": "Blood Draw / Lab Work / Dr. Leila Sato, DO (Lab) / Mission Bay Health Center / 2026-10-01 09:00:00",
+      "llm_calls": 18,
+      "prompt_tokens": 16927,
+      "completion_tokens": 421,
+      "avg_prompt_tokens": 940,
+      "max_prompt_tokens": 1311,
+      "cost_usd": 0.0087,
+      "cost_uncached_usd": 0.0093,
+      "jev_calls": 2,
+      "jev_avg_latency_ms": 450,
+      "jev_cost_usd": 0.00183,
+      "cached_tokens": 2048,
+      "turns": 8,
+      "seconds": 19.6,
+      "per_call": [
+        {
+          "node": "greeting",
+          "prompt": 291,
+          "cached": 0,
+          "completion": 17
+        },
+        {
+          "node": "greeting",
+          "prompt": 334,
+          "cached": 0,
+          "completion": 10
+        },
+        {
+          "node": "answer_questions",
+          "prompt": 716,
+          "cached": 0,
+          "completion": 18
+        },
+        {
+          "node": "answer_questions",
+          "prompt": 880,
+          "cached": 0,
+          "completion": 18
+        },
+        {
+          "node": "answer_questions",
+          "prompt": 991,
+          "cached": 0,
+          "completion": 30
+        },
+        {
+          "node": "answer_questions",
+          "prompt": 1042,
+          "cached": 0,
+          "completion": 23
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 894,
+          "cached": 0,
+          "completion": 16
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 923,
+          "cached": 0,
+          "completion": 10
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 949,
+          "cached": 0,
+          "completion": 18
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 980,
+          "cached": 0,
+          "completion": 45
+        },
+        {
+          "node": "find_service",
+          "prompt": 914,
+          "cached": 0,
+          "completion": 25
+        },
+        {
+          "node": "offer_slots",
+          "prompt": 1086,
+          "cached": 1024,
+          "completion": 39
+        },
+        {
+          "node": "offer_slots",
+          "prompt": 1152,
+          "cached": 1024,
+          "completion": 32
+        },
+        {
+          "node": "confirm_booking",
+          "prompt": 958,
+          "cached": 0,
+          "completion": 34
+        },
+        {
+          "node": "confirm_booking",
+          "prompt": 1004,
+          "cached": 0,
+          "completion": 11
+        },
+        {
+          "node": "booked",
+          "prompt": 1248,
+          "cached": 0,
+          "completion": 48
+        },
+        {
+          "node": "booked",
+          "prompt": 1311,
+          "cached": 0,
+          "completion": 10
+        },
+        {
+          "node": "goodbye",
+          "prompt": 1254,
+          "cached": 0,
+          "completion": 17
+        }
+      ],
+      "transcript": [
+        {
+          "role": "event",
+          "text": "-> node greeting"
+        },
+        {
+          "role": "assistant",
+          "text": "Hello, this is Ava from Prosper Health. How can I assist you today?"
+        },
+        {
+          "role": "user",
+          "text": "Hi, I need to schedule routine blood work. Can I do that at the Mission clinic?"
+        },
+        {
+          "role": "event",
+          "text": "ask_question({}) -> {\"status\": \"success\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node answer_questions"
+        },
+        {
+          "role": "event",
+          "text": "find_appointment_types({\"request\": \"routine blood work\"}) -> {\"status\": \"match\", \"candidates\": [{\"appointment_type_id\": \"appt_072\", \"name\": \"Blood Draw / Lab Work\", \"specialty\": \"Lab\", \"duration_min\": 15, \"requires_referral\": false, \"new_patients_allowed\": true, \"description\": \"Standard blood draw for lab tests; no fasting needed.\", \"only_at_sites_with\": \"lab"
+        },
+        {
+          "role": "event",
+          "text": "find_locations({\"appointment_type_id\": \"appt_072\"}) -> {\"status\": \"match\", \"candidates\": [{\"location_id\": \"loc_000\", \"name\": \"Mission Bay Health Center\", \"address\": \"4874 Main St, San Francisco\", \"phone\": \"(415) 555-9313\", \"hours\": \"Mon-Fri 8:00-17:00\", \"services\": [\"lab\", \"physical_therapy\", \"surgery\"]}]}"
+        },
+        {
+          "role": "assistant",
+          "text": "Routine blood work is available at our Mission Bay Health Center, not the Mission clinic. Would you like me to help you book an appointment there?"
+        },
+        {
+          "role": "user",
+          "text": "Yes, that works for me. What days do you have available?"
+        },
+        {
+          "role": "event",
+          "text": "start_booking({\"request\": \"Blood Draw / Lab Work at Mission Bay Health Center\"}) -> {\"status\": \"success\", \"request\": \"Blood Draw / Lab Work at Mission Bay Health Center\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node identify_patient"
+        },
+        {
+          "role": "assistant",
+          "text": "May I have the full name of the person needing the blood work appointment?"
+        },
+        {
+          "role": "user",
+          "text": "Sure, it's Dana White."
+        },
+        {
+          "role": "assistant",
+          "text": "What is Dana White's date of birth?"
+        },
+        {
+          "role": "user",
+          "text": "It's January 20, 1970."
+        },
+        {
+          "role": "assistant",
+          "text": "Has Dana White been seen at Prosper Health before, or is this the first visit?"
+        },
+        {
+          "role": "user",
+          "text": "I've been seen there before."
+        },
+        {
+          "role": "event",
+          "text": "record_patient({\"full_name\": \"Dana White\", \"date_of_birth\": \"1970-01-20\", \"new_patient\": false, \"request\": \"Blood Draw / Lab Work at Mission Bay Health Center\"}) -> {\"status\": \"success\", \"full_name\": \"Dana White\", \"date_of_birth\": \"1970-01-20\", \"new_patient\": false, \"request\": \"Blood Draw / Lab Work at Mission Bay Health Center\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node find_service"
+        },
+        {
+          "role": "event",
+          "text": "select_service({\"appointment_type_id\": \"appt_072\", \"location_id\": \"loc_000\"}) -> {\"status\": \"ok\", \"appointment_type\": \"Blood Draw / Lab Work\", \"eligible_providers\": 1, \"eligible_locations\": 1}"
+        },
+        {
+          "role": "event",
+          "text": "-> node offer_slots"
+        },
+        {
+          "role": "assistant",
+          "text": "The soonest blood draw at Mission Bay Health Center is Thursday, October 1st at 9 AM with Dr. Leila Sato. Would you like that, or another day?"
+        },
+        {
+          "role": "user",
+          "text": "That sounds good. I'll take the appointment for Thursday, October 1st at 9 AM."
+        },
+        {
+          "role": "event",
+          "text": "choose_slot({\"slot_id\": \"appt_072|prov_038|loc_000|20261001T0900\"}) -> {\"status\": \"ok\", \"slot_id\": \"appt_072|prov_038|loc_000|20261001T0900\", \"when\": \"Thursday, October 1 at 9 AM\", \"provider\": \"Dr. Leila Sato, DO\", \"location\": \"Mission Bay Health Center\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node confirm_booking"
+        },
+        {
+          "role": "assistant",
+          "text": "You chose a blood draw on Thursday, October 1st at 9 AM with Dr. Leila Sato at Mission Bay Health Center. Is that correct?"
+        },
+        {
+          "role": "user",
+          "text": "Yes, that's correct."
+        },
+        {
+          "role": "event",
+          "text": "book_appointment({}) -> {\"status\": \"booked\", \"confirmation\": \"PX-015529\", \"patient_name\": \"Dana White\", \"date_of_birth\": \"1970-01-20\", \"appointment_type\": \"Blood Draw / Lab Work\", \"slot_id\": \"appt_072|prov_038|loc_000|20261001T0900\", \"when\": \"Thursday, October 1 at 9 AM\", \"provider\": \"Dr. Leila Sato, DO\", \"location\": \"Miss"
+        },
+        {
+          "role": "event",
+          "text": "-> node booked"
+        },
+        {
+          "role": "assistant",
+          "text": "You're booked for a blood draw on October 1st at 9 AM with Dr. Leila Sato. Your confirmation number is PX-015529. The location is 4874 Main St, San Francisco. Anything else?"
+        },
+        {
+          "role": "user",
+          "text": "No, that's all. Thank you!"
+        },
+        {
+          "role": "event",
+          "text": "end_call({}) -> {\"status\": \"success\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node goodbye"
+        },
+        {
+          "role": "assistant",
+          "text": "Thank you for choosing Prosper Health, Dana, and have a wonderful day! Goodbye!"
+        }
+      ]
+    },
+    {
+      "agent": "ours_cascade",
+      "scenario": "flu_shot_afternoon",
+      "pass": true,
+      "reasons": [],
+      "booked": "Flu Shot / Dr. Maria Garcia, MD (Pediatrics) / Mission Bay Health Center / 2026-09-29 13:00:00",
+      "llm_calls": 17,
+      "prompt_tokens": 17001,
+      "completion_tokens": 473,
+      "avg_prompt_tokens": 1000,
+      "max_prompt_tokens": 1617,
+      "cost_usd": 0.0064,
+      "cost_uncached_usd": 0.0076,
+      "jev_calls": 0,
+      "jev_avg_latency_ms": 0,
+      "jev_cost_usd": 0.0,
+      "cached_tokens": 3840,
+      "turns": 9,
+      "seconds": 22.6,
+      "per_call": [
+        {
+          "node": "greeting",
+          "prompt": 291,
+          "cached": 0,
+          "completion": 17
+        },
+        {
+          "node": "greeting",
+          "prompt": 328,
+          "cached": 0,
+          "completion": 15
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 457,
+          "cached": 0,
+          "completion": 15
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 486,
+          "cached": 0,
+          "completion": 10
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 512,
+          "cached": 0,
+          "completion": 18
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 543,
+          "cached": 0,
+          "completion": 38
+        },
+        {
+          "node": "find_service",
+          "prompt": 999,
+          "cached": 0,
+          "completion": 27
+        },
+        {
+          "node": "find_service",
+          "prompt": 1058,
+          "cached": 0,
+          "completion": 37
+        },
+        {
+          "node": "offer_slots",
+          "prompt": 1054,
+          "cached": 0,
+          "completion": 63
+        },
+        {
+          "node": "offer_slots",
+          "prompt": 1138,
+          "cached": 0,
+          "completion": 25
+        },
+        {
+          "node": "offer_slots",
+          "prompt": 1379,
+          "cached": 1024,
+          "completion": 54
+        },
+        {
+          "node": "offer_slots",
+          "prompt": 1459,
+          "cached": 1280,
+          "completion": 32
+        },
+        {
+          "node": "confirm_booking",
+          "prompt": 1263,
+          "cached": 0,
+          "completion": 32
+        },
+        {
+          "node": "confirm_booking",
+          "prompt": 1308,
+          "cached": 0,
+          "completion": 11
+        },
+        {
+          "node": "booked",
+          "prompt": 1549,
+          "cached": 0,
+          "completion": 52
+        },
+        {
+          "node": "booked",
+          "prompt": 1617,
+          "cached": 1536,
+          "completion": 10
+        },
+        {
+          "node": "goodbye",
+          "prompt": 1560,
+          "cached": 0,
+          "completion": 17
+        }
+      ],
+      "transcript": [
+        {
+          "role": "event",
+          "text": "-> node greeting"
+        },
+        {
+          "role": "assistant",
+          "text": "Hello, this is Ava from Prosper Health. How can I assist you today?"
+        },
+        {
+          "role": "user",
+          "text": "Hi, I\u2019d like to schedule a flu shot, please."
+        },
+        {
+          "role": "event",
+          "text": "start_booking({\"request\": \"flu shot\"}) -> {\"status\": \"success\", \"request\": \"flu shot\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node identify_patient"
+        },
+        {
+          "role": "assistant",
+          "text": "May I have the full name of the person getting the flu shot?"
+        },
+        {
+          "role": "user",
+          "text": "Sure, it\u2019s Evan Wu."
+        },
+        {
+          "role": "assistant",
+          "text": "What is Evan Wu's date of birth?"
+        },
+        {
+          "role": "user",
+          "text": "It's October 10, 1992."
+        },
+        {
+          "role": "assistant",
+          "text": "Has Evan Wu been seen at Prosper Health before, or is this his first visit?"
+        },
+        {
+          "role": "user",
+          "text": "I've been seen there before."
+        },
+        {
+          "role": "event",
+          "text": "record_patient({\"full_name\": \"Evan Wu\", \"date_of_birth\": \"1992-10-10\", \"new_patient\": false, \"request\": \"flu shot\"}) -> {\"status\": \"success\", \"full_name\": \"Evan Wu\", \"date_of_birth\": \"1992-10-10\", \"new_patient\": false, \"request\": \"flu shot\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node find_service"
+        },
+        {
+          "role": "assistant",
+          "text": "You need a flu shot appointment, which does not require a referral. Do you have a preferred clinic location or provider for this?"
+        },
+        {
+          "role": "user",
+          "text": "I don\u2019t have a specific preference. Any location or provider is fine as long as I can get it in the afternoon."
+        },
+        {
+          "role": "event",
+          "text": "select_service({\"appointment_type_id\": \"appt_011\"}) -> {\"status\": \"ok\", \"appointment_type\": \"Flu Shot\", \"eligible_providers\": 21, \"eligible_locations\": 8}"
+        },
+        {
+          "role": "event",
+          "text": "-> node offer_slots"
+        },
+        {
+          "role": "assistant",
+          "text": "The soonest flu shot appointments are Tuesday, September 29th: 8 AM with Dr. Kenji Patel at North Beach Specialty Center, or 8:30 AM with Dr. Michael Sato at Sunset Community Clinic, or Dr. David Johnson at North Gate Health Center. Which works for you?"
+        },
+        {
+          "role": "user",
+          "text": "I need an afternoon appointment. Do you have any afternoon slots available?"
+        },
+        {
+          "role": "event",
+          "text": "search_slots({\"appointment_type_id\": \"appt_011\", \"time_of_day\": \"afternoon\"}) -> {\"status\": \"ok\", \"appointment_type\": \"Flu Shot\", \"eligible_providers\": 21, \"eligible_locations\": 8, \"slots\": [{\"slot_id\": \"appt_011|prov_002|loc_000|20260929T1300\", \"when\": \"Tuesday, September 29 at 1 PM\", \"provider\": \"Dr. Maria Garcia, MD\", \"location\": \"Mission Bay Health Center\"}, {\"slot_id\": \"app"
+        },
+        {
+          "role": "assistant",
+          "text": "For the afternoon on Tuesday, September 29th, you can get a flu shot at 1 PM with Dr. Maria Garcia or Dr. Wei Chen at Mission Bay Health Center, or Dr. Carlos Garcia at North Beach Specialty Center. Which do you prefer?"
+        },
+        {
+          "role": "user",
+          "text": "I\u2019ll take the 1 PM appointment with Dr. Maria Garcia at Mission Bay Health Center."
+        },
+        {
+          "role": "event",
+          "text": "choose_slot({\"slot_id\": \"appt_011|prov_002|loc_000|20260929T1300\"}) -> {\"status\": \"ok\", \"slot_id\": \"appt_011|prov_002|loc_000|20260929T1300\", \"when\": \"Tuesday, September 29 at 1 PM\", \"provider\": \"Dr. Maria Garcia, MD\", \"location\": \"Mission Bay Health Center\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node confirm_booking"
+        },
+        {
+          "role": "assistant",
+          "text": "You chose a flu shot on Tuesday, September 29th at 1 PM with Dr. Maria Garcia at Mission Bay Health Center. Is that correct?"
+        },
+        {
+          "role": "user",
+          "text": "Yes, that\u2019s correct."
+        },
+        {
+          "role": "event",
+          "text": "book_appointment({}) -> {\"status\": \"booked\", \"confirmation\": \"PX-412531\", \"patient_name\": \"Evan Wu\", \"date_of_birth\": \"1992-10-10\", \"appointment_type\": \"Flu Shot\", \"slot_id\": \"appt_011|prov_002|loc_000|20260929T1300\", \"when\": \"Tuesday, September 29 at 1 PM\", \"provider\": \"Dr. Maria Garcia, MD\", \"location\": \"Mission Bay Heal"
+        },
+        {
+          "role": "event",
+          "text": "-> node booked"
+        },
+        {
+          "role": "assistant",
+          "text": "Your flu shot appointment is booked for Tuesday, September 29th at 1 PM with Dr. Maria Garcia at Mission Bay Health Center, 4874 Main St, San Francisco. Confirmation number PX-412531. Anything else I can help with?"
+        },
+        {
+          "role": "user",
+          "text": "No, that\u2019s all. Thank you!"
+        },
+        {
+          "role": "event",
+          "text": "end_call({}) -> {\"status\": \"success\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node goodbye"
+        },
+        {
+          "role": "assistant",
+          "text": "Thank you for choosing Prosper Health, Evan, and have a wonderful day! Goodbye!"
+        }
+      ]
+    },
+    {
+      "agent": "ours_cascade",
+      "scenario": "michael_sato_new",
+      "pass": true,
+      "reasons": [],
+      "booked": "Annual Physical / Dr. Michael Sato, DO (Family Medicine) / Richmond Care Center / 2026-09-29 10:00:00",
+      "llm_calls": 16,
+      "prompt_tokens": 14152,
+      "completion_tokens": 415,
+      "avg_prompt_tokens": 884,
+      "max_prompt_tokens": 1328,
+      "cost_usd": 0.0063,
+      "cost_uncached_usd": 0.0072,
+      "jev_calls": 1,
+      "jev_avg_latency_ms": 580,
+      "jev_cost_usd": 0.00092,
+      "cached_tokens": 3200,
+      "turns": 8,
+      "seconds": 19.6,
+      "per_call": [
+        {
+          "node": "greeting",
+          "prompt": 291,
+          "cached": 0,
+          "completion": 17
+        },
+        {
+          "node": "greeting",
+          "prompt": 338,
+          "cached": 0,
+          "completion": 21
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 479,
+          "cached": 0,
+          "completion": 10
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 502,
+          "cached": 0,
+          "completion": 13
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 531,
+          "cached": 0,
+          "completion": 18
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 563,
+          "cached": 0,
+          "completion": 43
+        },
+        {
+          "node": "find_service",
+          "prompt": 1026,
+          "cached": 0,
+          "completion": 23
+        },
+        {
+          "node": "find_service",
+          "prompt": 1131,
+          "cached": 1024,
+          "completion": 31
+        },
+        {
+          "node": "find_service",
+          "prompt": 1182,
+          "cached": 0,
+          "completion": 32
+        },
+        {
+          "node": "offer_slots",
+          "prompt": 1095,
+          "cached": 1024,
+          "completion": 50
+        },
+        {
+          "node": "offer_slots",
+          "prompt": 1168,
+          "cached": 0,
+          "completion": 32
+        },
+        {
+          "node": "confirm_booking",
+          "prompt": 973,
+          "cached": 0,
+          "completion": 32
+        },
+        {
+          "node": "confirm_booking",
+          "prompt": 1017,
+          "cached": 0,
+          "completion": 11
+        },
+        {
+          "node": "booked",
+          "prompt": 1257,
+          "cached": 0,
+          "completion": 55
+        },
+        {
+          "node": "booked",
+          "prompt": 1328,
+          "cached": 1152,
+          "completion": 10
+        },
+        {
+          "node": "goodbye",
+          "prompt": 1271,
+          "cached": 0,
+          "completion": 17
+        }
+      ],
+      "transcript": [
+        {
+          "role": "event",
+          "text": "-> node greeting"
+        },
+        {
+          "role": "assistant",
+          "text": "Hello, this is Ava from Prosper Health. How can I assist you today?"
+        },
+        {
+          "role": "user",
+          "text": "Hi, I\u2019d like to schedule an annual physical with Dr. Michael Sato. A coworker recommended him."
+        },
+        {
+          "role": "event",
+          "text": "start_booking({\"request\": \"annual physical with Dr. Michael Sato\"}) -> {\"status\": \"success\", \"request\": \"annual physical with Dr. Michael Sato\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node identify_patient"
+        },
+        {
+          "role": "assistant",
+          "text": "May I have your full name, please?"
+        },
+        {
+          "role": "user",
+          "text": "Sure, it's Taylor Brooks."
+        },
+        {
+          "role": "assistant",
+          "text": "Thank you, Taylor. What is your date of birth?"
+        },
+        {
+          "role": "user",
+          "text": "It's May 5, 1983."
+        },
+        {
+          "role": "assistant",
+          "text": "Have you been seen at Prosper Health before, or would this be your first visit?"
+        },
+        {
+          "role": "user",
+          "text": "This will be my first visit."
+        },
+        {
+          "role": "event",
+          "text": "record_patient({\"full_name\": \"Taylor Brooks\", \"date_of_birth\": \"1983-05-05\", \"new_patient\": true, \"request\": \"annual physical with Dr. Michael Sato\"}) -> {\"status\": \"success\", \"full_name\": \"Taylor Brooks\", \"date_of_birth\": \"1983-05-05\", \"new_patient\": true, \"request\": \"annual physical with Dr. Michael Sato\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node find_service"
+        },
+        {
+          "role": "event",
+          "text": "find_providers({\"name\": \"Michael Sato\", \"specialty\": \"Family Medicine\"}) -> {\"status\": \"match\", \"candidates\": [{\"provider_id\": \"prov_032\", \"name\": \"Dr. Michael Sato\", \"title\": \"DO\", \"specialty\": \"Family Medicine\", \"locations\": [\"Richmond Care Center\"], \"accepting_new_patients\": true, \"languages\": [\"English\", \"Vietnamese\"]}]}"
+        },
+        {
+          "role": "assistant",
+          "text": "Dr. Michael Sato is a family medicine doctor at Richmond Care Center and is accepting new patients. Would you like to book your annual physical there?"
+        },
+        {
+          "role": "user",
+          "text": "Yes, that sounds good. When is the next available appointment?"
+        },
+        {
+          "role": "event",
+          "text": "select_service({\"appointment_type_id\": \"appt_002\", \"provider_id\": \"prov_032\", \"location_id\": \"loc_007\"}) -> {\"status\": \"ok\", \"appointment_type\": \"Annual Physical\", \"eligible_providers\": 1, \"eligible_locations\": 1}"
+        },
+        {
+          "role": "event",
+          "text": "-> node offer_slots"
+        },
+        {
+          "role": "assistant",
+          "text": "The soonest annual physical with Dr. Michael Sato at Richmond Care Center is Tuesday, September 29 at 10 AM. Would you like to book that, or would Wednesday at 8 AM or Thursday at 9 AM work better?"
+        },
+        {
+          "role": "user",
+          "text": "I can take the appointment for Tuesday, September 29 at 10 AM."
+        },
+        {
+          "role": "event",
+          "text": "choose_slot({\"slot_id\": \"appt_002|prov_032|loc_007|20260929T1000\"}) -> {\"status\": \"ok\", \"slot_id\": \"appt_002|prov_032|loc_007|20260929T1000\", \"when\": \"Tuesday, September 29 at 10 AM\", \"provider\": \"Dr. Michael Sato, DO\", \"location\": \"Richmond Care Center\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node confirm_booking"
+        },
+        {
+          "role": "assistant",
+          "text": "You are booking an annual physical with Dr. Michael Sato at Richmond Care Center on Tuesday, September 29 at 10 AM. Is that correct?"
+        },
+        {
+          "role": "user",
+          "text": "Yes, that's correct."
+        },
+        {
+          "role": "event",
+          "text": "book_appointment({}) -> {\"status\": \"booked\", \"confirmation\": \"PX-574234\", \"patient_name\": \"Taylor Brooks\", \"date_of_birth\": \"1983-05-05\", \"appointment_type\": \"Annual Physical\", \"slot_id\": \"appt_002|prov_032|loc_007|20260929T1000\", \"when\": \"Tuesday, September 29 at 10 AM\", \"provider\": \"Dr. Michael Sato, DO\", \"location\": \"Ri"
+        },
+        {
+          "role": "event",
+          "text": "-> node booked"
+        },
+        {
+          "role": "assistant",
+          "text": "You're booked for an annual physical with Dr. Michael Sato on Tuesday, September 29 at 10 AM. Your confirmation number is PX-574234. The Richmond Care Center is at 4671 Bryant St, San Francisco. Anything else I can help with?"
+        },
+        {
+          "role": "user",
+          "text": "No, that\u2019s all. Thank you!"
+        },
+        {
+          "role": "event",
+          "text": "end_call({}) -> {\"status\": \"success\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node goodbye"
+        },
+        {
+          "role": "assistant",
+          "text": "Thank you for choosing Prosper Health, Taylor, and have a wonderful day! Goodbye!"
+        }
+      ]
+    },
+    {
+      "agent": "ours_cascade",
+      "scenario": "dental_mandarin",
+      "pass": true,
+      "reasons": [],
+      "booked": "Dental Cleaning / Dr. Lucas Singh, MD (Dental) / Mission District Family Clinic / 2026-09-30 08:30:00",
+      "llm_calls": 15,
+      "prompt_tokens": 13242,
+      "completion_tokens": 402,
+      "avg_prompt_tokens": 883,
+      "max_prompt_tokens": 1320,
+      "cost_usd": 0.0059,
+      "cost_uncached_usd": 0.0059,
+      "jev_calls": 0,
+      "jev_avg_latency_ms": 0,
+      "jev_cost_usd": 0.0,
+      "cached_tokens": 0,
+      "turns": 7,
+      "seconds": 15.9,
+      "per_call": [
+        {
+          "node": "greeting",
+          "prompt": 291,
+          "cached": 0,
+          "completion": 17
+        },
+        {
+          "node": "greeting",
+          "prompt": 341,
+          "cached": 0,
+          "completion": 24
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 490,
+          "cached": 0,
+          "completion": 10
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 522,
+          "cached": 0,
+          "completion": 18
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 559,
+          "cached": 0,
+          "completion": 46
+        },
+        {
+          "node": "find_service",
+          "prompt": 891,
+          "cached": 0,
+          "completion": 29
+        },
+        {
+          "node": "find_service",
+          "prompt": 1006,
+          "cached": 0,
+          "completion": 39
+        },
+        {
+          "node": "find_service",
+          "prompt": 1065,
+          "cached": 0,
+          "completion": 32
+        },
+        {
+          "node": "offer_slots",
+          "prompt": 1101,
+          "cached": 0,
+          "completion": 36
+        },
+        {
+          "node": "offer_slots",
+          "prompt": 1162,
+          "cached": 0,
+          "completion": 32
+        },
+        {
+          "node": "confirm_booking",
+          "prompt": 968,
+          "cached": 0,
+          "completion": 31
+        },
+        {
+          "node": "confirm_booking",
+          "prompt": 1011,
+          "cached": 0,
+          "completion": 11
+        },
+        {
+          "node": "booked",
+          "prompt": 1252,
+          "cached": 0,
+          "completion": 50
+        },
+        {
+          "node": "booked",
+          "prompt": 1320,
+          "cached": 0,
+          "completion": 10
+        },
+        {
+          "node": "goodbye",
+          "prompt": 1263,
+          "cached": 0,
+          "completion": 17
+        }
+      ],
+      "transcript": [
+        {
+          "role": "event",
+          "text": "-> node greeting"
+        },
+        {
+          "role": "assistant",
+          "text": "Hello, this is Ava from Prosper Health. How can I assist you today?"
+        },
+        {
+          "role": "user",
+          "text": "Hi, my name is Wei Zhang. I\u2019d like to schedule a teeth cleaning. Do you have a dentist who speaks Mandarin?"
+        },
+        {
+          "role": "event",
+          "text": "start_booking({\"request\": \"teeth cleaning\", \"preferences\": \"dentist who speaks Mandarin\"}) -> {\"status\": \"success\", \"request\": \"teeth cleaning\", \"preferences\": \"dentist who speaks Mandarin\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node identify_patient"
+        },
+        {
+          "role": "assistant",
+          "text": "Could you please provide your date of birth?"
+        },
+        {
+          "role": "user",
+          "text": "Sure, my date of birth is August 8, 1960."
+        },
+        {
+          "role": "assistant",
+          "text": "Have you been seen at Prosper Health before, or would this be your first visit?"
+        },
+        {
+          "role": "user",
+          "text": "This will be my first visit. I'm a new patient."
+        },
+        {
+          "role": "event",
+          "text": "record_patient({\"full_name\": \"Wei Zhang\", \"date_of_birth\": \"1960-08-08\", \"new_patient\": true, \"request\": \"teeth cleaning\", \"preferences\": \"dentist who speaks Mandarin\"}) -> {\"status\": \"success\", \"full_name\": \"Wei Zhang\", \"date_of_birth\": \"1960-08-08\", \"new_patient\": true, \"request\": \"teeth cleaning\", \"preferences\": \"dentist who speaks Mandarin\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node find_service"
+        },
+        {
+          "role": "event",
+          "text": "find_providers({\"specialty\": \"Dental\", \"appointment_type_id\": \"appt_074\", \"language\": \"Mandarin\"}) -> {\"status\": \"match\", \"candidates\": [{\"provider_id\": \"prov_020\", \"name\": \"Dr. Lucas Singh\", \"title\": \"MD\", \"specialty\": \"Dental\", \"locations\": [\"Mission District Family Clinic\", \"North Gate Health Center\"], \"accepting_new_patients\": true, \"languages\": [\"English\", \"Mandarin\"]}]}"
+        },
+        {
+          "role": "assistant",
+          "text": "I found Dr. Lucas Singh, a dentist who speaks Mandarin and accepts new patients, available for dental cleaning at Mission District Family Clinic. Would you like to book with Dr. Singh there?"
+        },
+        {
+          "role": "user",
+          "text": "Yes, that sounds good. When is the next available appointment?"
+        },
+        {
+          "role": "event",
+          "text": "select_service({\"appointment_type_id\": \"appt_074\", \"provider_id\": \"prov_020\", \"location_id\": \"loc_001\"}) -> {\"status\": \"ok\", \"appointment_type\": \"Dental Cleaning\", \"eligible_providers\": 1, \"eligible_locations\": 1}"
+        },
+        {
+          "role": "event",
+          "text": "-> node offer_slots"
+        },
+        {
+          "role": "assistant",
+          "text": "The soonest dental cleaning with Dr. Lucas Singh at Mission District Family Clinic is Wednesday, September 30 at 8:30 AM. Would you like to book that?"
+        },
+        {
+          "role": "user",
+          "text": "Yes, please book me for Wednesday, September 30 at 8:30 AM."
+        },
+        {
+          "role": "event",
+          "text": "choose_slot({\"slot_id\": \"appt_074|prov_020|loc_001|20260930T0830\"}) -> {\"status\": \"ok\", \"slot_id\": \"appt_074|prov_020|loc_001|20260930T0830\", \"when\": \"Wednesday, September 30 at 8:30 AM\", \"provider\": \"Dr. Lucas Singh, MD\", \"location\": \"Mission District Family Clinic\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node confirm_booking"
+        },
+        {
+          "role": "assistant",
+          "text": "You want a dental cleaning on Wednesday, September 30 at 8:30 AM with Dr. Lucas Singh at Mission District Family Clinic, correct?"
+        },
+        {
+          "role": "user",
+          "text": "Yes, that's correct."
+        },
+        {
+          "role": "event",
+          "text": "book_appointment({}) -> {\"status\": \"booked\", \"confirmation\": \"PX-405101\", \"patient_name\": \"Wei Zhang\", \"date_of_birth\": \"1960-08-08\", \"appointment_type\": \"Dental Cleaning\", \"slot_id\": \"appt_074|prov_020|loc_001|20260930T0830\", \"when\": \"Wednesday, September 30 at 8:30 AM\", \"provider\": \"Dr. Lucas Singh, MD\", \"location\": \"Mis"
+        },
+        {
+          "role": "event",
+          "text": "-> node booked"
+        },
+        {
+          "role": "assistant",
+          "text": "You're booked for dental cleaning on September 30 at 8:30 AM with Dr. Singh. Your confirmation number is PX-405101. The clinic is at 4732 Market St, San Francisco. Anything else I can help with?"
+        },
+        {
+          "role": "user",
+          "text": "No, that\u2019s all. Thank you very much!"
+        },
+        {
+          "role": "event",
+          "text": "end_call({}) -> {\"status\": \"success\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node goodbye"
+        },
+        {
+          "role": "assistant",
+          "text": "Thank you for choosing Prosper Health, Wei; have a wonderful day and take care!"
+        }
+      ]
+    },
+    {
+      "agent": "ours_cascade",
+      "scenario": "pacemaker_no_referral",
+      "pass": true,
+      "reasons": [],
+      "llm_calls": 8,
+      "prompt_tokens": 5158,
+      "completion_tokens": 179,
+      "avg_prompt_tokens": 645,
+      "max_prompt_tokens": 1076,
+      "cost_usd": 0.0023,
+      "cost_uncached_usd": 0.0023,
+      "jev_calls": 0,
+      "jev_avg_latency_ms": 0,
+      "jev_cost_usd": 0.0,
+      "cached_tokens": 0,
+      "turns": 5,
+      "seconds": 9.3,
+      "per_call": [
+        {
+          "node": "greeting",
+          "prompt": 291,
+          "cached": 0,
+          "completion": 17
+        },
+        {
+          "node": "greeting",
+          "prompt": 331,
+          "cached": 0,
+          "completion": 16
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 462,
+          "cached": 0,
+          "completion": 13
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 493,
+          "cached": 0,
+          "completion": 12
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 517,
+          "cached": 0,
+          "completion": 39
+        },
+        {
+          "node": "find_service",
+          "prompt": 970,
+          "cached": 0,
+          "completion": 25
+        },
+        {
+          "node": "find_service",
+          "prompt": 1018,
+          "cached": 0,
+          "completion": 35
+        },
+        {
+          "node": "find_service",
+          "prompt": 1076,
+          "cached": 0,
+          "completion": 22
+        }
+      ],
+      "transcript": [
+        {
+          "role": "event",
+          "text": "-> node greeting"
+        },
+        {
+          "role": "assistant",
+          "text": "Hello, this is Ava from Prosper Health. How can I assist you today?"
+        },
+        {
+          "role": "user",
+          "text": "Hi, this is Harold Finch. I need to schedule a pacemaker check."
+        },
+        {
+          "role": "event",
+          "text": "start_booking({\"request\": \"pacemaker check\"}) -> {\"status\": \"success\", \"request\": \"pacemaker check\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node identify_patient"
+        },
+        {
+          "role": "assistant",
+          "text": "Hi Harold, can you please provide your date of birth?"
+        },
+        {
+          "role": "user",
+          "text": "Sure, it's March 3, 1950."
+        },
+        {
+          "role": "assistant",
+          "text": "Have you been seen at Prosper Health before, Harold?"
+        },
+        {
+          "role": "user",
+          "text": "Yes, I have."
+        },
+        {
+          "role": "event",
+          "text": "record_patient({\"full_name\": \"Harold Finch\", \"date_of_birth\": \"1950-03-03\", \"new_patient\": false, \"request\": \"pacemaker check\"}) -> {\"status\": \"success\", \"full_name\": \"Harold Finch\", \"date_of_birth\": \"1950-03-03\", \"new_patient\": false, \"request\": \"pacemaker check\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node find_service"
+        },
+        {
+          "role": "assistant",
+          "text": "A pacemaker check appointment requires a referral and is for existing patients only. Do you have a referral for this check?"
+        },
+        {
+          "role": "user",
+          "text": "I don't have a referral right now. I can get one from my doctor."
+        },
+        {
+          "role": "assistant",
+          "text": "Great, once you have your referral, we can proceed with booking your pacemaker check. Would you like me to help you find a provider or location for this appointment?"
+        },
+        {
+          "role": "user",
+          "text": "No, that's okay. I'll get the referral first. Thank you. Goodbye!"
+        },
+        {
+          "role": "assistant",
+          "text": "You're welcome! Feel free to reach out when you're ready to book. Have a good day, goodbye!"
+        }
+      ]
+    },
+    {
+      "agent": "ours_cascade",
+      "scenario": "qa_mri_locations",
+      "pass": true,
+      "reasons": [],
+      "llm_calls": 8,
+      "prompt_tokens": 6937,
+      "completion_tokens": 133,
+      "avg_prompt_tokens": 867,
+      "max_prompt_tokens": 1301,
+      "cost_usd": 0.0033,
+      "cost_uncached_usd": 0.0039,
+      "jev_calls": 1,
+      "jev_avg_latency_ms": 679,
+      "jev_cost_usd": 0.00092,
+      "cached_tokens": 2176,
+      "turns": 3,
+      "seconds": 9.0,
+      "per_call": [
+        {
+          "node": "greeting",
+          "prompt": 291,
+          "cached": 0,
+          "completion": 17
+        },
+        {
+          "node": "greeting",
+          "prompt": 339,
+          "cached": 0,
+          "completion": 10
+        },
+        {
+          "node": "answer_questions",
+          "prompt": 721,
+          "cached": 0,
+          "completion": 16
+        },
+        {
+          "node": "answer_questions",
+          "prompt": 1038,
+          "cached": 0,
+          "completion": 18
+        },
+        {
+          "node": "answer_questions",
+          "prompt": 1068,
+          "cached": 0,
+          "completion": 18
+        },
+        {
+          "node": "answer_questions",
+          "prompt": 1241,
+          "cached": 1024,
+          "completion": 29
+        },
+        {
+          "node": "answer_questions",
+          "prompt": 1301,
+          "cached": 1152,
+          "completion": 10
+        },
+        {
+          "node": "goodbye",
+          "prompt": 938,
+          "cached": 0,
+          "completion": 15
+        }
+      ],
+      "transcript": [
+        {
+          "role": "event",
+          "text": "-> node greeting"
+        },
+        {
+          "role": "assistant",
+          "text": "Hello, this is Ava from Prosper Health. How can I assist you today?"
+        },
+        {
+          "role": "user",
+          "text": "Hi, this is Pat Morgan. I have a quick question. Which of your locations can I get an MRI at?"
+        },
+        {
+          "role": "event",
+          "text": "ask_question({}) -> {\"status\": \"success\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node answer_questions"
+        },
+        {
+          "role": "event",
+          "text": "find_appointment_types({\"request\": \"MRI\"}) -> {\"status\": \"ambiguous\", \"candidates\": [{\"appointment_type_id\": \"appt_063\", \"name\": \"MRI - Brain\", \"specialty\": \"Radiology\", \"duration_min\": 60, \"requires_referral\": true, \"new_patients_allowed\": false, \"description\": \"MRI of the brain; needs an imaging site and a referral.\", \"only_at_sites_with\": \"i"
+        },
+        {
+          "role": "assistant",
+          "text": "Which part of the body is the MRI for: brain, spine, or knee?"
+        },
+        {
+          "role": "user",
+          "text": "It's for my knee."
+        },
+        {
+          "role": "event",
+          "text": "find_locations({\"appointment_type_id\": \"appt_065\"}) -> {\"status\": \"multiple\", \"candidates\": [{\"location_id\": \"loc_004\", \"name\": \"Downtown Health Center\", \"address\": \"4455 Geary Blvd, San Francisco\", \"phone\": \"(415) 555-6146\", \"hours\": \"Mon-Fri 8:00-17:00\", \"services\": [\"imaging\"]}, {\"location_id\": \"loc_005\", \"name\": \"Midtown Medical Group\", \"address\": \""
+        },
+        {
+          "role": "assistant",
+          "text": "You can get a knee MRI at Downtown Health Center on Geary Blvd or Midtown Medical Group on Market St. Which location do you prefer?"
+        },
+        {
+          "role": "user",
+          "text": "Thanks for the information! I\u2019m not looking to book right now, just wanted to know. I appreciate your help!"
+        },
+        {
+          "role": "event",
+          "text": "end_call({}) -> {\"status\": \"success\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node goodbye"
+        },
+        {
+          "role": "assistant",
+          "text": "Thank you for calling Prosper Health, Pat, and have a wonderful day!"
+        }
+      ]
+    },
+    {
+      "agent": "ours_cascade",
+      "scenario": "echo_new_patient",
+      "pass": true,
+      "reasons": [],
+      "booked": "Cardiology Consultation / Dr. Linda Ramirez, MD (Cardiology) / Midtown Medical Group / 2026-09-29 08:00:00",
+      "llm_calls": 16,
+      "prompt_tokens": 13697,
+      "completion_tokens": 422,
+      "avg_prompt_tokens": 856,
+      "max_prompt_tokens": 1312,
+      "cost_usd": 0.0058,
+      "cost_uncached_usd": 0.0062,
+      "jev_calls": 0,
+      "jev_avg_latency_ms": 0,
+      "jev_cost_usd": 0.0,
+      "cached_tokens": 1024,
+      "turns": 9,
+      "seconds": 18.8,
+      "per_call": [
+        {
+          "node": "greeting",
+          "prompt": 291,
+          "cached": 0,
+          "completion": 17
+        },
+        {
+          "node": "greeting",
+          "prompt": 337,
+          "cached": 0,
+          "completion": 17
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 470,
+          "cached": 0,
+          "completion": 18
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 501,
+          "cached": 0,
+          "completion": 13
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 530,
+          "cached": 0,
+          "completion": 18
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 564,
+          "cached": 0,
+          "completion": 40
+        },
+        {
+          "node": "find_service",
+          "prompt": 958,
+          "cached": 0,
+          "completion": 43
+        },
+        {
+          "node": "find_service",
+          "prompt": 1028,
+          "cached": 0,
+          "completion": 16
+        },
+        {
+          "node": "find_service",
+          "prompt": 1065,
+          "cached": 0,
+          "completion": 24
+        },
+        {
+          "node": "offer_slots",
+          "prompt": 1059,
+          "cached": 0,
+          "completion": 59
+        },
+        {
+          "node": "offer_slots",
+          "prompt": 1145,
+          "cached": 1024,
+          "completion": 32
+        },
+        {
+          "node": "confirm_booking",
+          "prompt": 949,
+          "cached": 0,
+          "completion": 31
+        },
+        {
+          "node": "confirm_booking",
+          "prompt": 996,
+          "cached": 0,
+          "completion": 11
+        },
+        {
+          "node": "booked",
+          "prompt": 1237,
+          "cached": 0,
+          "completion": 56
+        },
+        {
+          "node": "booked",
+          "prompt": 1312,
+          "cached": 0,
+          "completion": 10
+        },
+        {
+          "node": "goodbye",
+          "prompt": 1255,
+          "cached": 0,
+          "completion": 17
+        }
+      ],
+      "transcript": [
+        {
+          "role": "event",
+          "text": "-> node greeting"
+        },
+        {
+          "role": "assistant",
+          "text": "Hello, this is Ava from Prosper Health. How can I assist you today?"
+        },
+        {
+          "role": "user",
+          "text": "Hi, Ava. I need to schedule an echocardiogram. I have a referral from my GP."
+        },
+        {
+          "role": "event",
+          "text": "start_booking({\"request\": \"echocardiogram\"}) -> {\"status\": \"success\", \"request\": \"echocardiogram\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node identify_patient"
+        },
+        {
+          "role": "assistant",
+          "text": "May I have the full name of the patient for the echocardiogram appointment?"
+        },
+        {
+          "role": "user",
+          "text": "Sure, it's Nina Ortiz."
+        },
+        {
+          "role": "assistant",
+          "text": "Thank you. What is Nina Ortiz's date of birth?"
+        },
+        {
+          "role": "user",
+          "text": "It's February 2, 1977."
+        },
+        {
+          "role": "assistant",
+          "text": "Has Nina Ortiz been seen at Prosper Health before, or is this her first visit?"
+        },
+        {
+          "role": "user",
+          "text": "This is my first visit to Prosper Health."
+        },
+        {
+          "role": "event",
+          "text": "record_patient({\"full_name\": \"Nina Ortiz\", \"date_of_birth\": \"1977-02-02\", \"new_patient\": true, \"request\": \"echocardiogram\"}) -> {\"status\": \"success\", \"full_name\": \"Nina Ortiz\", \"date_of_birth\": \"1977-02-02\", \"new_patient\": true, \"request\": \"echocardiogram\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node find_service"
+        },
+        {
+          "role": "assistant",
+          "text": "Echocardiogram is only for existing patients and requires a referral. Would you like to book a cardiology consultation instead, which is available for new patients with a referral? Do you have a referral?"
+        },
+        {
+          "role": "user",
+          "text": "Yes, I have a referral from my GP. I\u2019d like to book the cardiology consultation."
+        },
+        {
+          "role": "assistant",
+          "text": "Great, do you have a preferred location or cardiologist for your consultation?"
+        },
+        {
+          "role": "user",
+          "text": "I don\u2019t have a preference. Whatever is available works for me."
+        },
+        {
+          "role": "event",
+          "text": "select_service({\"appointment_type_id\": \"appt_020\", \"has_referral\": true}) -> {\"status\": \"ok\", \"appointment_type\": \"Cardiology Consultation\", \"eligible_providers\": 2, \"eligible_locations\": 4}"
+        },
+        {
+          "role": "event",
+          "text": "-> node offer_slots"
+        },
+        {
+          "role": "assistant",
+          "text": "The soonest cardiology consultation slots are Tuesday the 29th at 8 AM with Dr. Linda Ramirez at Midtown or Dr. Emily Chen at Richmond Care Center, or Wednesday the 30th at 10:30 AM with Dr. Chen at Downtown. Which works for you?"
+        },
+        {
+          "role": "user",
+          "text": "I can do Tuesday the 29th at 8 AM with Dr. Linda Ramirez at Midtown."
+        },
+        {
+          "role": "event",
+          "text": "choose_slot({\"slot_id\": \"appt_020|prov_005|loc_005|20260929T0800\"}) -> {\"status\": \"ok\", \"slot_id\": \"appt_020|prov_005|loc_005|20260929T0800\", \"when\": \"Tuesday, September 29 at 8 AM\", \"provider\": \"Dr. Linda Ramirez, MD\", \"location\": \"Midtown Medical Group\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node confirm_booking"
+        },
+        {
+          "role": "assistant",
+          "text": "You chose a cardiology consultation on Tuesday, September 29 at 8 AM with Dr. Linda Ramirez at Midtown Medical Group. Is that correct?"
+        },
+        {
+          "role": "user",
+          "text": "Yes, that\u2019s correct. Thank you!"
+        },
+        {
+          "role": "event",
+          "text": "book_appointment({}) -> {\"status\": \"booked\", \"confirmation\": \"PX-131391\", \"patient_name\": \"Nina Ortiz\", \"date_of_birth\": \"1977-02-02\", \"appointment_type\": \"Cardiology Consultation\", \"slot_id\": \"appt_020|prov_005|loc_005|20260929T0800\", \"when\": \"Tuesday, September 29 at 8 AM\", \"provider\": \"Dr. Linda Ramirez, MD\", \"location\""
+        },
+        {
+          "role": "event",
+          "text": "-> node booked"
+        },
+        {
+          "role": "assistant",
+          "text": "You're booked for a cardiology consultation with Dr. Linda Ramirez on Tuesday, September 29 at 8 AM. Your confirmation number is PX-131391. The location is Midtown Medical Group at 2099 Market Street, San Francisco. Anything else I can help with?"
+        },
+        {
+          "role": "user",
+          "text": "No, that\u2019s all. Thank you for your help!"
+        },
+        {
+          "role": "event",
+          "text": "end_call({}) -> {\"status\": \"success\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node goodbye"
+        },
+        {
+          "role": "assistant",
+          "text": "Thank you for choosing Prosper Health, Nina, and have a wonderful day! Goodbye!"
+        }
+      ]
+    },
+    {
+      "agent": "ours_cascade",
+      "scenario": "indirect_peds_fever",
+      "pass": true,
+      "reasons": [],
+      "booked": "Pediatric Sick Visit / Dr. Michael Chen, NP (Pediatrics) / Mission District Family Clinic / 2026-10-01 08:00:00",
+      "llm_calls": 16,
+      "prompt_tokens": 14449,
+      "completion_tokens": 428,
+      "avg_prompt_tokens": 903,
+      "max_prompt_tokens": 1394,
+      "cost_usd": 0.0071,
+      "cost_uncached_usd": 0.0074,
+      "jev_calls": 1,
+      "jev_avg_latency_ms": 611,
+      "jev_cost_usd": 0.00092,
+      "cached_tokens": 1024,
+      "turns": 9,
+      "seconds": 19.4,
+      "per_call": [
+        {
+          "node": "greeting",
+          "prompt": 291,
+          "cached": 0,
+          "completion": 17
+        },
+        {
+          "node": "greeting",
+          "prompt": 355,
+          "cached": 0,
+          "completion": 20
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 494,
+          "cached": 0,
+          "completion": 10
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 517,
+          "cached": 0,
+          "completion": 13
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 550,
+          "cached": 0,
+          "completion": 25
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 611,
+          "cached": 0,
+          "completion": 47
+        },
+        {
+          "node": "find_service",
+          "prompt": 976,
+          "cached": 0,
+          "completion": 43
+        },
+        {
+          "node": "find_service",
+          "prompt": 1041,
+          "cached": 0,
+          "completion": 25
+        },
+        {
+          "node": "offer_slots",
+          "prompt": 1079,
+          "cached": 0,
+          "completion": 38
+        },
+        {
+          "node": "offer_slots",
+          "prompt": 1154,
+          "cached": 0,
+          "completion": 34
+        },
+        {
+          "node": "offer_slots",
+          "prompt": 1224,
+          "cached": 1024,
+          "completion": 32
+        },
+        {
+          "node": "confirm_booking",
+          "prompt": 1028,
+          "cached": 0,
+          "completion": 34
+        },
+        {
+          "node": "confirm_booking",
+          "prompt": 1078,
+          "cached": 0,
+          "completion": 11
+        },
+        {
+          "node": "booked",
+          "prompt": 1320,
+          "cached": 0,
+          "completion": 53
+        },
+        {
+          "node": "booked",
+          "prompt": 1394,
+          "cached": 0,
+          "completion": 10
+        },
+        {
+          "node": "goodbye",
+          "prompt": 1337,
+          "cached": 0,
+          "completion": 16
+        }
+      ],
+      "transcript": [
+        {
+          "role": "event",
+          "text": "-> node greeting"
+        },
+        {
+          "role": "assistant",
+          "text": "Hello, this is Ava from Prosper Health. How can I assist you today?"
+        },
+        {
+          "role": "user",
+          "text": "Hi, this is a parent calling. My daughter, Mia, has had a fever since last night. I\u2019m really worried and would like to get her seen by a doctor as soon as possible."
+        },
+        {
+          "role": "event",
+          "text": "start_booking({\"request\": \"see a doctor for fever for child\"}) -> {\"status\": \"success\", \"request\": \"see a doctor for fever for child\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node identify_patient"
+        },
+        {
+          "role": "assistant",
+          "text": "May I have your full name, please?"
+        },
+        {
+          "role": "user",
+          "text": "Sure, it's Ava Lopez."
+        },
+        {
+          "role": "assistant",
+          "text": "Thank you, Ava. What is your date of birth?"
+        },
+        {
+          "role": "user",
+          "text": "My date of birth is January 15, 1990."
+        },
+        {
+          "role": "assistant",
+          "text": "Is this appointment for you or your daughter Mia? If for Mia, please provide her full name and date of birth."
+        },
+        {
+          "role": "user",
+          "text": "This appointment is for my daughter, Mia. Her full name is Mia Lopez, and she was born on February 11, 2022."
+        },
+        {
+          "role": "event",
+          "text": "record_patient({\"full_name\": \"Mia Lopez\", \"date_of_birth\": \"2022-02-11\", \"new_patient\": true, \"request\": \"see a doctor for fever for child\", \"preferences\": \"urgent\"}) -> {\"status\": \"success\", \"full_name\": \"Mia Lopez\", \"date_of_birth\": \"2022-02-11\", \"new_patient\": true, \"request\": \"see a doctor for fever for child\", \"preferences\": \"urgent\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node find_service"
+        },
+        {
+          "role": "assistant",
+          "text": "For your child\u2019s fever, a Pediatric Sick Visit is the right appointment type and new patients are welcome. Do you have a preferred location among Mission Bay, Mission District, North Beach, Downtown, or Midtown?"
+        },
+        {
+          "role": "user",
+          "text": "We\u2019ve been to the Mission District location before. Can we go there?"
+        },
+        {
+          "role": "event",
+          "text": "select_service({\"appointment_type_id\": \"appt_017\", \"location_id\": \"loc_001\"}) -> {\"status\": \"ok\", \"appointment_type\": \"Pediatric Sick Visit\", \"eligible_providers\": 1, \"eligible_locations\": 1}"
+        },
+        {
+          "role": "event",
+          "text": "-> node offer_slots"
+        },
+        {
+          "role": "assistant",
+          "text": "The soonest Pediatric Sick Visit for your child is Thursday, October 1st at 8 AM with Dr. Michael Chen at Mission District Family Clinic. Does that work for you?"
+        },
+        {
+          "role": "user",
+          "text": "Actually, today is Monday, September 28th. Did you mean Thursday, September 30th? If so, that time works for us."
+        },
+        {
+          "role": "assistant",
+          "text": "I see the confusion; the available slot is actually Thursday, October 1st, not September 30th. Would you like me to book that for you?"
+        },
+        {
+          "role": "user",
+          "text": "Yes, please go ahead and book that appointment for Thursday, October 1st at 8 AM with Dr. Michael Chen. Thank you!"
+        },
+        {
+          "role": "event",
+          "text": "choose_slot({\"slot_id\": \"appt_017|prov_012|loc_001|20261001T0800\"}) -> {\"status\": \"ok\", \"slot_id\": \"appt_017|prov_012|loc_001|20261001T0800\", \"when\": \"Thursday, October 1 at 8 AM\", \"provider\": \"Dr. Michael Chen, NP\", \"location\": \"Mission District Family Clinic\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node confirm_booking"
+        },
+        {
+          "role": "assistant",
+          "text": "You are booking a Pediatric Sick Visit on Thursday, October 1st at 8 AM with Dr. Michael Chen at Mission District Family Clinic. Is that correct?"
+        },
+        {
+          "role": "user",
+          "text": "Yes, that\u2019s correct. Thank you!"
+        },
+        {
+          "role": "event",
+          "text": "book_appointment({}) -> {\"status\": \"booked\", \"confirmation\": \"PX-759358\", \"patient_name\": \"Mia Lopez\", \"date_of_birth\": \"2022-02-11\", \"appointment_type\": \"Pediatric Sick Visit\", \"slot_id\": \"appt_017|prov_012|loc_001|20261001T0800\", \"when\": \"Thursday, October 1 at 8 AM\", \"provider\": \"Dr. Michael Chen, NP\", \"location\": \"Miss"
+        },
+        {
+          "role": "event",
+          "text": "-> node booked"
+        },
+        {
+          "role": "assistant",
+          "text": "Your Pediatric Sick Visit is booked for Thursday, October 1st at 8 AM with Dr. Michael Chen. Your confirmation number is PX-759358. The clinic is at 4732 Market Street, San Francisco. Anything else I can help with?"
+        },
+        {
+          "role": "user",
+          "text": "No, that\u2019s all I needed. Thank you for your help!"
+        },
+        {
+          "role": "event",
+          "text": "end_call({}) -> {\"status\": \"success\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node goodbye"
+        },
+        {
+          "role": "assistant",
+          "text": "Thank you for choosing Prosper Health, Mia, and take care\u2014goodbye!"
+        }
+      ]
+    },
+    {
+      "agent": "ours_cascade",
+      "scenario": "indirect_memory",
+      "pass": true,
+      "reasons": [],
+      "booked": "Memory Evaluation / Dr. Olivia Singh, MD (Neurology) / Midtown Medical Group / 2026-09-29 09:30:00",
+      "llm_calls": 16,
+      "prompt_tokens": 13446,
+      "completion_tokens": 399,
+      "avg_prompt_tokens": 840,
+      "max_prompt_tokens": 1295,
+      "cost_usd": 0.0066,
+      "cost_uncached_usd": 0.0069,
+      "jev_calls": 1,
+      "jev_avg_latency_ms": 483,
+      "jev_cost_usd": 0.00092,
+      "cached_tokens": 1024,
+      "turns": 9,
+      "seconds": 19.3,
+      "per_call": [
+        {
+          "node": "greeting",
+          "prompt": 291,
+          "cached": 0,
+          "completion": 17
+        },
+        {
+          "node": "greeting",
+          "prompt": 337,
+          "cached": 0,
+          "completion": 18
+        },
+        {
+          "node": "greeting",
+          "prompt": 390,
+          "cached": 0,
+          "completion": 16
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 521,
+          "cached": 0,
+          "completion": 13
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 552,
+          "cached": 0,
+          "completion": 18
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 585,
+          "cached": 0,
+          "completion": 39
+        },
+        {
+          "node": "find_service",
+          "prompt": 923,
+          "cached": 0,
+          "completion": 29
+        },
+        {
+          "node": "find_service",
+          "prompt": 969,
+          "cached": 0,
+          "completion": 27
+        },
+        {
+          "node": "find_service",
+          "prompt": 1013,
+          "cached": 0,
+          "completion": 31
+        },
+        {
+          "node": "offer_slots",
+          "prompt": 1072,
+          "cached": 0,
+          "completion": 36
+        },
+        {
+          "node": "offer_slots",
+          "prompt": 1126,
+          "cached": 1024,
+          "completion": 32
+        },
+        {
+          "node": "confirm_booking",
+          "prompt": 932,
+          "cached": 0,
+          "completion": 33
+        },
+        {
+          "node": "confirm_booking",
+          "prompt": 980,
+          "cached": 0,
+          "completion": 11
+        },
+        {
+          "node": "booked",
+          "prompt": 1222,
+          "cached": 0,
+          "completion": 52
+        },
+        {
+          "node": "booked",
+          "prompt": 1295,
+          "cached": 0,
+          "completion": 10
+        },
+        {
+          "node": "goodbye",
+          "prompt": 1238,
+          "cached": 0,
+          "completion": 17
+        }
+      ],
+      "transcript": [
+        {
+          "role": "event",
+          "text": "-> node greeting"
+        },
+        {
+          "role": "assistant",
+          "text": "Hello, this is Ava from Prosper Health. How can I assist you today?"
+        },
+        {
+          "role": "user",
+          "text": "Hi, this is Ruth Adler. I need to schedule an appointment. My doctor referred me to your clinic."
+        },
+        {
+          "role": "assistant",
+          "text": "Thank you, Ruth. What kind of appointment or service do you need to schedule?"
+        },
+        {
+          "role": "user",
+          "text": "I\u2019m not exactly sure what it\u2019s called, but I\u2019ve been having some memory issues lately. My family is really worried about me."
+        },
+        {
+          "role": "event",
+          "text": "start_booking({\"request\": \"memory issues consultation\"}) -> {\"status\": \"success\", \"request\": \"memory issues consultation\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node identify_patient"
+        },
+        {
+          "role": "assistant",
+          "text": "Could you please tell me your date of birth, Ruth?"
+        },
+        {
+          "role": "user",
+          "text": "Sure, it's June 30, 1948."
+        },
+        {
+          "role": "assistant",
+          "text": "Have you been seen at Prosper Health before, or would this be your first visit?"
+        },
+        {
+          "role": "user",
+          "text": "Yes, I've been seen there before."
+        },
+        {
+          "role": "event",
+          "text": "record_patient({\"full_name\": \"Ruth Adler\", \"date_of_birth\": \"1948-06-30\", \"new_patient\": false, \"request\": \"memory issues consultation\"}) -> {\"status\": \"success\", \"full_name\": \"Ruth Adler\", \"date_of_birth\": \"1948-06-30\", \"new_patient\": false, \"request\": \"memory issues consultation\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node find_service"
+        },
+        {
+          "role": "assistant",
+          "text": "For your memory issues consultation, the appropriate appointment is a Memory Evaluation, which requires a referral. Do you already have a referral for this?"
+        },
+        {
+          "role": "user",
+          "text": "Yes, I have a referral from my doctor."
+        },
+        {
+          "role": "assistant",
+          "text": "Great! Would you prefer to have your Memory Evaluation at Mission District Family Clinic, North Gate Health Center, or Midtown Medical Group?"
+        },
+        {
+          "role": "user",
+          "text": "I think I\u2019d prefer the Midtown Medical Group."
+        },
+        {
+          "role": "event",
+          "text": "select_service({\"appointment_type_id\": \"appt_039\", \"location_id\": \"loc_005\", \"has_referral\": true}) -> {\"status\": \"ok\", \"appointment_type\": \"Memory Evaluation\", \"eligible_providers\": 1, \"eligible_locations\": 1}"
+        },
+        {
+          "role": "event",
+          "text": "-> node offer_slots"
+        },
+        {
+          "role": "assistant",
+          "text": "The soonest Memory Evaluation appointment with Dr. Olivia Singh at Midtown Medical Group is Tuesday, September 29 at 9:30 AM. Would you like to book that?"
+        },
+        {
+          "role": "user",
+          "text": "Yes, that works for me. Please book it."
+        },
+        {
+          "role": "event",
+          "text": "choose_slot({\"slot_id\": \"appt_039|prov_017|loc_005|20260929T0930\"}) -> {\"status\": \"ok\", \"slot_id\": \"appt_039|prov_017|loc_005|20260929T0930\", \"when\": \"Tuesday, September 29 at 9:30 AM\", \"provider\": \"Dr. Olivia Singh, MD\", \"location\": \"Midtown Medical Group\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node confirm_booking"
+        },
+        {
+          "role": "assistant",
+          "text": "You are booking a Memory Evaluation with Dr. Olivia Singh at Midtown Medical Group on Tuesday, September 29 at 9:30 AM. Is that correct?"
+        },
+        {
+          "role": "user",
+          "text": "Yes, that's correct. Thank you!"
+        },
+        {
+          "role": "event",
+          "text": "book_appointment({}) -> {\"status\": \"booked\", \"confirmation\": \"PX-097564\", \"patient_name\": \"Ruth Adler\", \"date_of_birth\": \"1948-06-30\", \"appointment_type\": \"Memory Evaluation\", \"slot_id\": \"appt_039|prov_017|loc_005|20260929T0930\", \"when\": \"Tuesday, September 29 at 9:30 AM\", \"provider\": \"Dr. Olivia Singh, MD\", \"location\": \"M"
+        },
+        {
+          "role": "event",
+          "text": "-> node booked"
+        },
+        {
+          "role": "assistant",
+          "text": "Your Memory Evaluation with Dr. Olivia Singh is booked for Tuesday, September 29 at 9:30 AM. Your confirmation number is PX-097564. The location is 2099 Market Street, San Francisco. Anything else I can help with?"
+        },
+        {
+          "role": "user",
+          "text": "No, that\u2019s all I needed. Thank you for your help!"
+        },
+        {
+          "role": "event",
+          "text": "end_call({}) -> {\"status\": \"success\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node goodbye"
+        },
+        {
+          "role": "assistant",
+          "text": "Thank you for choosing Prosper Health, Ruth, and have a wonderful day! Goodbye!"
+        }
+      ]
+    },
+    {
+      "agent": "ours_cascade",
+      "scenario": "indirect_travel",
+      "pass": true,
+      "reasons": [],
+      "booked": "Travel Vaccination Consult / Dr. Lucas Chen, MD (Family Medicine) / Mission Bay Health Center / 2026-09-29 09:00:00",
+      "llm_calls": 14,
+      "prompt_tokens": 12181,
+      "completion_tokens": 363,
+      "avg_prompt_tokens": 870,
+      "max_prompt_tokens": 1321,
+      "cost_usd": 0.006,
+      "cost_uncached_usd": 0.0064,
+      "jev_calls": 1,
+      "jev_avg_latency_ms": 456,
+      "jev_cost_usd": 0.00092,
+      "cached_tokens": 1152,
+      "turns": 7,
+      "seconds": 17.5,
+      "per_call": [
+        {
+          "node": "greeting",
+          "prompt": 291,
+          "cached": 0,
+          "completion": 17
+        },
+        {
+          "node": "greeting",
+          "prompt": 345,
+          "cached": 0,
+          "completion": 16
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 476,
+          "cached": 0,
+          "completion": 12
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 506,
+          "cached": 0,
+          "completion": 12
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 534,
+          "cached": 0,
+          "completion": 40
+        },
+        {
+          "node": "find_service",
+          "prompt": 998,
+          "cached": 0,
+          "completion": 28
+        },
+        {
+          "node": "find_service",
+          "prompt": 1050,
+          "cached": 0,
+          "completion": 18
+        },
+        {
+          "node": "offer_slots",
+          "prompt": 1057,
+          "cached": 0,
+          "completion": 60
+        },
+        {
+          "node": "offer_slots",
+          "prompt": 1143,
+          "cached": 0,
+          "completion": 32
+        },
+        {
+          "node": "confirm_booking",
+          "prompt": 947,
+          "cached": 0,
+          "completion": 36
+        },
+        {
+          "node": "confirm_booking",
+          "prompt": 1003,
+          "cached": 0,
+          "completion": 11
+        },
+        {
+          "node": "booked",
+          "prompt": 1246,
+          "cached": 0,
+          "completion": 54
+        },
+        {
+          "node": "booked",
+          "prompt": 1321,
+          "cached": 1152,
+          "completion": 10
+        },
+        {
+          "node": "goodbye",
+          "prompt": 1264,
+          "cached": 0,
+          "completion": 17
+        }
+      ],
+      "transcript": [
+        {
+          "role": "event",
+          "text": "-> node greeting"
+        },
+        {
+          "role": "assistant",
+          "text": "Hello, this is Ava from Prosper Health. How can I assist you today?"
+        },
+        {
+          "role": "user",
+          "text": "Hi, this is Omar Haddad. I\u2019m traveling to Kenya next month and I want to check on any vaccines I might need before my trip."
+        },
+        {
+          "role": "event",
+          "text": "start_booking({\"request\": \"travel vaccine consultation\"}) -> {\"status\": \"success\", \"request\": \"travel vaccine consultation\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node identify_patient"
+        },
+        {
+          "role": "assistant",
+          "text": "Can you please provide your date of birth, Omar?"
+        },
+        {
+          "role": "user",
+          "text": "Sure, it's March 14, 1991."
+        },
+        {
+          "role": "assistant",
+          "text": "Have you been seen at Prosper Health before, Omar?"
+        },
+        {
+          "role": "user",
+          "text": "Yes, I have been seen here before."
+        },
+        {
+          "role": "event",
+          "text": "record_patient({\"full_name\": \"Omar Haddad\", \"date_of_birth\": \"1991-03-14\", \"new_patient\": false, \"request\": \"travel vaccine consultation\"}) -> {\"status\": \"success\", \"full_name\": \"Omar Haddad\", \"date_of_birth\": \"1991-03-14\", \"new_patient\": false, \"request\": \"travel vaccine consultation\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node find_service"
+        },
+        {
+          "role": "assistant",
+          "text": "You need a Travel Vaccination Consult, which does not require a referral. Do you have a preferred location or provider for this appointment?"
+        },
+        {
+          "role": "user",
+          "text": "I don\u2019t have a specific preference. Just the earliest available appointment would be great."
+        },
+        {
+          "role": "event",
+          "text": "select_service({\"appointment_type_id\": \"appt_013\"}) -> {\"status\": \"ok\", \"appointment_type\": \"Travel Vaccination Consult\", \"eligible_providers\": 8, \"eligible_locations\": 7}"
+        },
+        {
+          "role": "event",
+          "text": "-> node offer_slots"
+        },
+        {
+          "role": "assistant",
+          "text": "The soonest travel vaccine consults are Tuesday the 29th at 8 AM with Dr. Kenji Patel at North Beach, 9 AM with Dr. Lucas Chen at Mission Bay, or 9:30 AM with Dr. Priya Ramirez at Sunset. Which works for you?"
+        },
+        {
+          "role": "user",
+          "text": "I\u2019ll take the 9 AM appointment with Dr. Lucas Chen at Mission Bay, please."
+        },
+        {
+          "role": "event",
+          "text": "choose_slot({\"slot_id\": \"appt_013|prov_047|loc_000|20260929T0900\"}) -> {\"status\": \"ok\", \"slot_id\": \"appt_013|prov_047|loc_000|20260929T0900\", \"when\": \"Tuesday, September 29 at 9 AM\", \"provider\": \"Dr. Lucas Chen, MD\", \"location\": \"Mission Bay Health Center\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node confirm_booking"
+        },
+        {
+          "role": "assistant",
+          "text": "You chose a travel vaccine consult on Tuesday, September 29 at 9 AM with Dr. Lucas Chen at Mission Bay Health Center. Should I book this appointment for you?"
+        },
+        {
+          "role": "user",
+          "text": "Yes, please go ahead and book that appointment. Thank you!"
+        },
+        {
+          "role": "event",
+          "text": "book_appointment({}) -> {\"status\": \"booked\", \"confirmation\": \"PX-776318\", \"patient_name\": \"Omar Haddad\", \"date_of_birth\": \"1991-03-14\", \"appointment_type\": \"Travel Vaccination Consult\", \"slot_id\": \"appt_013|prov_047|loc_000|20260929T0900\", \"when\": \"Tuesday, September 29 at 9 AM\", \"provider\": \"Dr. Lucas Chen, MD\", \"location"
+        },
+        {
+          "role": "event",
+          "text": "-> node booked"
+        },
+        {
+          "role": "assistant",
+          "text": "You're booked for the travel vaccine consult on Tuesday, September 29 at 9 AM with Dr. Lucas Chen at Mission Bay Health Center, 4874 Main St, San Francisco. Your confirmation number is PX-776318. Anything else I can help with?"
+        },
+        {
+          "role": "user",
+          "text": "No, that\u2019s all for now. Thank you for your help!"
+        },
+        {
+          "role": "event",
+          "text": "end_call({}) -> {\"status\": \"success\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node goodbye"
+        },
+        {
+          "role": "assistant",
+          "text": "Thank you for calling Prosper Health, Omar, and have a wonderful day! Goodbye!"
+        }
+      ]
+    },
+    {
+      "agent": "ours_cascade",
+      "scenario": "indirect_heartburn",
+      "pass": true,
+      "reasons": [],
+      "booked": "GI Consultation / Dr. Fatima Hernandez, DO (Gastroenterology) / North Gate Health Center / 2026-09-29 09:30:00",
+      "llm_calls": 14,
+      "prompt_tokens": 12140,
+      "completion_tokens": 408,
+      "avg_prompt_tokens": 867,
+      "max_prompt_tokens": 1335,
+      "cost_usd": 0.0064,
+      "cost_uncached_usd": 0.0064,
+      "jev_calls": 1,
+      "jev_avg_latency_ms": 508,
+      "jev_cost_usd": 0.00092,
+      "cached_tokens": 0,
+      "turns": 7,
+      "seconds": 17.6,
+      "per_call": [
+        {
+          "node": "greeting",
+          "prompt": 291,
+          "cached": 0,
+          "completion": 17
+        },
+        {
+          "node": "greeting",
+          "prompt": 354,
+          "cached": 0,
+          "completion": 24
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 501,
+          "cached": 0,
+          "completion": 10
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 529,
+          "cached": 0,
+          "completion": 18
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 561,
+          "cached": 0,
+          "completion": 46
+        },
+        {
+          "node": "find_service",
+          "prompt": 906,
+          "cached": 0,
+          "completion": 30
+        },
+        {
+          "node": "find_service",
+          "prompt": 953,
+          "cached": 0,
+          "completion": 24
+        },
+        {
+          "node": "offer_slots",
+          "prompt": 1066,
+          "cached": 0,
+          "completion": 42
+        },
+        {
+          "node": "offer_slots",
+          "prompt": 1127,
+          "cached": 0,
+          "completion": 63
+        },
+        {
+          "node": "confirm_booking",
+          "prompt": 968,
+          "cached": 0,
+          "completion": 35
+        },
+        {
+          "node": "confirm_booking",
+          "prompt": 1015,
+          "cached": 0,
+          "completion": 11
+        },
+        {
+          "node": "booked",
+          "prompt": 1256,
+          "cached": 0,
+          "completion": 61
+        },
+        {
+          "node": "booked",
+          "prompt": 1335,
+          "cached": 0,
+          "completion": 10
+        },
+        {
+          "node": "goodbye",
+          "prompt": 1278,
+          "cached": 0,
+          "completion": 17
+        }
+      ],
+      "transcript": [
+        {
+          "role": "event",
+          "text": "-> node greeting"
+        },
+        {
+          "role": "assistant",
+          "text": "Hello, this is Ava from Prosper Health. How can I assist you today?"
+        },
+        {
+          "role": "user",
+          "text": "Hi, my name is Grace Liu. I need to schedule an appointment. I've been having constant heartburn and stomach pain for months now. My GP referred me to a specialist at your clinic."
+        },
+        {
+          "role": "event",
+          "text": "start_booking({\"request\": \"gastroenterology consultation for heartburn and stomach pain\"}) -> {\"status\": \"success\", \"request\": \"gastroenterology consultation for heartburn and stomach pain\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node identify_patient"
+        },
+        {
+          "role": "assistant",
+          "text": "Could you please provide your date of birth?"
+        },
+        {
+          "role": "user",
+          "text": "Sure, it's September 19, 1983."
+        },
+        {
+          "role": "assistant",
+          "text": "Have you been seen at Prosper Health before, or would this be your first visit?"
+        },
+        {
+          "role": "user",
+          "text": "This will be my first visit."
+        },
+        {
+          "role": "event",
+          "text": "record_patient({\"full_name\": \"Grace Liu\", \"date_of_birth\": \"1983-09-19\", \"new_patient\": true, \"request\": \"gastroenterology consultation for heartburn and stomach pain\"}) -> {\"status\": \"success\", \"full_name\": \"Grace Liu\", \"date_of_birth\": \"1983-09-19\", \"new_patient\": true, \"request\": \"gastroenterology consultation for heartburn and stomach pain\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node find_service"
+        },
+        {
+          "role": "assistant",
+          "text": "For your gastroenterology consultation for heartburn and stomach pain, a referral is required. Do you have a referral from your primary care provider?"
+        },
+        {
+          "role": "user",
+          "text": "Yes, I have a referral from my GP."
+        },
+        {
+          "role": "event",
+          "text": "select_service({\"appointment_type_id\": \"appt_053\", \"has_referral\": true}) -> {\"status\": \"ok\", \"appointment_type\": \"GI Consultation\", \"eligible_providers\": 1, \"eligible_locations\": 1}"
+        },
+        {
+          "role": "event",
+          "text": "-> node offer_slots"
+        },
+        {
+          "role": "assistant",
+          "text": "The soonest GI consultation for heartburn and stomach pain is Tuesday, September 29 at 9:30 AM with Dr. Fatima Hernandez at North Gate Health Center. Does that work for you?"
+        },
+        {
+          "role": "user",
+          "text": "Yes, that works for me. Please book that appointment."
+        },
+        {
+          "role": "event",
+          "text": "choose_slot({\"slot_id\": \"appt_053|prov_049|loc_003|20260929T0930\"}) -> {\"status\": \"ok\", \"slot_id\": \"appt_053|prov_049|loc_003|20260929T0930\", \"when\": \"Tuesday, September 29 at 9:30 AM\", \"provider\": \"Dr. Fatima Hernandez, DO\", \"location\": \"North Gate Health Center\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node confirm_booking"
+        },
+        {
+          "role": "assistant",
+          "text": "You are booking a GI consultation on Tuesday, September 29 at 9:30 AM with Dr. Fatima Hernandez at North Gate Health Center. Is that correct?"
+        },
+        {
+          "role": "user",
+          "text": "Yes, that's correct."
+        },
+        {
+          "role": "event",
+          "text": "book_appointment({}) -> {\"status\": \"booked\", \"confirmation\": \"PX-114956\", \"patient_name\": \"Grace Liu\", \"date_of_birth\": \"1983-09-19\", \"appointment_type\": \"GI Consultation\", \"slot_id\": \"appt_053|prov_049|loc_003|20260929T0930\", \"when\": \"Tuesday, September 29 at 9:30 AM\", \"provider\": \"Dr. Fatima Hernandez, DO\", \"location\": \""
+        },
+        {
+          "role": "event",
+          "text": "-> node booked"
+        },
+        {
+          "role": "assistant",
+          "text": "Your GI consultation with Dr. Fatima Hernandez is booked for Tuesday, September 29 at 9:30 AM. Your confirmation number is PX-114956. The appointment is at North Gate Health Center, 944 Bryant St, San Francisco. Is there anything else I can help you with?"
+        },
+        {
+          "role": "user",
+          "text": "No, that's all. Thank you for your help!"
+        },
+        {
+          "role": "event",
+          "text": "end_call({}) -> {\"status\": \"success\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node goodbye"
+        },
+        {
+          "role": "assistant",
+          "text": "Thank you for choosing Prosper Health, Grace; have a wonderful day and take care!"
+        }
+      ]
+    },
+    {
+      "agent": "ours_cascade",
+      "scenario": "indirect_cast",
+      "pass": true,
+      "reasons": [],
+      "booked": "Fracture Follow-up / Dr. Carlos Nguyen, MD (Orthopedics) / North Beach Specialty Center / 2026-09-30 10:30:00",
+      "llm_calls": 14,
+      "prompt_tokens": 12151,
+      "completion_tokens": 395,
+      "avg_prompt_tokens": 868,
+      "max_prompt_tokens": 1324,
+      "cost_usd": 0.0061,
+      "cost_uncached_usd": 0.0064,
+      "jev_calls": 1,
+      "jev_avg_latency_ms": 641,
+      "jev_cost_usd": 0.00092,
+      "cached_tokens": 1024,
+      "turns": 7,
+      "seconds": 16.8,
+      "per_call": [
+        {
+          "node": "greeting",
+          "prompt": 291,
+          "cached": 0,
+          "completion": 17
+        },
+        {
+          "node": "greeting",
+          "prompt": 352,
+          "cached": 0,
+          "completion": 18
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 487,
+          "cached": 0,
+          "completion": 13
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 518,
+          "cached": 0,
+          "completion": 12
+        },
+        {
+          "node": "identify_patient",
+          "prompt": 546,
+          "cached": 0,
+          "completion": 39
+        },
+        {
+          "node": "find_service",
+          "prompt": 928,
+          "cached": 0,
+          "completion": 45
+        },
+        {
+          "node": "find_service",
+          "prompt": 990,
+          "cached": 0,
+          "completion": 25
+        },
+        {
+          "node": "offer_slots",
+          "prompt": 1076,
+          "cached": 0,
+          "completion": 36
+        },
+        {
+          "node": "offer_slots",
+          "prompt": 1126,
+          "cached": 1024,
+          "completion": 67
+        },
+        {
+          "node": "confirm_booking",
+          "prompt": 970,
+          "cached": 0,
+          "completion": 35
+        },
+        {
+          "node": "confirm_booking",
+          "prompt": 1017,
+          "cached": 0,
+          "completion": 11
+        },
+        {
+          "node": "booked",
+          "prompt": 1259,
+          "cached": 0,
+          "completion": 50
+        },
+        {
+          "node": "booked",
+          "prompt": 1324,
+          "cached": 0,
+          "completion": 10
+        },
+        {
+          "node": "goodbye",
+          "prompt": 1267,
+          "cached": 0,
+          "completion": 17
+        }
+      ],
+      "transcript": [
+        {
+          "role": "event",
+          "text": "-> node greeting"
+        },
+        {
+          "role": "assistant",
+          "text": "Hello, this is Ava from Prosper Health. How can I assist you today?"
+        },
+        {
+          "role": "user",
+          "text": "Hi, this is Leo. I need to schedule a time to come in. I broke my arm three weeks ago, and I was told to come back to get my cast checked."
+        },
+        {
+          "role": "event",
+          "text": "start_booking({\"request\": \"cast check for broken arm\"}) -> {\"status\": \"success\", \"request\": \"cast check for broken arm\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node identify_patient"
+        },
+        {
+          "role": "assistant",
+          "text": "Hi Leo, can you please provide your date of birth?"
+        },
+        {
+          "role": "user",
+          "text": "Sure, it's December 5, 2001."
+        },
+        {
+          "role": "assistant",
+          "text": "Have you been seen at Prosper Health before, Leo?"
+        },
+        {
+          "role": "user",
+          "text": "Yes, I have been seen there before."
+        },
+        {
+          "role": "event",
+          "text": "record_patient({\"full_name\": \"Leo\", \"date_of_birth\": \"2001-12-05\", \"new_patient\": false, \"request\": \"cast check for broken arm\"}) -> {\"status\": \"success\", \"full_name\": \"Leo\", \"date_of_birth\": \"2001-12-05\", \"new_patient\": false, \"request\": \"cast check for broken arm\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node find_service"
+        },
+        {
+          "role": "assistant",
+          "text": "For your cast check after a broken arm, we have a Fracture Follow-up appointment in Orthopedics. Do you have a preferred location among North Beach Specialty Center, Midtown Medical Group, or Richmond Care Center?"
+        },
+        {
+          "role": "user",
+          "text": "I can go to the North Beach Specialty Center."
+        },
+        {
+          "role": "event",
+          "text": "select_service({\"appointment_type_id\": \"appt_034\", \"location_id\": \"loc_002\"}) -> {\"status\": \"ok\", \"appointment_type\": \"Fracture Follow-up\", \"eligible_providers\": 1, \"eligible_locations\": 1}"
+        },
+        {
+          "role": "event",
+          "text": "-> node offer_slots"
+        },
+        {
+          "role": "assistant",
+          "text": "The soonest fracture follow-up is Wednesday, September 30 at 10:30 AM with Dr. Carlos Nguyen at North Beach Specialty Center. Does that work for you?"
+        },
+        {
+          "role": "user",
+          "text": "Yes, that works for me."
+        },
+        {
+          "role": "event",
+          "text": "choose_slot({\"slot_id\": \"appt_034|prov_037|loc_002|20260930T1030\"}) -> {\"status\": \"ok\", \"slot_id\": \"appt_034|prov_037|loc_002|20260930T1030\", \"when\": \"Wednesday, September 30 at 10:30 AM\", \"provider\": \"Dr. Carlos Nguyen, MD\", \"location\": \"North Beach Specialty Center\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node confirm_booking"
+        },
+        {
+          "role": "assistant",
+          "text": "You are scheduling a fracture follow-up with Dr. Carlos Nguyen on Wednesday, September 30 at 10:30 AM at North Beach Specialty Center. Is that correct?"
+        },
+        {
+          "role": "user",
+          "text": "Yes, that's correct."
+        },
+        {
+          "role": "event",
+          "text": "book_appointment({}) -> {\"status\": \"booked\", \"confirmation\": \"PX-950879\", \"patient_name\": \"Leo\", \"date_of_birth\": \"2001-12-05\", \"appointment_type\": \"Fracture Follow-up\", \"slot_id\": \"appt_034|prov_037|loc_002|20260930T1030\", \"when\": \"Wednesday, September 30 at 10:30 AM\", \"provider\": \"Dr. Carlos Nguyen, MD\", \"location\": \"Nor"
+        },
+        {
+          "role": "event",
+          "text": "-> node booked"
+        },
+        {
+          "role": "assistant",
+          "text": "You're booked for a fracture follow-up with Dr. Nguyen on September 30 at 10:30 AM. Your confirmation number is PX-950879. The location is 481 Mission St, San Francisco. Anything else I can help with?"
+        },
+        {
+          "role": "user",
+          "text": "No, that's all. Thank you!"
+        },
+        {
+          "role": "event",
+          "text": "end_call({}) -> {\"status\": \"success\"}"
+        },
+        {
+          "role": "event",
+          "text": "-> node goodbye"
+        },
+        {
+          "role": "assistant",
+          "text": "Thank you for calling Prosper Health, Leo; have a wonderful day and take care!"
+        }
+      ]
+    }
+  ]
+}

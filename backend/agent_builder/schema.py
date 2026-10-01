@@ -94,6 +94,7 @@ class AgentConfig:
     persona: str = ""                    # global role_message, applied to every node
     voice_id: str = DEFAULT_VOICE_ID
     model: str = DEFAULT_MODEL
+    resolver: str = "fuzzy"              # catalog matcher: "fuzzy" | "jev" (TypeSafe Jev, full catalog)
 
     @classmethod
     def from_dict(cls, d: dict) -> "AgentConfig":
@@ -104,4 +105,5 @@ class AgentConfig:
             persona=d.get("persona", ""),
             voice_id=d.get("voice_id", DEFAULT_VOICE_ID),
             model=d.get("model", DEFAULT_MODEL),
+            resolver=d.get("resolver", "fuzzy"),
         )

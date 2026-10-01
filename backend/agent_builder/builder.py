@@ -13,6 +13,7 @@
 # context resets that carry over a compact state summary instead of the transcript.
 #
 
+import inspect
 import json
 from datetime import date
 from pathlib import Path
@@ -101,6 +102,8 @@ class AgentBuilder:
         names = set(self._nodes_by_name)
         if not names:
             return ["Agent has no nodes."]
+        if self.config.resolver not in ("fuzzy", "jev", "cascade"):
+            errors.append(f"Unknown resolver '{self.config.resolver}' (use 'fuzzy', 'jev' or 'cascade').")
         if self.config.initial_node not in names:
             errors.append(f"initial_node '{self.config.initial_node}' is not a defined node.")
         for node in self.config.nodes:
@@ -127,16 +130,22 @@ class AgentBuilder:
             raise ValueError(" ".join(errors))
 
     # ---- compilation -------------------------------------------------------
-    def build_initial_node(self) -> NodeConfig:
+    async def build_initial_node(self) -> NodeConfig:
         """Return the entry NodeConfig; downstream nodes are built lazily on transition."""
-        return self._make_node(self._nodes_by_name[self.config.initial_node], {})
+        return await self._make_node(self._nodes_by_name[self.config.initial_node], {})
+
+    async def _call(self, fn, args: dict, state: dict):
+        """Run a tool/action; tools may be sync (local lookups) or async (network, e.g. Jev)."""
+        state.setdefault("_resolver", self.config.resolver)
+        result = fn(self.engine_factory(), args, state)
+        return await result if inspect.isawaitable(result) else result
 
     def _role_message(self, node: Node) -> str:
         today = self.today or date.today()
         base = node.role_message or self.config.persona
         return f"{base}\nToday is {today:%A, %B} {today.day}, {today.year}."
 
-    def _make_node(self, node: Node, state: dict) -> NodeConfig:
+    async def _make_node(self, node: Node, state: dict) -> NodeConfig:
         task_messages = list(node.task_messages)
         node_config: NodeConfig = {"name": node.name, "role_message": self._role_message(node)}
         if node.context == "reset":
@@ -146,7 +155,7 @@ class AgentBuilder:
             summary = summarize_state(state)
             if summary:
                 task_messages = [{"role": "developer", "content": f"Known so far in this call:\n{summary}"}] + task_messages
-        task_messages += self._run_prefetch(node, state)
+        task_messages += await self._run_prefetch(node, state)
         node_config["task_messages"] = task_messages
         node_config["functions"] = [self._make_tool_function(t) for t in node.tools] + [
             self._make_edge_function(node, edge) for edge in node.edges
@@ -161,7 +170,7 @@ class AgentBuilder:
         self.on_event({"type": "node", "node": node.name, "context": node.context})
         return node_config
 
-    def _run_prefetch(self, node: Node, state: dict) -> list:
+    async def _run_prefetch(self, node: Node, state: dict) -> list:
         """Run the node's prefetch tools server-side and hand the LLM the results.
 
         Without this, entering e.g. offer_slots costs one LLM call just to decide to
@@ -181,7 +190,7 @@ class AgentBuilder:
             if missing:
                 continue
             name = pf["tool"]
-            result = self.tools[name].fn(self.engine_factory(), args, state)
+            result = await self._call(self.tools[name].fn, args, state)
             self.on_event({"type": "tool", "name": name, "args": args, "result": result, "prefetch": True})
             messages.append({"role": "developer", "content":
                              f"{name}({json.dumps(args)}) was already called for you. Result:\n{json.dumps(result)}"})
@@ -191,7 +200,7 @@ class AgentBuilder:
         spec = self.tools[name]
 
         async def handler(args: dict, flow_manager: FlowManager):
-            result = spec.fn(self.engine_factory(), args, flow_manager.state)
+            result = await self._call(spec.fn, args, flow_manager.state)
             logger.info(f"[tool {name}] {args} -> {result.get('status')}")
             self.on_event({"type": "tool", "name": name, "args": args, "result": result})
             return result, None  # stay on the current node
@@ -209,13 +218,13 @@ class AgentBuilder:
             result = {"status": "success", **args}
             updates = {}
             if edge.action:
-                ok, result, updates = self.actions[edge.action](self.engine_factory(), args, flow_manager.state)
+                ok, result, updates = await self._call(self.actions[edge.action], args, flow_manager.state)
                 self.on_event({"type": "action", "name": edge.action, "ok": ok, "args": args, "result": result})
                 if not ok:
                     logger.info(f"[{edge.function}] action '{edge.action}' refused: {result}")
                     if edge.fallback_target:
                         target = self._nodes_by_name[edge.fallback_target]
-                        return result, self._make_node(target, flow_manager.state)
+                        return result, await self._make_node(target, flow_manager.state)
                     return result, None  # stay; the LLM sees why and self-corrects
             # Persist what the caller gave us so later nodes can use it.
             flow_manager.state.update({k: v for k, v in args.items() if v is not None})
@@ -223,7 +232,7 @@ class AgentBuilder:
             logger.info(f"[{edge.function}] -> {edge.target} | collected: {args}")
             self.on_event({"type": "transition", "function": edge.function, "from": node.name,
                            "to": edge.target, "args": args})
-            next_node = self._make_node(self._nodes_by_name[edge.target], flow_manager.state)
+            next_node = await self._make_node(self._nodes_by_name[edge.target], flow_manager.state)
             return result, next_node
 
         return FlowsFunctionSchema(

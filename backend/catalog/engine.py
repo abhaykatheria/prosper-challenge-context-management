@@ -118,7 +118,8 @@ class CatalogEngine:
 
     # ---- appointment types -------------------------------------------------
     def match_appointment_types(
-        self, query: str, new_patient: Optional[bool] = None, limit: int = 4
+        self, query: str, new_patient: Optional[bool] = None, limit: int = 4,
+        patient_age: Optional[int] = None,
     ) -> dict:
         scored = []
         for t in self.c.appointment_types.values():
@@ -129,7 +130,10 @@ class CatalogEngine:
             scored.append((s, t))
         scored.sort(key=lambda x: -x[0])
 
-        top = [(s, t) for s, t in scored if s >= 60][: limit + 2]
+        top = [(s, t) for s, t in scored if s >= 60][: limit + 6]
+        if patient_age is not None:
+            top = self._apply_age(top, patient_age)
+        top = top[: limit + 2]
         if not top:
             return {"status": "no_match", "query": query, "candidates": [],
                     "hint": "Ask the caller to describe the reason for the visit in other words."}
@@ -146,14 +150,7 @@ class CatalogEngine:
         if exact:
             close = close[:1]
         else:
-            groups = self.c.group_by_type.get(close[0][1].id, [])
-            ids_in_play = {t.id for _, t in close}
-            # choose the smallest group containing the top hit and >=1 other close candidate
-            best_group = None
-            for g in sorted(groups, key=lambda g: len(g["ids"])):
-                if len(ids_in_play & set(g["ids"])) >= 2:
-                    best_group = g
-                    break
+            best_group = self.confusable_group(close[0][1].id, {t.id for _, t in close})
             if best_group:
                 question = best_group["question"]
                 known = {t.id for _, t in close}
@@ -162,19 +159,55 @@ class CatalogEngine:
                     if tid not in known:
                         close.append((best - 10, self.c.appointment_types[tid]))
 
-        # Patient context narrows further: a new patient can't book existing-only types.
-        if new_patient is True:
-            allowed = [(s, t) for s, t in close if t.new_patients_allowed]
-            if allowed:
-                close = allowed
-
-        candidates = [self.describe_type(t) for _, t in close]
-        if not any(self.c.providers_by_type.get(t.id) for _, t in close):
-            return {"status": "not_offered", "candidates": candidates,
-                    "related_offered": self._related_offered_types(close[0][1])}
         clear = len(close) == 1 or (close[0][0] - close[1][0] >= 8 and close[0][0] >= 90)
+        out = self.finalize_type_match([t for _, t in close], clear, question, new_patient, patient_age)
+        out["score"] = round(best)  # lexical confidence; the cascade resolver keys off it
+        return out
+
+    def _apply_age(self, ranked: list, age: int) -> list:
+        """Adults never get pediatric types; for a child, drop an adult type whenever a
+        pediatric type from the same confusable group is also a candidate."""
+        if age >= 18:
+            return [(s, t) for s, t in ranked if t.specialty != "Pediatrics"] or ranked
+        peds = {t.id for _, t in ranked if t.specialty == "Pediatrics"}
+        if not peds:
+            return ranked
+        shadowed = {i for p in peds for g in self.c.group_by_type.get(p, []) for i in g["ids"]} - peds
+        return [(s, t) for s, t in ranked if t.id not in shadowed]
+
+    def confusable_group(self, top_id: str, ids_in_play: set):
+        """Smallest curated confusable group containing the top hit and >=1 other candidate."""
+        for g in sorted(self.c.group_by_type.get(top_id, []), key=lambda g: len(g["ids"])):
+            if len(ids_in_play & set(g["ids"])) >= 2:
+                return g
+        return None
+
+    def finalize_type_match(self, types: list, clear: bool, question: Optional[str],
+                            new_patient: Optional[bool], patient_age: Optional[int] = None) -> dict:
+        """Shared by every resolver (fuzzy, Jev): turn ranked candidate types into the
+        tool result, applying patient context, offered-ness, repairs and bookability."""
+        # The patient's age (from the DOB already collected) separates "Sick Visit" from
+        # "Pediatric Sick Visit" when the caller never says "child" - deterministically,
+        # instead of asking a question we already know the answer to.
+        if patient_age is not None and len(types) > 1:
+            peds = [t for t in types if t.specialty == "Pediatrics"]
+            keep = peds if patient_age < 18 else [t for t in types if t.specialty != "Pediatrics"]
+            if keep and len(keep) < len(types):
+                types = keep
+                if len(types) == 1:
+                    clear, question = True, None
+        # Patient context narrows further: a new patient can't book existing-only types.
+        if new_patient is True and len(types) > 1:
+            allowed = [t for t in types if t.new_patients_allowed]
+            if allowed:
+                types = allowed
+                clear = clear or len(types) == 1
+        candidates = [self.describe_type(t) for t in types]
+        if not any(self.c.providers_by_type.get(t.id) for t in types):
+            return {"status": "not_offered", "candidates": candidates,
+                    "related_offered": self._related_offered_types(types[0])}
         if clear:
-            only = close[0][1]
+            only = types[0]
             if not self.c.providers_by_type.get(only.id):
                 return {"status": "not_offered", "candidates": candidates[:1],
                         "related_offered": self._related_offered_types(only)}
@@ -192,8 +225,7 @@ class CatalogEngine:
                                    for l in sorted({l.id: l for _, l in opts}.values(), key=lambda l: l.id)]
             cand["provider_count"] = len({p.id for p, _ in opts})
             return {"status": "match", "candidates": [cand]}
-        out = {"status": "ambiguous", "candidates": candidates,
-               "differs_by": self._differences([t for _, t in close])}
+        out = {"status": "ambiguous", "candidates": candidates, "differs_by": self._differences(types)}
         if question:
             out["suggested_question"] = question
         return out

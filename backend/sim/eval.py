@@ -39,14 +39,15 @@ CATALOG = Catalog.load()
 SIM_PROMPT = """You are role-playing a patient phoning a clinic's scheduling line. Stay in character.
 Goal: {persona}
 Your facts (share only when asked): name {name}; date of birth {dob}; {status}; {referral}.
-Talk like a real caller: short, natural sentences, one thing at a time. Don't volunteer every fact at once.
+Today is {today}. Talk like a real caller: short, natural sentences, one thing at a time. Don't volunteer every fact at once.
 When your goal is done (booked and confirmed, or clearly impossible), or the assistant says goodbye, reply with exactly: [END]"""
 
 
 def agent_config(kind: str, model: str) -> dict:
-    if kind == "ours":
+    if kind in ("ours", "ours_jev", "ours_cascade"):
         cfg = json.loads((HERE.parent / "agents" / "scheduler.json").read_text())
         cfg["model"] = model
+        cfg["resolver"] = {"ours": "fuzzy", "ours_jev": "jev", "ours_cascade": "cascade"}[kind]
         return cfg
     return naive_agent(guarded=(kind == "naive_guarded"), model=model)
 
@@ -97,6 +98,7 @@ async def run_one(client, kind: str, sc: dict, model: str, sim_model: str, max_t
     runner = TextFlowRunner(builder, client=client, model=model)
     pt = sc["patient"]
     sim_sys = SIM_PROMPT.format(
+        today=f"{TODAY:%A, %B} {TODAY.day}, {TODAY.year}",
         persona=sc["persona"], name=pt["name"], dob=pt["dob"],
         status="you are a NEW patient here" if pt["new_patient"] else "you have been seen here before",
         referral="you have a referral" if pt["has_referral"] else "you do not have a referral")
@@ -114,13 +116,20 @@ async def run_one(client, kind: str, sc: dict, model: str, sim_model: str, max_t
         agent_text = await runner.send(caller)
     result = score(sc, runner.state, runner.transcript)
     u = runner.usage
+    from catalog import jev as _jev
+    jr = _jev._resolvers.pop((id(engine), "full"), None)
+    jev_calls = jr.client.calls if jr else []
+    jev_cost = _jev.cost_usd(sum(c["input_tokens"] for c in jev_calls))
     return {
         "agent": kind, "scenario": sc["id"], **result,
         "llm_calls": u.calls, "prompt_tokens": u.prompt_tokens, "completion_tokens": u.completion_tokens,
         "avg_prompt_tokens": round(u.prompt_tokens / max(u.calls, 1)),
         "max_prompt_tokens": u.max_prompt_tokens,
-        "cost_usd": round(u.cost(model), 4),
-        "cost_uncached_usd": round(u.cost(model, use_cache=False), 4),
+        "cost_usd": round(u.cost(model) + jev_cost, 4),
+        "cost_uncached_usd": round(u.cost(model, use_cache=False) + jev_cost, 4),
+        "jev_calls": len(jev_calls),
+        "jev_avg_latency_ms": round(1000 * sum(c["latency"] for c in jev_calls) / len(jev_calls)) if jev_calls else 0,
+        "jev_cost_usd": round(jev_cost, 5),
         "cached_tokens": u.cached_tokens,
         "turns": sum(1 for t in runner.transcript if t["role"] == "user"),
         "seconds": round(time.time() - t0, 1),
@@ -173,7 +182,7 @@ async def main():
 
     for r in results:
         mark = "PASS" if r["pass"] else "FAIL"
-        print(f"{r['agent']:14} {r['scenario']:26} {mark}  calls={r['llm_calls']:2} "
+        print(f"{r['agent']:14} {r['scenario']:26} {mark}  calls={r['llm_calls']:2} jev={r.get('jev_calls', 0)} "
               f"avg_prompt={r['avg_prompt_tokens']:6} cost=${r['cost_usd']:.4f}  {'; '.join(r['reasons'])}")
         if args.verbose:
             for t in r["transcript"]:
