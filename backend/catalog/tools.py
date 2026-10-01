@@ -106,6 +106,14 @@ async def _hybrid(e: CatalogEngine, request: str, new_patient: Optional[bool], a
         jev.match_appointment_types(request, new_patient, age, shortlist=shortlist), JEV_TIMEOUT_S)
     result["resolver"], result["shortlist_size"] = "hybrid", len(shortlist)
     if result["status"] == "no_match":
+        # A category word with no detail ("some kind of scan") is a question, not a dead
+        # end: if the caller's own words name a confusable group, ask that group's question.
+        g = e.category_group(request)
+        if g:
+            out = e.finalize_type_match([e.c.appointment_types[i] for i in g["ids"]], False,
+                                        g["question"], new_patient, age)
+            out["resolver"] = "hybrid_category"
+            return out
         # Escape hatch for zero-lexical-overlap requests ("I keep forgetting things"):
         # one call over every option. At catalog sizes past Jev's window this raises
         # ContextTooLarge and degrades to fuzzy (or becomes a specialty->type two-stage).

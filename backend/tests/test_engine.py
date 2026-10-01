@@ -182,3 +182,70 @@ def test_jev_client_refuses_oversized_requests():
     client = jev.JevClient(api_key="unused")
     with pytest.raises(jev.ContextTooLarge):
         asyncio.run(client.system_one("x" * 120_000, {}))
+
+
+# ---- hybrid ambiguity logic -------------------------------------------------
+
+def test_stemming_fixes_plural_recall(e):
+    from catalog.tools import _shortlist
+    ids = {t.id for t in _shortlist(e, e.rank_appointment_types("go over all my medications with my primary doctor"))}
+    assert "appt_009" in ids  # Medication Review
+
+
+def test_discriminators_from_enrichment(e):
+    g = next(g for g in CAT.confusable_groups if set(g["ids"]) == {"appt_072", "appt_073"})
+    assert {"fasting", "cholesterol"} <= e.discriminators("appt_073", g)
+    assert not e.mentions_discriminator("a blood test", "appt_072", g)
+
+
+def test_category_group_uses_callers_words(e):
+    assert "appt_066" in e.category_group("I need some kind of scan")["ids"]
+    assert e.category_group("I want to see a doctor") is None
+
+
+class _FakeJev:
+    """Answers every question deterministically: main choice -> `main`; each group
+    question -> `group_answers.get(frozenset(options))`, else 'not specified'."""
+
+    def __init__(self, main, group_answers=None):
+        self.main, self.group_answers, self.calls = main, group_answers or {}, []
+
+    async def system_one(self, state, questions):
+        answers = {}
+        for k, q in questions.items():
+            opts = list(q["criteria"])
+            if k == "appointment_type":
+                pick, p = self.main
+            else:
+                pick, p = self.group_answers.get(frozenset(o for o in opts if o != "not specified"), ("not specified", 0.9))
+            probs = {o: (p if o == pick else (1 - p) / (len(opts) - 1)) for o in opts}
+            answers[k] = {"type": "choice", "choice": pick, "probabilities": probs, "confidence": p}
+        return {"answers": answers, "usage": {"input_tokens": 0}}
+
+
+def _hybrid_with(e, fake, text):
+    import asyncio
+    from catalog.jev import JevResolver
+    from catalog.tools import _shortlist
+    r = JevResolver(e, client=fake)
+    sl = _shortlist(e, e.rank_appointment_types(text))
+    return asyncio.run(r.match_appointment_types(text, shortlist=sl))
+
+
+def test_confident_pick_without_distinguishing_words_asks(e):
+    blood = frozenset({"Blood Draw / Lab Work", "Fasting Blood Test"})
+    out = _hybrid_with(e, _FakeJev(("Blood Draw / Lab Work", 1.0), {blood: ("Blood Draw / Lab Work", 0.7)}), "a blood test")
+    assert out["status"] == "ambiguous" and out["suggested_question"]
+
+
+def test_distinguishing_word_commits(e):
+    fu = frozenset({"Follow-up Visit", "Follow-up Consultation", "Telehealth Follow-up"})
+    out = _hybrid_with(e, _FakeJev(("Telehealth Follow-up", 1.0), {fu: ("Telehealth Follow-up", 0.8)}),
+                       "a video appointment to follow up with my doctor")
+    assert out["status"] == "match" and out["candidates"][0]["name"] == "Telehealth Follow-up"
+
+
+def test_group_says_not_specified_asks(e):
+    out = _hybrid_with(e, _FakeJev(("MRI - Brain", 0.95)), "I need an MRI")
+    assert out["status"] == "ambiguous"
+    assert {c["name"] for c in out["candidates"]} >= {"MRI - Brain", "MRI - Knee", "MRI - Spine"}

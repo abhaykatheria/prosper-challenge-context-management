@@ -103,9 +103,12 @@ async def main():
     ap.add_argument("--only", default="fuzzy,jev_options,jev_full,cascade,hybrid")
     ap.add_argument("--concurrency", type=int, default=4)
     ap.add_argument("--verbose", action="store_true")
+    ap.add_argument("--bench", default="dev", choices=["dev", "holdout"],
+                    help="dev = match_bench.json (used for tuning); holdout = frozen, generated set")
     args = ap.parse_args()
 
-    items = json.loads((HERE / "match_bench.json").read_text())
+    bench_file = "match_bench.json" if args.bench == "dev" else "match_bench_holdout.json"
+    items = json.loads((HERE / bench_file).read_text())
     engine = CatalogEngine(Catalog.load(), today=date(2026, 9, 28))
     summary, all_rows = {}, {}
 
@@ -149,7 +152,7 @@ async def main():
               + " | ".join(cells)
               + f" | {s['p50_ms']}ms | {s['p95_ms']}ms | {s['avg_input_tokens']} | ${s['cost_per_lookup']:.5f} |")
 
-    out = HERE / "results" / "match_bench.json"
+    out = HERE / "results" / ("match_bench.json" if args.bench == "dev" else "match_bench_holdout.json")
     out.write_text(json.dumps({"summary": summary, "rows": {k: [{kk: vv for kk, vv in r.items()} for r in v]
                                                             for k, v in all_rows.items()}}, indent=1, default=str))
     print(f"\nSaved {out}")

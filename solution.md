@@ -221,11 +221,12 @@ descriptions, 10 STT garbles, 8 genuinely ambiguous, 5 not offered, 3 vague):
 
 | resolver | correct | asked a clarifying Q (safe) | committed on an ambiguous request | wrong | ambiguous handled | p50 latency | Jev input tokens | $/lookup |
 |---|---|---|---|---|---|---|---|---|
-| fuzzy + aliases | 64 | 8 | 3 | **15** | 4/8 | 3 ms | 0 | 0 |
+| fuzzy + aliases (+ plural stemming) | 66 | 10 | 3 | **11** | 4/8 | 4 ms | 0 | 0 |
 | Jev, option list only | 68 | 16 | 4 | 2 | 2/8 | 285 ms | 6,930 | $0.0003 |
 | Jev, full catalog † | 69 (68–70) | 20 | **0** | **1** | **7/8** | 405 ms | 21,805 | $0.0009 |
 | cascade (fuzzy if confident, else full-catalog Jev) | 69 | 16 | 3 | 2 | 4/8 | 389 ms | 14,780 | $0.0006 |
-| **hybrid (fuzzy shortlist → Jev picks)** † | **79.7 (79–80)** | 6 | 2 (1–3) | 2 | 4–6/8 | **260 ms** | **3,041** | **$0.00013** |
+| hybrid v1 (shortlist + global yes/no) † | 79.7 (79–80) | 6 | 2 (1–3) | 2 | 4–6/8 | 260 ms | 3,041 | $0.00013 |
+| **hybrid v2 (per-group questions + word check)** † | **87 (87–87)** | **2** | **0** | **1** | **8/8** | **260 ms** | 3,838 | $0.00016 |
 
 † Mean [range] over 3 runs: Jev's answers vary slightly from run to run, so single
 runs differ by a few points. Other rows are single runs (fuzzy is deterministic).
@@ -281,28 +282,64 @@ recall.** The right type is in fuzzy's top 5 for 80/82 benchmark phrasings (top
    confusable siblings, so "which MRI?" can still be asked;
 2. an exact match on a type with no confusable siblings skips Jev entirely;
 3. otherwise Jev picks within the shortlist, with only those options and the
-   patient facts in context (~2.8k tokens instead of 21.8k, the same at any
-   catalog size), plus the same-call specificity question;
-4. if Jev answers "none of these" (zero lexical overlap, e.g. "I keep forgetting
-   things"), one escape-hatch call over every option;
-5. a size check refuses any request over 30k tokens before sending it, and any Jev
+   patient facts in context (~3.8k tokens instead of 21.8k, the same at any
+   catalog size);
+4. **ambiguity is decided per confusable group, in the same call**: for every
+   group touching the shortlist Jev also answers "which of these, or *not
+   specified*?". Committing inside a group requires the group answer to agree
+   with the main pick **and** either a word in the caller's request that singles
+   it out (derived from the enrichment data: Fasting Blood Test ← fasting,
+   cholesterol, lipid; Telehealth ← video, virtual; MRI-Knee ← knee) or a very sure
+   group answer (p ≥ 0.9). Otherwise the agent asks the group's curated question;
+5. if Jev answers "none of these": a request that names a category ("some kind of
+   scan") gets that group's question; anything else gets one escape-hatch call
+   over every option ("I keep forgetting things");
+6. a size check refuses any request over 30k tokens before sending it, and any Jev
    error, timeout or oversize degrades to the fuzzy result (tested).
 
-With only the shortlist in context, the specificity scores run lower across the
-board, so shortlist mode uses its own threshold (0.28). Like the 0.4 threshold,
-it was tuned on this benchmark and would be recalibrated on real call transcripts.
+**How v2 came about.** v1 used one global yes/no ("is the request specific?")
+next to the choice. Failure analysis of three v1 runs showed that, with only a
+shortlist in view, that score is noise: clear and ambiguous requests both scored
+0.22–0.33, so it caused both errors at once (asking about "a video appointment"
+when Jev was certain it meant Telehealth, and committing on "a blood test").
+Two smaller fixes came from the same analysis: plural folding in the fuzzy
+normaliser ("medications" never matched "medication", so Medication Review
+missed the shortlist), and category requests no longer dead-ending in "no match".
 
-**Decision:** default to **hybrid**. It gets the most right on the first try
-(~80/90 vs 69), asks ~14 fewer unnecessary questions, is ~35% faster and ~7×
-cheaper than full-catalog Jev, passed 40/40 end to end, and its Jev context
-doesn't grow with the catalog. Its known weakness: on genuinely ambiguous
-requests it still commits in ~2 of 8 cases where full-catalog Jev always asks
-(the specificity signal is weaker without the whole catalog in view). The next
-step would be to always ask the curated clarifying question when a confusable
-sibling of the top pick carries meaningful probability, and to calibrate on real
-call transcripts. The resolver remains a per-agent setting in the builder UI
-(fuzzy, jev, cascade, hybrid). Past Jev's 255-option limit, step 4 becomes Jev's
-documented two-stage choice (specialty, then type).
+**Held-out check.** The dev set above was used for tuning, so before changing
+anything I generated a second set of 60 phrasings with a different model
+(gpt-4.1, from the catalog's own descriptions; labels are the generation target,
+with a pre-registered audit of 5 underspecified items) and committed it frozen
+(`sim/match_bench_holdout.json`, commit f8aefa0). Results, 3 runs each, no
+tuning after the first reading:
+
+| held-out (60) | correct | asked (safe) | committed on ambiguous | wrong | ambiguous handled | p50 |
+|---|---|---|---|---|---|---|
+| fuzzy | 22 | 8 | 6 | **24** | 2/15 | 7 ms |
+| Jev, full catalog | 36.7 | 19 | 0 | 4.3 | 11–12/15 | 400 ms |
+| hybrid v1 | 45 | 8 | 4 | 3 | 8/15 | 259 ms |
+| **hybrid v2** | **50** | **5** | **1** | 4 | **12/15** | 265 ms |
+
+Two lessons. First, **my fuzzy matcher was overfit to my own vocabulary**: 66/90
+on phrasings I wrote, 22/60 on someone else's; the aliases are only as good as
+the person who wrote them, which is exactly the gap a model like Jev fills.
+Second, the v2 gains hold on unseen data. The remaining misses are hard STT
+garbles ("general ex-am with a Dennis" for a dentist, "neural allergy" for
+neurology), one wrong clarifying question, and two debatable labels ("some blood
+work" read as a standard blood draw).
+
+**End to end** with hybrid v2: **100% (40/40), 0 policy violations**, 0.93 Jev
+calls per conversation, ~320 ms each, $0.00015 of Jev cost per call.
+
+**Decision:** default to **hybrid v2**. On held-out data it gets the most right
+on the first try (50/60 vs 36.7 for full-catalog Jev and 22 for fuzzy), asks the
+fewest needless questions, almost never guesses on an ambiguous request, is ~35%
+faster and ~6× cheaper than full-catalog Jev, and its Jev context doesn't grow
+with the catalog. No matcher is perfect, so correctness doesn't rest on it alone:
+the agent reads the appointment back before booking, and the policy guards
+re-validate every booking. The resolver remains a per-agent setting in the
+builder UI (fuzzy, jev, cascade, hybrid). Past Jev's 255-option limit, step 5's
+escape call becomes Jev's documented two-stage choice (specialty, then type).
 
 ## 4. Trade-offs and alternatives considered
 

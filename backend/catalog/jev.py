@@ -34,6 +34,7 @@ MODEL = "jev-latest"
 PRICE_PER_M_INPUT = 0.042
 
 NONE_OPTION = "none of these"
+NOT_SPECIFIED = "not specified"
 # Measured: 32,973 input tokens accepted, larger -> HTTP 400 max_tokens_exceeded.
 MAX_INPUT_TOKENS = 30_000
 CHARS_PER_TOKEN = 3.0  # calibrated on catalog.json: 45.6KB of JSON ~ 15.2k Jev tokens
@@ -92,10 +93,9 @@ class JevResolver:
     MIN_P = 0.12
     # Top option is "clear" above this, with no real runner-up.
     CLEAR_P = 0.75
-    # With only a shortlist in context the specificity answers run lower across the board
-    # (ambiguous requests <= 0.27, 53/61 clear ones >= 0.28 on the benchmark), so shortlist
-    # mode uses its own cut. Tuned on the benchmark; recalibrate on real call transcripts.
-    SHORTLIST_SPECIFIC_THRESHOLD = 0.28
+    # Shortlist mode: a confusable-group answer this confident overrides the
+    # missing-discriminator backstop (the caller described it unambiguously in other words).
+    GROUP_SURE_P = 0.9
 
     def __init__(self, engine: CatalogEngine, client: Optional[JevClient] = None, context: str = "full",
                  specific_threshold: float = 0.4):
@@ -142,17 +142,9 @@ class JevResolver:
         catalog size.
         """
         if shortlist:
-            criteria = {t.name: self._type_criteria[t.name] for t in shortlist}
-            criteria[NONE_OPTION] = self._type_criteria[NONE_OPTION]
-        else:
-            criteria = self._type_criteria
-        state = self._state(query, {"new_patient": new_patient, "patient_age_years": patient_age},
-                            with_catalog=not shortlist)
-        if shortlist:
-            # The yes/no specificity question reads `state`, not the choice's options.
-            # Without the catalog in state it can't see that several similar types exist
-            # ("MRI" looks specific), so list the candidates it is choosing between.
-            state["similar_appointment_types_offered"] = [t.name for t in shortlist]
+            return await self._match_shortlist(query, new_patient, patient_age, shortlist)
+        criteria = self._type_criteria
+        state = self._state(query, {"new_patient": new_patient, "patient_age_years": patient_age})
         data = await self.client.system_one(
             state,
             {
@@ -186,8 +178,7 @@ class JevResolver:
             return {"status": "no_match", "query": query, "candidates": []}
 
         types = [t for _, t in cands]
-        threshold = self.SHORTLIST_SPECIFIC_THRESHOLD if shortlist else self.specific_threshold
-        clear = (cands[0][0] >= self.CLEAR_P and specific >= threshold
+        clear = (cands[0][0] >= self.CLEAR_P and specific >= self.specific_threshold
                  and (len(cands) == 1 or cands[1][0] < self.MIN_P + 0.03))
         if not clear and len(types) == 1:
             # Not specific, but the choice question gave only one candidate: widen with
@@ -208,6 +199,82 @@ class JevResolver:
         out = self.e.finalize_type_match(types, clear or len(types) == 1, question, new_patient, patient_age)
         out["confidence"] = round(cands[0][0], 3)
         out["specific"] = round(specific, 3)
+        return out
+
+    async def _match_shortlist(self, query: str, new_patient: Optional[bool],
+                               patient_age: Optional[int], shortlist: list) -> dict:
+        """Hybrid mode: choose within fuzzy's shortlist, and decide ambiguity per confusable group.
+
+        A single global "is this specific?" yes/no proved to be noise with only a shortlist
+        in view (clear and ambiguous requests both scored 0.22-0.33). Ambiguity in this
+        catalog is defined by the curated confusable groups, so for every group touching
+        the shortlist the same call also asks "which of these, or not specified?". The
+        answer is then cross-checked against the caller's actual words: committing inside a
+        group requires either a term that singles the option out, or a very sure answer.
+        """
+        criteria = {t.name: self._type_criteria[t.name] for t in shortlist}
+        criteria[NONE_OPTION] = self._type_criteria[NONE_OPTION]
+        in_list = {t.id for t in shortlist}
+        groups = [g for g in self.e.c.confusable_groups if in_list & set(g["ids"])]
+        questions = {"appointment_type": {
+            "type": "choice",
+            "instructions": "Which of this clinic's appointment types is the caller asking for?",
+            "criteria": criteria,
+        }}
+        for i, g in enumerate(groups):
+            members = {self.e.c.appointment_types[t].name: self._type_criteria[self.e.c.appointment_types[t].name]
+                       for t in g["ids"]}
+            members[NOT_SPECIFIED] = "What the caller said fits more than one of these, or doesn't say which."
+            questions[f"group_{i}"] = {
+                "type": "choice",
+                "instructions": "Based only on what the caller actually said (not on what is most common), "
+                                "which one of these do they mean? Choose 'not specified' if their words "
+                                "would fit more than one of them.",
+                "criteria": members,
+            }
+        data = await self.client.system_one(
+            self._state(query, {"new_patient": new_patient, "patient_age_years": patient_age}, with_catalog=False),
+            questions)
+
+        ranked = sorted(data["answers"]["appointment_type"]["probabilities"].items(), key=lambda kv: -kv[1])
+        top_name, top_p = ranked[0]
+        if top_name == NONE_OPTION:
+            return {"status": "no_match", "query": query, "candidates": [], "confidence": round(top_p, 3)}
+        top = self._type_by_option[top_name]
+
+        verdicts = []  # (group, decision, chosen_type) for each of top's groups that was asked
+        for i, g in enumerate(groups):
+            if top.id not in g["ids"]:
+                continue
+            ans = data["answers"][f"group_{i}"]
+            choice, p = ans["choice"], ans["probabilities"][ans["choice"]]
+            if choice == NOT_SPECIFIED:
+                verdicts.append((g, "ask", None))
+            else:
+                chosen = self._type_by_option[choice]
+                said_it = self.e.mentions_discriminator(query, chosen.id, g)
+                if chosen.id != top.id and p < self.GROUP_SURE_P:
+                    verdicts.append((g, "ask", None))           # the two questions disagree
+                elif not said_it and p < self.GROUP_SURE_P:
+                    verdicts.append((g, "ask", None))           # nothing they said singles it out
+                else:
+                    verdicts.append((g, "commit", chosen))
+
+        asks = [g for g, d, _ in verdicts if d == "ask"]
+        if asks:
+            g = min(asks, key=lambda g: len(g["ids"]))
+            types = [self.e.c.appointment_types[i] for i in g["ids"]]
+            out = self.e.finalize_type_match(types, False, g["question"], new_patient, patient_age)
+        else:
+            chosen = next((c for _, d, c in verdicts if d == "commit"), top)
+            runner_up = ranked[1][1] if len(ranked) > 1 and ranked[1][0] != NONE_OPTION else 0.0
+            if verdicts or (top_p >= self.CLEAR_P and runner_up < self.MIN_P + 0.03):
+                out = self.e.finalize_type_match([chosen], True, None, new_patient, patient_age)
+            else:  # no group to consult and the main choice is split: offer the contenders
+                types = [self._type_by_option[n] for n, p in ranked if n != NONE_OPTION and p >= self.MIN_P][:4]
+                out = self.e.finalize_type_match(types or [chosen], len(types) <= 1, None, new_patient, patient_age)
+        out["confidence"] = round(top_p, 3)
+        out["groups_asked"] = len(groups)
         return out
 
     # ---- providers ---------------------------------------------------------

@@ -35,8 +35,23 @@ def norm(text: str) -> str:
     return " ".join(text.split())
 
 
+def _stem(token: str) -> str:
+    """Plural folding only ("medications" -> "medication", "allergies" -> "allergy"):
+    enough to stop near-identical words missing each other, without the surprises of
+    an aggressive stemmer on medical terms."""
+    if len(token) <= 3 or token.endswith(("ss", "us", "is")):
+        return token
+    if token.endswith("ies") and len(token) > 4:
+        return token[:-3] + "y"
+    if token.endswith(("ches", "shes", "xes", "ses")):
+        return token[:-2]
+    if token.endswith("s"):
+        return token[:-1]
+    return token
+
+
 def _content(text: str) -> str:
-    return " ".join(t for t in norm(text).split() if t not in _STOPWORDS)
+    return " ".join(_stem(t) for t in norm(text).split() if t not in _STOPWORDS)
 
 
 def _phrase_score(query: str, phrase: str) -> float:
@@ -184,6 +199,44 @@ class CatalogEngine:
             return ranked
         shadowed = {i for p in peds for g in self.c.group_by_type.get(p, []) for i in g["ids"]} - peds
         return [(s, t) for s, t in ranked if t.id not in shadowed]
+
+    # Words that appear across a group's names/aliases but say nothing about WHICH member.
+    _GENERIC_TERMS = {"consult", "consultation", "exam", "check", "checkup", "follow", "up", "followup",
+                      "test", "appointment", "visit", "new", "patient", "doctor", "session", "scan"}
+
+    def discriminators(self, type_id: str, group: dict) -> frozenset:
+        """Terms in this type's name/aliases that none of its group siblings use, e.g.
+        Fasting Blood Test -> {fasting, cholesterol, lipid, glucose}. If a caller's words
+        contain none of them, nothing they said singles this type out from its siblings."""
+        key = (type_id, tuple(group["ids"]))
+        cache = self.__dict__.setdefault("_disc_cache", {})
+        if key not in cache:
+            def terms(t):
+                return {w for ph in [t.name] + t.aliases for w in _content(ph).split()}
+            own = terms(self.c.appointment_types[type_id])
+            others = set().union(*(terms(self.c.appointment_types[i]) for i in group["ids"] if i != type_id))
+            cache[key] = frozenset(w for w in own - others - self._GENERIC_TERMS if len(w) > 2)
+        return cache[key]
+
+    def mentions_discriminator(self, query: str, type_id: str, group: dict) -> bool:
+        words = set(_content(query).split())
+        return any(set(term.split()) <= words for term in self.discriminators(type_id, group))
+
+    _NOT_A_CATEGORY = {"doctor", "appointment", "visit", "patient", "new", "see", "someone", "help"}
+
+    def category_group(self, query: str):
+        """The confusable group a vague request names by category ("some kind of scan" ->
+        imaging), chosen by exact words shared with members' names/aliases, never by a
+        fuzzy guess. Returns None when the caller's words name no group."""
+        words = set(_content(query).split()) - self._NOT_A_CATEGORY
+        best, best_hits = None, 0
+        for g in self.c.confusable_groups:
+            hits = sum(1 for i in g["ids"]
+                       if words & {w for ph in [self.c.appointment_types[i].name] + self.c.appointment_types[i].aliases
+                                   for w in _content(ph).split()})
+            if hits > best_hits or (hits == best_hits and best and hits and len(g["ids"]) > len(best["ids"])):
+                best, best_hits = g, hits
+        return best if best_hits else None
 
     def confusable_group(self, top_id: str, ids_in_play: set):
         """Smallest curated confusable group containing the top hit and >=1 other candidate."""
