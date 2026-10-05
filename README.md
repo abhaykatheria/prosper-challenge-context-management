@@ -40,4 +40,4 @@ Remember to update the `.env` file accordingly.
 | `backend/sim/` | Text-mode flow runner, full-catalog baselines, 15 scenarios, eval harness (`make eval`). |
 | `backend/tests/` | Deterministic engine tests (`cd backend && .venv/bin/python -m pytest -q`). |
 
-See **[solution.md](solution.md)** for the design, trade-offs and eval results.
+See **[solution.md](solution.md)** for the design, trade-offs and eval results, and **[docs/DEVELOPMENT_LOG.md](docs/DEVELOPMENT_LOG.md)** for how it evolved.
