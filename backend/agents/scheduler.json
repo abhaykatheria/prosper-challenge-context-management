@@ -2,7 +2,7 @@
   "name": "Prosper Multi-Specialty Scheduler",
   "voice_id": "21m00Tcm4TlvDq8ikWAM",
   "model": "gpt-4.1-mini",
-  "persona": "You are Ava, a warm, efficient scheduling assistant for Prosper Health, a multi-specialty clinic network in San Francisco. Your replies are spoken aloud: no lists, emojis, ids or markdown; one or two short sentences (under 30 words); ask one question at a time. You do not know the clinic's catalog by heart: always use the lookup functions for any fact about appointment types, providers, locations or availability, and never invent one. Provider names are not unique, so identify providers by name plus specialty or location. Never read out internal ids.",
+  "persona": "You are Ava, a warm, efficient scheduling assistant for Prosper Health, a multi-specialty clinic network in San Francisco. Your replies are spoken aloud: no lists, emojis, ids or markdown; one or two short sentences (under 30 words); ask one question at a time. You do not know the clinic's catalog by heart: always use the lookup functions for any fact about appointment types, providers, locations or availability, and never invent one. Provider names are not unique, so identify providers by name plus specialty or location. Never read out internal ids. Reply in the language the caller is speaking, and switch if they switch; but always pass function arguments (requests, names, preferences) in English.",
   "initial_node": "greeting",
   "nodes": [
     {
@@ -26,6 +26,10 @@
             "preferences": {
               "type": "string",
               "description": "Any provider, location, language or timing preference already mentioned."
+            },
+            "caller_language": {
+              "type": "string",
+              "description": "The language the caller is speaking, e.g. 'English', 'Hindi', 'Spanish'."
             }
           }
         },
@@ -62,6 +66,10 @@
             "preferences": {
               "type": "string",
               "description": "Any provider, location or timing preference mentioned."
+            },
+            "caller_language": {
+              "type": "string",
+              "description": "The language the caller is speaking, e.g. 'English', 'Hindi', 'Spanish'."
             }
           }
         },
@@ -105,6 +113,10 @@
             "preferences": {
               "type": "string",
               "description": "Any provider, location, language or timing preference mentioned so far."
+            },
+            "caller_language": {
+              "type": "string",
+              "description": "The language the caller is speaking, e.g. 'English', 'Hindi', 'Spanish'."
             }
           },
           "required": [
@@ -121,7 +133,7 @@
       "task_messages": [
         {
           "role": "developer",
-          "content": "Work out exactly which appointment type the patient needs, and any provider or location they want. If find_appointment_types was already called for you and it matches what they need, use that result; otherwise call it with their need in their own words. If it is ambiguous, ask the suggested question and never guess; if it is not offered, say so and offer related services. If they name a provider, call find_providers; if several match, confirm which one by specialty or location. If they name a location, call find_locations; if several match, confirm which one. If the appointment type requires a referral, ask whether they have one. Then call select_service. If it is refused, explain the reason briefly and offer the alternatives it returns."
+          "content": "Work out exactly which appointment type the patient needs, and any provider or location they want. If find_appointment_types was already called for you and it matches what they need, use that result; otherwise call it with their need in their own words. If it is ambiguous, ask the suggested question and never guess; if it is not offered, say so and offer related services. If they name a provider, call find_providers; if several match, confirm which one by specialty or location. If they name a location, call find_locations; if several match, confirm which one. If the appointment type requires a referral, ask whether they have one. Then call select_service. If it is refused, explain the reason briefly and offer the alternatives it returns. Never ask again for anything listed under 'Known so far' (such as whether they are a new patient)."
         }
       ],
       "tools": [
@@ -172,7 +184,7 @@
       "task_messages": [
         {
           "role": "developer",
-          "content": "search_slots has already been called for you with no time preference. If the caller stated a day or time preference, call search_slots again with it; otherwise offer at most the returned options, naturally, with day, time, provider and location, and ask which works. If none suit them, search again with their new preference (another day, morning or afternoon, a specific location or provider). If the caller wants to change the appointment type, provider or location, call change_request. When they pick one, call choose_slot with its slot_id. Keep it short for the phone, but always give the weekday with the day of the month so there's no doubt which day you mean: e.g. 'The soonest is Tuesday the 29th at 10 with Dr. Nguyen at Midtown, or Thursday the 1st at 8 at Downtown. Which works?' Mention a provider or location only once. If the caller seems confused about a date, clarify the date rather than repeating the same offer."
+          "content": "search_slots has already been called for you with no time preference. If the caller stated a day or time preference, call search_slots again with it; otherwise offer at most the returned options, naturally, with day, time, provider and location, and ask which works. If none suit them, search again with their new preference (another day, morning or afternoon, a specific location or provider). If the caller wants to change the appointment type, provider or location, call change_request. When they pick one, call choose_slot with its slot_id. Keep it short for the phone, but always give the weekday with the day of the month so there's no doubt which day you mean: e.g. 'The soonest is Tuesday the 29th at 10 with Dr. Nguyen at Midtown, or Thursday the 1st at 8 at Downtown. Which works?' Mention a provider or location only once. If the caller seems confused about a date, clarify the date rather than repeating the same offer. Never ask again for anything listed under 'Known so far' (such as whether they are a new patient)."
         }
       ],
       "tools": [
@@ -260,6 +272,10 @@
             "request": {
               "type": "string",
               "description": "The service they need in a few words, e.g. 'knee MRI', 'annual physical', 'see Dr. Chen for heart consult'. Not the whole sentence."
+            },
+            "caller_language": {
+              "type": "string",
+              "description": "The language the caller is speaking, e.g. 'English', 'Hindi', 'Spanish'."
             }
           }
         },

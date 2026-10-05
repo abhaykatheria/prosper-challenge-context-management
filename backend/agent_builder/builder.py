@@ -35,6 +35,7 @@ from .schema import AgentConfig, Edge, Node
 # State keys worth carrying across a context reset, with how to label them.
 # Everything else (raw tool output, chit-chat) is deliberately dropped.
 SUMMARY_KEYS = [
+    ("caller_language", "Caller speaks (reply in this language)"),
     ("full_name", "Caller name"),
     ("date_of_birth", "Date of birth"),
     ("new_patient", "New patient"),

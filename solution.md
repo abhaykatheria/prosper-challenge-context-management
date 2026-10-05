@@ -147,14 +147,17 @@ verified against the live API before shipping.
 
 ## 7. Known issues and next steps
 
-Found in live test calls, not yet fixed: (1) adults offered and booked with a
-pediatric provider (allowed by the catalog, wrong clinically; providers need the
-age filter types already have); (2) inconsistent handling of a Hindi-speaking
-caller; (3) "stomach pain / food poisoning" matched to a new-patient consultation
-instead of a sick visit; (4) a weak alternative (Mammogram) when an MRI was refused;
-(5) one fact asked twice.
+Live test calls surfaced issues the simulations missed. **Fixed** (40 tests, 40/40
+end to end after the fixes): adults were offered pediatric providers (the solver now
+filters providers by age, and booking re-checks it from the DOB); a refused MRI
+suggested a Mammogram (alternatives now exclude equipment-bound tests); one fact was
+asked twice; a Hindi-speaking caller got mixed English/Hindi (the agent now replies in
+the caller's language, carried across context resets, while tool arguments stay in
+English). **Still open:** "stomach pain / food poisoning" matched a new-patient
+consultation instead of a sick visit; aliases learned from real calls would fix this
+class of miss. A missing `TYPESAFE_API_KEY` is now flagged at startup and in the builder.
 
-Next: fix the above; look patients up by name + DOB instead of asking; feed
+Next: look patients up by name + DOB instead of asking; feed
 lookup misses from real calls into an alias review queue; recalibrate the
 resolver on real transcripts; run the evaluation in CI on every agent edit.
 

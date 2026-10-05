@@ -22,6 +22,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 
 from agent_builder import AgentBuilder, AgentConfig
+from catalog.jev import jev_available
 from catalog.tools import ACTIONS, TOOLS, get_engine
 
 HERE = Path(__file__).parent
@@ -141,6 +142,7 @@ def register(app: FastAPI) -> None:
         return {
             "tools": {k: {"description": t.description, "properties": t.properties} for k, t in TOOLS.items()},
             "actions": {k: (f.__doc__ or "").strip() for k, f in ACTIONS.items()},
+            "jev_available": jev_available(),
         }
 
     @app.get("/builder/api/trace")

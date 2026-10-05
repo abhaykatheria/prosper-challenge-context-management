@@ -40,6 +40,14 @@ MAX_INPUT_TOKENS = 30_000
 CHARS_PER_TOKEN = 3.0  # calibrated on catalog.json: 45.6KB of JSON ~ 15.2k Jev tokens
 
 
+class JevUnavailable(RuntimeError):
+    """No API key configured; callers fall back to the local matcher."""
+
+
+def jev_available() -> bool:
+    return bool(os.environ.get("TYPESAFE_API_KEY"))
+
+
 class ContextTooLarge(ValueError):
     """Request would exceed Jev's input window; callers fall back to the local matcher."""
 
@@ -52,6 +60,8 @@ class JevClient:
         self.cache = cache  # optional {request_json: response}, used by the offline benchmark sweeps
 
     async def system_one(self, state, questions: dict) -> dict:
+        if not self.api_key:  # fail fast: no network round trip just to get a 401
+            raise JevUnavailable("TYPESAFE_API_KEY is not set")
         body = {"model": MODEL, "state": state, "questions": questions}
         est = len(json.dumps(body)) / CHARS_PER_TOKEN
         if est > MAX_INPUT_TOKENS:  # fail fast instead of a guaranteed 400 round trip

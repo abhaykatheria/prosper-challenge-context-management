@@ -209,6 +209,7 @@ function renderAgentPane() {
       <option value="cascade" ${agent.resolver === 'cascade' ? 'selected' : ''}>Cascade: fuzzy when confident, else Jev with full catalog</option>
       <option value="hybrid" ${agent.resolver === 'hybrid' ? 'selected' : ''}>Hybrid: fuzzy shortlist, Jev picks (scales past Jev's 32k window)</option>
     </select>
+    ${meta.jev_available === false && (agent.resolver || 'fuzzy') !== 'fuzzy' ? `<div style="color:var(--warn);margin-top:6px">TYPESAFE_API_KEY isn't set, so this matcher falls back to fuzzy matching. Add the key to backend/.env for Jev.</div>` : ''}
     <label>Initial node</label>
     <select onchange="agent.initial_node=this.value;markDirty();renderGraph()">${agent.nodes.map(n => `<option ${n.name === agent.initial_node ? 'selected' : ''}>${esc(n.name)}</option>`).join('')}</select>
     <label>Persona (global role message)</label>

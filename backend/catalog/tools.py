@@ -63,13 +63,7 @@ HYBRID_MAX = 30      # cap after adding confusable-group siblings
 
 
 def _age(e: CatalogEngine, s: dict) -> Optional[int]:
-    from datetime import date
-    try:
-        dob = date.fromisoformat(str(s.get("date_of_birth", ""))[:10])
-    except ValueError:
-        return None
-    t = e.today
-    return t.year - dob.year - ((t.month, t.day) < (dob.month, dob.day))
+    return e.age_on(s.get("date_of_birth"))
 
 
 def _shortlist(e: CatalogEngine, ranked: list) -> list:
@@ -132,6 +126,7 @@ async def _find_appointment_types(e: CatalogEngine, a: dict, s: dict) -> dict:
             logger.warning(f"Jev unavailable ({ex!r}); falling back to fuzzy matcher")
             result = e.match_appointment_types(a["request"], new_patient=new_patient, patient_age=age)
             result["resolver"] = "fuzzy_fallback"
+            result["fallback_reason"] = str(ex) or type(ex).__name__
             return result
     if s.get("_resolver") == "cascade":
         # Fast path: accept the local matcher when it's lexically confident; only the
@@ -151,6 +146,7 @@ async def _find_appointment_types(e: CatalogEngine, a: dict, s: dict) -> dict:
             logger.warning(f"Jev unavailable ({ex!r}); falling back to fuzzy matcher")
             result = e.match_appointment_types(a["request"], new_patient=new_patient, patient_age=age)
             result["resolver"] = "fuzzy_fallback"
+            result["fallback_reason"] = str(ex) or type(ex).__name__
             return result
     return e.match_appointment_types(a["request"], new_patient=new_patient, patient_age=age)
 
@@ -178,6 +174,7 @@ def _search_slots(e: CatalogEngine, a: dict, s: dict) -> dict:
         new_patient=_bool(s, "new_patient"),
         has_referral=_bool(s, "has_referral"),
         language=s.get("language"),
+        patient_age=_age(e, s),
         earliest_date=a.get("earliest_date"),
         weekdays=a.get("weekdays"),
         time_of_day=a.get("time_of_day"),
@@ -259,7 +256,7 @@ def _select_service(e: CatalogEngine, a: dict, s: dict):
     if t.requires_referral and has_ref is None:
         return False, {"status": "need_info", "message": f"{t.name} requires a referral. Ask whether they have one, then call again with has_referral."}, {}
     options, blockers = e.solve(tid, a.get("provider_id"), a.get("location_id"),
-                                _bool(s, "new_patient"), has_ref, s.get("language"))
+                                _bool(s, "new_patient"), has_ref, s.get("language"), _age(e, s))
     if blockers:
         return False, {"status": "blocked", "blockers": [b.to_dict() for b in blockers]}, {}
     updates = {"appointment_type_id": tid, "appointment_type": t.name,

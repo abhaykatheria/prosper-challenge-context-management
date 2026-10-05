@@ -212,4 +212,8 @@ if __name__ == "__main__":
     from pipecat.runner.run import app, main
 
     builder_api.register(app)
+    from catalog.jev import jev_available
+    if not jev_available():
+        logger.warning("TYPESAFE_API_KEY not set: Jev-based matchers (hybrid, jev, cascade) will "
+                       "fall back to the local fuzzy matcher. Lookups show 'fuzzy_fallback' in the trace.")
     main()

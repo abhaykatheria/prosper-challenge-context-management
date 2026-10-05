@@ -415,6 +415,7 @@ class CatalogEngine:
         new_patient: Optional[bool] = None,
         has_referral: Optional[bool] = None,
         language: Optional[str] = None,
+        patient_age: Optional[int] = None,
     ) -> tuple:
         """Enumerate every (provider, location) that satisfies ALL policies.
 
@@ -476,6 +477,18 @@ class CatalogEngine:
                 return [], [Blocker("language_unavailable", f"No provider for {t.name} speaks {language}.",
                                     [self.describe_provider(x) for x in providers][:4])]
             providers = spoken
+        if patient_age is not None and patient_age >= 18 and t.specialty != "Pediatrics":
+            # The catalog lets pediatric providers do general visits, but an adult
+            # shouldn't be booked with a pediatrician (found in a live test call).
+            adult_care = [p for p in providers if p.specialty != "Pediatrics"]
+            if not adult_care:
+                return [], [Blocker("pediatric_provider_only",
+                                    f"{providers[0].display if provider_id else 'The only providers for ' + t.name} "
+                                    f"{'only sees' if provider_id else 'see'} children.",
+                                    [self.describe_provider(x) for x in c.providers.values()
+                                     if t.id in x.appointment_type_ids and x.specialty != "Pediatrics"
+                                     and (not new_patient or x.accepting_new_patients)][:4])]
+            providers = adult_care
 
         options, cap_blocked = [], []
         for p in providers:
@@ -495,13 +508,21 @@ class CatalogEngine:
                     msg = f"{loc.name} does not have {t.required_capability.replace('_', ' ')}, which {t.name} requires."
                 else:
                     msg = f"No eligible provider does {t.name} at {loc.name}."
-                alt_opts, _ = self.solve(t.id, provider_id, None, new_patient, has_referral, language)
+                alt_opts, _ = self.solve(t.id, provider_id, None, new_patient, has_referral, language, patient_age)
                 alts = sorted({o[1].id for o in alt_opts})
                 return [], [Blocker("location_ineligible", msg,
                                     [c.locations[a].brief() for a in alts])]
             return [], [Blocker("no_eligible_site",
                                 f"None of the eligible providers practice at a site that supports {t.name}.")]
         return options, []
+
+    def age_on(self, date_of_birth) -> Optional[int]:
+        """Age in whole years on `self.today`, or None if the DOB doesn't parse."""
+        try:
+            dob = date.fromisoformat(str(date_of_birth or "")[:10])
+        except ValueError:
+            return None
+        return self.today.year - dob.year - ((self.today.month, self.today.day) < (dob.month, dob.day))
 
     @staticmethod
     def _resolve_id(value, table: dict):
@@ -511,11 +532,14 @@ class CatalogEngine:
         return hits[0] if len(hits) == 1 else value
 
     def _new_patient_alternatives(self, t: AppointmentType) -> list:
-        same = [x for x in self.c.appointment_types.values()
-                if x.specialty == t.specialty and x.new_patients_allowed and self.c.providers_by_type.get(x.id)]
-        if not same:
-            same = [self.c.appointment_types[i] for i in ("appt_001", "appt_000")]
-        return same[:3]
+        """What a new patient can book instead: an entry visit with the same specialty,
+        else a general new-patient visit to get established and referred. Equipment-bound
+        tests (imaging, lab, surgery) are never entry visits: a refused knee MRI used to
+        suggest a Mammogram just because it shares the specialty."""
+        entry = [x for x in self.c.appointment_types.values()
+                 if x.specialty == t.specialty and x.new_patients_allowed and self.c.providers_by_type.get(x.id)
+                 and not x.required_capability]
+        return (entry or [self.c.appointment_types[i] for i in ("appt_001", "appt_000")])[:3]
 
     def _related_offered_types(self, t: AppointmentType) -> list:
         return [
@@ -565,13 +589,14 @@ class CatalogEngine:
         new_patient: Optional[bool] = None,
         has_referral: Optional[bool] = None,
         language: Optional[str] = None,
+        patient_age: Optional[int] = None,
         earliest_date: Optional[str] = None,
         weekdays: Optional[list] = None,
         time_of_day: Optional[str] = None,
         limit: int = 3,
     ) -> dict:
         options, blockers = self.solve(appointment_type_id, provider_id, location_id,
-                                       new_patient, has_referral, language)
+                                       new_patient, has_referral, language, patient_age)
         if blockers:
             return {"status": "blocked", "blockers": [b.to_dict() for b in blockers]}
 
@@ -654,7 +679,7 @@ class CatalogEngine:
             return {"status": "blocked",
                     "blockers": [Blocker("referral_required", f"{t.name} requires a referral; ask the caller to confirm they have one.").to_dict()]}
         options, blockers = self.solve(s.appointment_type_id, s.provider_id, s.location_id,
-                                       new_patient, has_referral)
+                                       new_patient, has_referral, patient_age=self.age_on(date_of_birth))
         if blockers:
             return {"status": "blocked", "blockers": [b.to_dict() for b in blockers]}
         p = self.c.providers[s.provider_id]

@@ -141,10 +141,28 @@ Three real calls (one in Hindi) on the final build, read from `logs/trace.jsonl`
 * Median **1.84 s** per turn; slow turns (3.5–6 s) are step changes where the LLM
   runs twice. Both completed calls booked validly; ambiguity questions and repairs
   worked live. $0.019 for all three calls.
-* **New problems the simulations missed** (documented in `solution.md` §7, not yet
-  fixed): adults offered and booked with a pediatric provider; inconsistent language
-  handling; acute symptoms resolved to a new-patient consultation instead of a sick
-  visit; a weak repair (Mammogram) for a refused MRI; one fact asked twice.
+* **New problems the simulations missed:** adults offered and booked with a pediatric
+  provider; inconsistent language handling; acute symptoms resolved to a new-patient
+  consultation instead of a sick visit; a weak repair (Mammogram) for a refused MRI;
+  one fact asked twice.
+
+## 9. Fixing what the live calls found (branch `feat/demo-fixes`)
+
+* **Age-aware providers:** the solver drops pediatric providers for adults (except for
+  pediatric types); `book()` re-derives the age from the DOB, so even a pediatric slot
+  offered earlier can't be booked for an adult.
+* **Repairs:** alternatives for an existing-patients-only type are the specialty's
+  entry visits, never equipment-bound tests; general new-patient visits only when the
+  specialty has none. A first version always appended the general visits, and the
+  regression run caught it (a new patient asking for therapy got a general consult
+  instead of a psychiatric evaluation).
+* **Language:** reply in the caller's language; tool arguments stay in English. The
+  first version lost the language at the first context reset; it's now a recorded fact
+  in the step summary.
+* **No re-asking** of facts already in the summary; a missing Jev key is flagged at
+  startup and in the builder, and falls back without a network call.
+* Result: 40 tests; 40/40 end to end, 0 rule violations. Still open: aliases for acute
+  symptoms ("food poisoning").
 
 ## Supporting material
 

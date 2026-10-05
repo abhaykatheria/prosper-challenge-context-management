@@ -249,3 +249,42 @@ def test_group_says_not_specified_asks(e):
     out = _hybrid_with(e, _FakeJev(("MRI - Brain", 0.95)), "I need an MRI")
     assert out["status"] == "ambiguous"
     assert {c["name"] for c in out["candidates"]} >= {"MRI - Brain", "MRI - Knee", "MRI - Spine"}
+
+
+# ---- fixes from live test calls ----------------------------------------------
+
+def test_adults_never_get_pediatric_providers(e):
+    opts, _ = e.solve("appt_000", new_patient=True, patient_age=27)
+    assert opts and all(p.specialty != "Pediatrics" for p, _ in opts)
+    kids, _ = e.solve("appt_000", new_patient=True, patient_age=6)
+    assert any(p.specialty == "Pediatrics" for p, _ in kids)
+    _, b = e.solve("appt_000", provider_id="prov_012", new_patient=True, patient_age=27)
+    assert b[0].code == "pediatric_provider_only" and b[0].alternatives
+
+
+def test_booking_rechecks_age(e):
+    """book() re-derives age from the DOB, so a pediatric slot can't be booked for an adult."""
+    from datetime import timedelta
+    peds = CAT.providers["prov_002"]  # Dr. Maria Garcia, MD (Pediatrics)
+    t = CAT.appointment_types["appt_000"]
+    slot = next(s for i in range(1, 15) for lid in peds.location_ids
+                for s in e._slots_for(t, peds, lid, e.today + timedelta(days=i)))
+    assert e.book(slot.slot_id, "Adult", "1998-12-04", new_patient=True)["status"] == "blocked"
+    assert e.book(slot.slot_id, "Child", "2020-05-01", new_patient=True)["status"] == "booked"
+
+
+def test_repairs_never_suggest_equipment_tests(e):
+    names = [x.name for x in e._new_patient_alternatives(CAT.appointment_types["appt_065"])]
+    assert "Mammogram" not in names and "New Patient Visit" in names
+    assert e._new_patient_alternatives(CAT.appointment_types["appt_060"])[0].name == "Psychiatric Evaluation"
+
+
+def test_missing_jev_key_falls_back_without_network(e, monkeypatch):
+    import asyncio
+    import catalog.jev as jev
+    from catalog.tools import _find_appointment_types
+    monkeypatch.delenv("TYPESAFE_API_KEY", raising=False)
+    jev._resolvers.clear()
+    r = asyncio.run(_find_appointment_types(e, {"request": "I need an MRI"}, {"_resolver": "hybrid"}))
+    assert r["resolver"] == "fuzzy_fallback" and "TYPESAFE_API_KEY" in r["fallback_reason"]
+    jev._resolvers.clear()
