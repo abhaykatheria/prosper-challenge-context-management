@@ -1,11 +1,11 @@
 #
-# Agent schema — the declarative contract the Phase 2 Copilot reads and writes.
+# Agent schema — the declarative contract the builder UI reads and writes.
 #
 # Design rule: stay as close to Pipecat Flows' own vocabulary as possible. A node
 # carries Pipecat's native fields (`role_message`, `task_messages`, `pre/post_actions`)
-# verbatim. The ONLY thing we add is `edges`: transitions expressed as DATA (a string
-# `target`) rather than as Python closures — because a Copilot can emit a string, not
-# a callable. `AgentBuilder` turns these strings back into the closures Pipecat wants.
+# verbatim. The core addition is `edges`: transitions expressed as DATA (a string
+# `target`) rather than as Python closures, because JSON (and the builder UI) can hold
+# a string, not a callable. `AgentBuilder` turns these strings back into closures.
 #
 # Context-management additions (also plain data, so the builder UI can edit them):
 #   Node.tools    — names of registered lookup tools (e.g. find_appointment_types)

@@ -72,7 +72,7 @@ Builder edits (`backend/agents/`) and call traces (`backend/logs/`) persist on t
 From `backend/` (or prefix with `docker compose run --rm scheduler`):
 
 ```bash
-.venv/bin/python -m pytest -q                                   # 36 deterministic tests
+.venv/bin/python -m pytest -q                                   # 40 deterministic tests
 .venv/bin/python -m sim.eval --agents ours_hybrid,naive --model gpt-4.1-mini   # simulated callers, 20 scenarios
 .venv/bin/python -m sim.match_bench --bench holdout             # matcher accuracy on the frozen held-out set
 ```

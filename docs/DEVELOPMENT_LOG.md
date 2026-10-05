@@ -166,6 +166,4 @@ Three real calls (one in Hindi) on the final build, read from `logs/trace.jsonl`
 
 ## Supporting material
 
-* Architecture walkthrough with diagrams (written for newcomers), published as a
-  claude.ai artifact during the session. It predates sections 4–8.
 * Every evaluation run's raw transcripts and summaries: `backend/sim/results/`.

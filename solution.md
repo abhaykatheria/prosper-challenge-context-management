@@ -27,7 +27,7 @@ Jev the whole catalog", 22 for fuzzy alone); median **1.8 s** response time on l
 ```bash
 make install && make run                      # http://localhost:7860/builder → Test call
 docker compose up --build                     # same, in Docker (voice needs host networking; see README)
-cd backend && .venv/bin/python -m pytest -q   # 36 tests
+cd backend && .venv/bin/python -m pytest -q   # 40 tests
 ```
 How the design evolved, including dead ends: [`docs/DEVELOPMENT_LOG.md`](docs/DEVELOPMENT_LOG.md).
 
@@ -67,7 +67,7 @@ Matcher numbers: correct on the first try out of 60 held-out phrasings, mean of 
 
 | Approach | Why not |
 |---|---|
-| Embeddings / RAG over the catalog | Solves recall, not constraints: retrieved chunks don't say which (provider, site) pairs can do an MRI for a new patient. Fuzzy recall is already 81/82 in the top 5, so embeddings only pay off at much larger catalogs; they'd slot into the retrieval step. |
+| Embeddings / RAG over the catalog | Solves retrieval, not bookability. For "new patient, knee MRI, near Mission", RAG surfaces the MRI type and Mission District ("has imaging"), and the LLM concludes Mission District; but no radiologist works there and new patients can't book MRIs. The baseline made that exact mistake 4/4 with the *whole* catalog in view; RAG gives it less. Retrieval also isn't the bottleneck (fuzzy recall is 81/82 in the top 5). Embeddings do belong in the hybrid's **retrieval step**, where they'd fix the overfit aliases and zero-overlap misses; untested, and the next experiment. |
 | A bigger, long-context LLM with the whole catalog | Not measured. Might narrow the accuracy gap, but pays the full-catalog cost and latency on every turn of a voice call, and still needs guards for safety. |
 | LLM writes queries (text-to-SQL) over the catalog | Flexible, but adds a multi-step loop (latency) and a new error surface; the rules still need enforcing in code. |
 | Two-stage lookup (specialty → type) | Jev's documented answer for more than 255 options; unnecessary at 82. It becomes the hybrid's escape path at scale. |
@@ -157,7 +157,7 @@ English). **Still open:** "stomach pain / food poisoning" matched a new-patient
 consultation instead of a sick visit; aliases learned from real calls would fix this
 class of miss. A missing `TYPESAFE_API_KEY` is now flagged at startup and in the builder.
 
-Next: look patients up by name + DOB instead of asking; feed
+Next: try embeddings as the hybrid's retrieval step (vs fuzzy, on the held-out set); look patients up by name + DOB instead of asking; feed
 lookup misses from real calls into an alias review queue; recalibrate the
 resolver on real transcripts; run the evaluation in CI on every agent edit.
 
@@ -177,5 +177,5 @@ Jev-based matchers fall back to fuzzy). Raw results are in `sim/results/`.
 .venv/bin/python -m sim.eval --agents ours,ours_jev,ours_cascade,ours_hybrid --repeat 2 --model gpt-4.1-mini
 ```
 
-Code layout is in the [README](README.md). Branches stack: `main` →
-`feat/context-management-scheduler` → `feat/hybrid-resolver` → `feat/hybrid-ambiguity` (latest).
+Code layout is in the [README](README.md). Everything is on `main`; the commit
+history follows the development log step by step.
