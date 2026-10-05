@@ -26,6 +26,7 @@ Jev the whole catalog", 22 for fuzzy alone); median **1.8 s** response time on l
 
 ```bash
 make install && make run                      # http://localhost:7860/builder → Test call
+docker compose up --build                     # same, in Docker (voice needs host networking; see README)
 cd backend && .venv/bin/python -m pytest -q   # 36 tests
 ```
 How the design evolved, including dead ends: [`docs/DEVELOPMENT_LOG.md`](docs/DEVELOPMENT_LOG.md).

@@ -24,6 +24,19 @@ Open **`http://localhost:7860/builder`** to edit agents and place a test call (c
 \
 Remember to update the `.env` file accordingly.
 
+## Run with Docker
+
+```bash
+cp backend/.env.example backend/.env    # add your keys
+docker compose up --build               # or: make docker → http://localhost:7860/builder
+```
+
+Voice calls use WebRTC, which needs **host networking**: native on Linux; on Docker
+Desktop (Mac/Windows 4.34+) turn on *Settings → Resources → Network → Enable host
+networking* and restart Docker Desktop. Without it, `make docker-bridge` serves the
+builder UI, catalog search, tests and evals on port 7860, but calls may not connect.
+Tests and evals in the container: `docker compose run --rm scheduler python -m pytest -q`.
+
 ## Layout
 
 | Path | Responsibility |

@@ -3,7 +3,7 @@
 VENV := backend/.venv
 PYTHON := $(VENV)/bin/python
 
-.PHONY: help install run eval clean
+.PHONY: help install run eval docker docker-bridge clean
 
 help: ## Show available targets
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
@@ -19,6 +19,12 @@ run: ## Run the voice agent + builder UI (then open http://localhost:7860/builde
 
 eval: ## Simulated-caller eval: our agent vs full-catalog baselines (needs OPENAI_API_KEY)
 	cd backend && .venv/bin/python -m sim.eval --model gpt-4.1-mini
+
+docker: ## Run in Docker with voice (host networking; see README)
+	docker compose up --build
+
+docker-bridge: ## Run in Docker without host networking (UI/evals; voice may not connect)
+	docker compose --profile bridge up --build scheduler-bridge
 
 clean: ## Remove the venv and Python caches
 	rm -rf $(VENV)

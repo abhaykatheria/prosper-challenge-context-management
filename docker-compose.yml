@@ -1,0 +1,36 @@
+# One command to run the scheduler:
+#
+#   cp backend/.env.example backend/.env   # add OPENAI_API_KEY, ELEVENLABS_API_KEY (TYPESAFE_API_KEY optional)
+#   docker compose up --build              # open http://localhost:7860/builder → Test call
+#
+# Tests and evals use the same image:
+#   docker compose run --rm scheduler python -m pytest -q
+#   docker compose run --rm scheduler python -m sim.eval --agents ours_hybrid --model gpt-4.1-mini
+
+x-common: &common
+  build: .
+  image: prosper-scheduler
+  env_file: backend/.env
+  volumes:
+    - ./backend/agents:/app/backend/agents   # agents edited in the builder persist on the host
+    - ./backend/logs:/app/backend/logs       # call traces (logs/trace.jsonl)
+
+services:
+  # Full functionality, including voice test calls.
+  # WebRTC audio needs host networking: with port mapping the bot advertises the
+  # container's internal IP, so the page loads but the call never connects.
+  # Native on Linux. On Docker Desktop (Mac/Windows, 4.34+): Settings → Resources →
+  # Network → "Enable host networking", then restart Docker Desktop.
+  scheduler:
+    <<: *common
+    network_mode: host
+    restart: unless-stopped
+
+  # Fallback when host networking isn't available: builder UI, catalog search, tests
+  # and evals work; voice calls may not connect.
+  #   docker compose --profile bridge up scheduler-bridge
+  scheduler-bridge:
+    <<: *common
+    profiles: [bridge]
+    ports:
+      - "7860:7860"

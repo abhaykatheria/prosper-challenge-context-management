@@ -1,0 +1,11 @@
+**/.venv
+**/__pycache__
+**/*.pyc
+**/.pytest_cache
+.git
+.env
+**/.env
+backend/logs
+backend/sim/results/archive
+backend/agents/.active
+.DS_Store
